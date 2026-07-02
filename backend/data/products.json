@@ -1,0 +1,167 @@
+[
+  {
+    "_id": "1",
+    "title": "El Aleph",
+    "description": "Cuentos de Borges",
+    "code": "FIC-001",
+    "price": 1800,
+    "status": true,
+    "stock": 5,
+    "category": "ficcion",
+    "thumbnails": []
+  },
+  {
+    "_id": "2",
+    "title": "1984",
+    "description": "Distopía de George Orwell",
+    "code": "FIC-002",
+    "price": 1900,
+    "status": true,
+    "stock": 10,
+    "category": "ficcion",
+    "thumbnails": []
+  },
+  {
+    "_id": "3",
+    "title": "Sapiens",
+    "description": "Historia de la humanidad",
+    "code": "NF-001",
+    "price": 2800,
+    "status": true,
+    "stock": 8,
+    "category": "no-ficcion",
+    "thumbnails": []
+  },
+  {
+    "_id": "4",
+    "title": "Educated",
+    "description": "Memorias de Tara Westover",
+    "code": "NF-002",
+    "price": 2600,
+    "status": true,
+    "stock": 6,
+    "category": "no-ficcion",
+    "thumbnails": []
+  },
+  {
+    "_id": "5",
+    "title": "Clean Code",
+    "description": "Guía para escribir código limpio",
+    "code": "CT-001",
+    "price": 3000,
+    "status": true,
+    "stock": 12,
+    "category": "ciencia-tecnologia",
+    "thumbnails": []
+  },
+  {
+    "_id": "6",
+    "title": "Introducción a la Inteligencia Artificial",
+    "description": "Conceptos básicos de IA",
+    "code": "CT-002",
+    "price": 3200,
+    "status": true,
+    "stock": 7,
+    "category": "ciencia-tecnologia",
+    "thumbnails": []
+  },
+  {
+    "_id": "7",
+    "title": "Hábitos Atómicos",
+    "description": "Mejorar hábitos diarios",
+    "code": "DP-001",
+    "price": 2700,
+    "status": true,
+    "stock": 15,
+    "category": "desarrollo-personal",
+    "thumbnails": []
+  },
+  {
+    "_id": "8",
+    "title": "El poder del ahora",
+    "description": "Guía espiritual de Eckhart Tolle",
+    "code": "DP-002",
+    "price": 2500,
+    "status": true,
+    "stock": 9,
+    "category": "desarrollo-personal",
+    "thumbnails": []
+  },
+  {
+    "_id": "9",
+    "title": "Harry Potter y la piedra filosofal",
+    "description": "Aventura mágica para jóvenes",
+    "code": "IJ-001",
+    "price": 2600,
+    "status": true,
+    "stock": 20,
+    "category": "infantil-juvenil",
+    "thumbnails": []
+  },
+  {
+    "_id": "10",
+    "title": "El Principito",
+    "description": "Clásico infantil",
+    "code": "IJ-002",
+    "price": 2000,
+    "status": true,
+    "stock": 18,
+    "category": "infantil-juvenil",
+    "thumbnails": []
+  },
+  {
+    "_id": "11",
+    "title": "Veinte poemas de amor",
+    "description": "Poesía de Pablo Neruda",
+    "code": "POE-001",
+    "price": 1700,
+    "status": true,
+    "stock": 11,
+    "category": "poesia",
+    "thumbnails": []
+  },
+  {
+    "_id": "12",
+    "title": "Antología poética",
+    "description": "Selección de poemas clásicos",
+    "code": "POE-002",
+    "price": 1600,
+    "status": true,
+    "stock": 13,
+    "category": "poesia",
+    "thumbnails": []
+  },
+  {
+    "_id": "13",
+    "title": "Curso de JavaScript (eBook)",
+    "description": "Aprendé JS desde cero",
+    "code": "EBOOK-001",
+    "price": 1500,
+    "status": true,
+    "stock": 999,
+    "category": "ebooks",
+    "thumbnails": []
+  },
+  {
+    "_id": "14",
+    "title": "Guía de React (eBook)",
+    "description": "Desarrollo frontend moderno",
+    "code": "EBOOK-002",
+    "price": 1800,
+    "status": true,
+    "stock": 999,
+    "category": "ebooks",
+    "thumbnails": []
+  },
+  {
+    "_id": "15",
+    "title": "El código Da Vinci",
+    "description": "Thriller de Dan Brown",
+    "code": "FIC-003",
+    "price": 2100,
+    "status": true,
+    "stock": 10,
+    "category": "ficcion",
+    "thumbnails": []
+  }
+]

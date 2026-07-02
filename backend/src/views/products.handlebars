@@ -1,0 +1,106 @@
+<h2 style="margin-bottom:1.5rem">Productos <span id="rt-badge" style="font-size:.8rem;background:#27ae60;color:#fff;padding:.2rem .6rem;border-radius:12px;vertical-align:middle">🔴 en vivo</span></h2>
+
+{{!-- Filtros --}}
+<form method="GET" action="/products" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem">
+  <select name="query" style="padding:.4rem .8rem;border-radius:6px;border:1px solid #ccc">
+    <option value="">Todas las categorías</option>
+    {{#each categories}}
+      <option value="{{this}}" {{#if (eq this ../query)}}selected{{/if}}>{{this}}</option>
+    {{/each}}
+    <option value="status=true"  {{#if (eq ../query "status=true")}}selected{{/if}}>Disponibles</option>
+    <option value="status=false" {{#if (eq ../query "status=false")}}selected{{/if}}>Sin stock</option>
+  </select>
+  <select name="sort" style="padding:.4rem .8rem;border-radius:6px;border:1px solid #ccc">
+    <option value="">Sin orden</option>
+    <option value="asc"  {{#if (eq sort "asc")}}selected{{/if}}>Precio ↑</option>
+    <option value="desc" {{#if (eq sort "desc")}}selected{{/if}}>Precio ↓</option>
+  </select>
+  <select name="limit" style="padding:.4rem .8rem;border-radius:6px;border:1px solid #ccc">
+    <option value="10" {{#if (eq limit 10)}}selected{{/if}}>10 por página</option>
+    <option value="20" {{#if (eq limit 20)}}selected{{/if}}>20 por página</option>
+    <option value="50" {{#if (eq limit 50)}}selected{{/if}}>50 por página</option>
+  </select>
+  <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+{{!-- Grid de productos --}}
+<div id="product-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem">
+  {{#each products}}
+  <div class="card product-card" data-id="{{_id}}">
+    {{#if thumbnails.[0]}}
+      <img src="{{thumbnails.[0]}}" alt="{{title}}" style="width:100%;height:160px;object-fit:cover;border-radius:4px;margin-bottom:.75rem" />
+    {{/if}}
+    <h3 style="font-size:1rem;margin-bottom:.4rem">{{title}}</h3>
+    <p style="color:#555;font-size:.85rem;margin-bottom:.5rem">{{category}}</p>
+    <strong style="font-size:1.1rem">${{price}}</strong>
+    <p style="font-size:.8rem;color:{{#if status}}#27ae60{{else}}#e74c3c{{/if}};margin:.4rem 0">
+      {{#if status}}✅ Disponible{{else}}❌ Sin stock{{/if}} · Stock: {{stock}}
+    </p>
+    <a href="/products/{{_id}}" class="btn btn-primary" style="margin-top:.5rem;display:block;text-align:center;font-size:.85rem">Ver detalle</a>
+  </div>
+  {{else}}
+  <p>No hay productos que coincidan con los filtros.</p>
+  {{/each}}
+</div>
+
+{{!-- Paginación --}}
+<div style="display:flex;justify-content:center;gap:1rem;margin-top:2rem;align-items:center">
+  {{#if hasPrevPage}}
+    <a href="{{prevLink}}" class="btn btn-primary">← Anterior</a>
+  {{/if}}
+  <span>Página {{page}} de {{totalPages}}</span>
+  {{#if hasNextPage}}
+    <a href="{{nextLink}}" class="btn btn-primary">Siguiente →</a>
+  {{/if}}
+</div>
+
+{{!-- WebSocket: actualización en tiempo real --}}
+
+<script>
+
+  socket.on('product:created', (product) => {
+    showToast(`✅ Nuevo producto: ${product.title}`);
+    addProductCard(product);
+  });
+
+  socket.on('product:updated', (product) => {
+    showToast(`✏️ Actualizado: ${product.title}`, '#2980b9');
+    updateProductCard(product);
+  });
+
+  socket.on('product:deleted', ({ _id }) => {
+    showToast('🗑️ Producto eliminado', '#e74c3c');
+    const card = document.querySelector(`[data-id="${_id}"]`);
+    if (card) card.remove();
+  });
+
+  function addProductCard(p) {
+    const grid = document.getElementById('product-grid');
+    const div  = document.createElement('div');
+    div.className   = 'card product-card';
+    div.dataset.id  = p._id;
+    div.innerHTML   = cardHTML(p);
+    grid.prepend(div);
+  }
+
+  function updateProductCard(p) {
+    const card = document.querySelector(`[data-id="${p._id}"]`);
+    if (card) card.innerHTML = cardHTML(p);
+  }
+
+  function cardHTML(p) {
+    const img = p.thumbnails && p.thumbnails[0]
+      ? `<img src="${p.thumbnails[0]}" alt="${p.title}" style="width:100%;height:160px;object-fit:cover;border-radius:4px;margin-bottom:.75rem">`
+      : '';
+    const statusColor = p.status ? '#27ae60' : '#e74c3c';
+    const statusText  = p.status ? '✅ Disponible' : '❌ Sin stock';
+    return `
+      ${img}
+      <h3 style="font-size:1rem;margin-bottom:.4rem">${p.title}</h3>
+      <p style="color:#555;font-size:.85rem;margin-bottom:.5rem">${p.category}</p>
+      <strong style="font-size:1.1rem">$${p.price}</strong>
+      <p style="font-size:.8rem;color:${statusColor};margin:.4rem 0">${statusText} · Stock: ${p.stock}</p>
+      <a href="/products/${p._id}" class="btn btn-primary" style="margin-top:.5rem;display:block;text-align:center;font-size:.85rem">Ver detalle</a>
+    `;
+  }
+</script>

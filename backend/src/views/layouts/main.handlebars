@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}} — BookWise</title>
+
+  <!-- ✅ Socket.io disponible ANTES que cualquier script del body -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io({ transports: ['websocket'] });
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #333; }
+    nav  { background: #1a1a2e; color: #fff; padding: 1rem 2rem; display: flex; gap: 2rem; align-items: center; }
+    nav a { color: #e0e0e0; text-decoration: none; font-weight: 500; }
+    nav a:hover { color: #fff; }
+    main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.1); padding: 1rem; }
+    .btn  { display: inline-block; padding: .5rem 1.2rem; border-radius: 6px; cursor: pointer;
+            font-size: .9rem; border: none; text-decoration: none; }
+    .btn-primary { background: #1a1a2e; color: #fff; }
+    .btn-primary:hover { background: #16213e; }
+    .btn-danger  { background: #e74c3c; color: #fff; }
+    #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #27ae60; color: #fff;
+             padding: .75rem 1.5rem; border-radius: 8px; display: none; z-index: 9999; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>📚 BookWise</strong>
+    <a href="/products">Productos</a>
+  </nav>
+
+  <main>
+    {{{body}}}   <!-- Los scripts aquí ya encuentran `socket` definido ✅ -->
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    function showToast(msg, color = '#27ae60') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = color;
+      t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+  </script>
+</body>
+</html>

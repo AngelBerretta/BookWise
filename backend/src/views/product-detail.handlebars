@@ -1,0 +1,60 @@
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+  <div>
+    {{#if thumbnails.[0]}}
+      <img src="{{thumbnails.[0]}}" alt="{{title}}" style="width:100%;border-radius:8px;max-height:400px;object-fit:cover" />
+    {{else}}
+      <div style="width:100%;height:300px;background:#e0e0e0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#888">
+        Sin imagen
+      </div>
+    {{/if}}
+  </div>
+  <div class="card" style="align-self:start">
+    <p style="color:#888;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em">{{category}}</p>
+    <h1 style="font-size:1.6rem;margin:.5rem 0">{{title}}</h1>
+    {{#if author}}<p style="color:#555;margin-bottom:.75rem">por <em>{{author}}</em></p>{{/if}}
+    <p style="font-size:2rem;font-weight:700;color:#1a1a2e;margin-bottom:1rem">${{price}}</p>
+    <p style="color:{{#if status}}#27ae60{{else}}#e74c3c{{/if}};font-weight:600;margin-bottom:.5rem">
+      {{#if status}}✅ Disponible{{else}}❌ Sin stock{{/if}}
+    </p>
+    <p style="font-size:.9rem;color:#666;margin-bottom:1rem">Stock: {{stock}} unidades · Código: <code>{{code}}</code></p>
+    <p style="line-height:1.6;margin-bottom:1.5rem">{{description}}</p>
+
+    {{#if status}}
+    <form id="add-cart-form" style="display:flex;gap:.5rem;align-items:center">
+      <input type="text" id="cart-id" placeholder="ID del carrito" required
+        style="flex:1;padding:.5rem .8rem;border:1px solid #ccc;border-radius:6px;font-size:.9rem" />
+      <button type="submit" class="btn btn-primary">Agregar al carrito 🛒</button>
+    </form>
+    <p id="cart-msg" style="margin-top:.5rem;font-size:.85rem"></p>
+    {{/if}}
+
+    <div style="margin-top:1.5rem">
+      <a href="/products" style="color:#1a1a2e;font-size:.9rem">← Volver al catálogo</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('add-cart-form');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cid = document.getElementById('cart-id').value.trim();
+      const msg = document.getElementById('cart-msg');
+      try {
+        const res = await fetch(`/api/carts/${cid}/products/{{_id}}`, { method: 'POST' });
+        if (res.ok) {
+          msg.style.color = '#27ae60';
+          msg.textContent = '✅ Producto agregado al carrito';
+        } else {
+          const data = await res.json();
+          msg.style.color = '#e74c3c';
+          msg.textContent = data.message || 'Error al agregar';
+        }
+      } catch {
+        msg.style.color = '#e74c3c';
+        msg.textContent = 'Error de conexión';
+      }
+    });
+  }
+</script>
