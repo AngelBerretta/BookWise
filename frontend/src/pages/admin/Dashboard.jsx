@@ -123,7 +123,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const [productsData, postsData] = await Promise.allSettled([
-          getProducts(),
+          getProducts({ limit: 100 }),
           getPosts(),
         ]);
 

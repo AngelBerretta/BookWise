@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import Layout from '../components/layout/Layout';
+import ScrollToTop from '../components/ScrollToTop';
 
 // Pages
 import Home          from '../pages/Home';
@@ -20,6 +21,7 @@ import NotFound      from '../pages/NotFound';
 const AppRouter = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
 
         {/* Rutas sin layout — diseño propio centrado */}

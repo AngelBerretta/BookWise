@@ -51,9 +51,7 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
     const errs = validate();
     if (Object.keys(errs).length) { setFieldErrors(errs); return; }
 
-    const slug = isEditing
-      ? post.slug
-      : blogService.generateSlug(fields.title);
+    const slug = blogService.generateSlug(fields.title);
 
     const tagsArray = fields.tags
       .split(',')
