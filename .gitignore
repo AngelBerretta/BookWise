@@ -1,0 +1,21 @@
+***REMOVED*** Dependencias
+node_modules/
+
+***REMOVED*** Environment variables
+.env
+*.env
+!.env.example
+
+***REMOVED*** Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+***REMOVED*** OS
+.DS_Store
+Thumbs.db
+
+***REMOVED*** Logs
+*.log
+npm-debug.log*
