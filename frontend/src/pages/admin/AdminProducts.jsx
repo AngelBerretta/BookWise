@@ -20,7 +20,7 @@ const AdminProducts = () => {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await productService.getProducts();
+      const data = await productService.getProducts({ limit: 50 });
       // ✅ Fix: solo un setProducts
       setProducts(Array.isArray(data) ? data : (data?.payload ?? []));
     } catch {
