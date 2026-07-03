@@ -214,18 +214,13 @@ const Dashboard = () => {
       `}</style>
 
       <div className="min-h-screen bg-[var(--bg)]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+        <div className="max-w-4xl">
 
           {/* ── Encabezado ───────────────────────────────────────────────── */}
           <div className="fade-up mb-10" style={{ animationDelay: '0ms' }}>
-            {/* Breadcrumb sutil */}
-            <p className="text-xs font-medium text-[var(--text)] uppercase tracking-widest mb-4">
-              Panel de administración
-            </p>
-
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-h)] leading-tight">
+                <h1 className="h1-admin leading-tight">
                   {greeting},{' '}
                   <span className="text-[var(--accent)]">
                     {user?.username ?? 'Admin'}

@@ -52,12 +52,9 @@ const Home = () => {
                 Selección del curador
               </span>
 
-              <h1
-                className="text-5xl sm:text-6xl lg:text-7xl text-[var(--text-h)] leading-[1.05]"
-                style={{ fontFamily: 'var(--heading)', fontWeight: 500, letterSpacing: '-0.03em' }}
-              >
+              <h1 className="h1-editorial-hero">
                 Tu próxima<br />
-                <em style={{ fontStyle: 'italic' }}>gran lectura</em>
+                <em>gran lectura</em>
               </h1>
 
               <p className="text-lg text-[var(--text)] leading-relaxed max-w-md">
@@ -121,10 +118,7 @@ const Home = () => {
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-2">
               Novedades
             </p>
-            <h2
-              className="text-[var(--text-h)]"
-              style={{ fontFamily: 'var(--heading)', fontWeight: 500 }}
-            >
+            <h2 className="h2-editorial">
               Nuevas incorporaciones
             </h2>
           </div>
@@ -210,7 +204,7 @@ const Home = () => {
               Comenzá hoy
             </p>
             <h2
-              className="text-[var(--text-h)] max-w-md"
+              className="h2-editorial max-w-md"
               style={{ fontFamily: 'var(--heading)', fontWeight: 500 }}
             >
               El lector que querés ser empieza aquí

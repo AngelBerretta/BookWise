@@ -6,6 +6,7 @@ import CartEmpty from '../components/cart/CartEmpty';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/ui/Toast';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 /**
  * Página del carrito de compras.
@@ -17,10 +18,10 @@ const Cart = () => {
 
   const [clearing, setClearing]     = useState(false);
   const [toast, setToast]           = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   /* ── Vaciar carrito ── */
   const handleClearCart = async () => {
-    if (!window.confirm('¿Querés vaciar todo el carrito?')) return;
     setClearing(true);
     try {
       await clearCart();
@@ -29,6 +30,7 @@ const Cart = () => {
       setToast({ type: 'error', message: 'No pudimos vaciar el carrito. Intentá de nuevo.' });
     } finally {
       setClearing(false);
+      setConfirmOpen(false);
     }
   };
 
@@ -46,7 +48,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="text-3xl font-bold text-[var(--text-h)] mb-2">Mi carrito</h1>
+          <h1 className="h1-admin mb-2">Mi carrito</h1>
           <CartEmpty />
         </div>
       </div>
@@ -63,13 +65,24 @@ const Cart = () => {
         />
       )}
 
+      {confirmOpen && (
+        <ConfirmDialog
+          title="Vaciar carrito"
+          message="¿Querés vaciar todo el carrito? Esta acción no se puede deshacer."
+          confirmLabel="Vaciar carrito"
+          loading={clearing}
+          onConfirm={handleClearCart}
+          onCancel={() => setConfirmOpen(false)}
+        />
+      )}
+
       <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--text-h)]">Mi carrito</h1>
+              <h1 className="h1-admin">Mi carrito</h1>
               <p className="mt-1 text-sm text-[var(--text)]">
                 {itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}
               </p>
@@ -79,8 +92,7 @@ const Cart = () => {
             <Button
               variant="ghost"
               size="sm"
-              loading={clearing}
-              onClick={handleClearCart}
+              onClick={() => setConfirmOpen(true)}
               className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
             >
               <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">

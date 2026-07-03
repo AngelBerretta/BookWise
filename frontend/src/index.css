@@ -107,17 +107,18 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
-
-body {
-  margin: 0;
-  font-family: var(--sans);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text);
-  background-color: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+@layer base {
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+    background-color: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 }
 
 #root {
@@ -129,28 +130,77 @@ body {
 /* ─────────────────────────────────────────────
    Tipografía
 ───────────────────────────────────────────── */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--heading);
-  color: var(--text-h);
-  line-height: 1.15;
-  font-weight: 500;
-  margin: 0;
-  letter-spacing: -0.02em;
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-h);
+    line-height: 1.15;
+    margin: 0;
+  }
+  h3 { font-size: 1.4rem; font-weight: 500; }
+  h4 { font-size: 1.1rem; font-weight: 500; }
 }
 
-h1 { font-size: clamp(2.5rem, 6vw, 4rem); }
-h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
-h3 { font-size: 1.4rem; }
-h4 { font-size: 1.1rem; }
+/* ─────────────────────────────────────────────
+   Jerarquía tipográfica — sistemas explícitos.
+   No depender de la herencia del selector de elemento:
+   usar siempre estas clases, nunca font-family inline.
+───────────────────────────────────────────── */
 
-p { margin: 0; }
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: opacity 0.15s ease;
+/* Sistema EDITORIAL — páginas de marca:
+   Home, Blog, BlogPost, ProductDetail */
+.h1-editorial {
+   font-family: var(--heading);
+   font-weight: 500;
+   letter-spacing: -0.02em;
+   line-height: 1.1;
+   color: var(--text-h);
+   font-size: clamp(2.2rem, 5vw, 3.5rem);
 }
-a:hover { opacity: 0.7; }
+.h1-editorial-hero {
+   font-family: var(--heading);
+   font-weight: 500;
+   letter-spacing: -0.03em;
+   line-height: 1.05;
+   color: var(--text-h);
+   font-size: clamp(2.75rem, 7vw, 4.5rem);
+}
+.h2-editorial {
+   font-family: var(--heading);
+   font-weight: 500;
+   color: var(--text-h);
+   line-height: 1.15;
+   font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+.h2-editorial-sm {
+   font-family: var(--heading);
+   font-weight: 500;
+   color: var(--text-h);
+   line-height: 1.15;
+   font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+/* Sistema UTILITARIO — pantallas de gestión:
+   Cart, Dashboard, AdminProducts, AdminBlog */
+.h1-admin {
+   font-family: var(--sans);
+   font-weight: 700;
+   line-height: 1.2;
+   color: var(--text-h);
+   font-size: 1.875rem;
+}
+
+@layer base {
+  p { margin: 0; }
+}  
+
+@layer base {
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  a:hover { opacity: 0.7; }
+}
 
 img, svg { display: block; }
 
@@ -262,6 +312,28 @@ img, svg { display: block; }
   border-color: var(--bw-primary);
   box-shadow: 0 0 0 1px var(--bw-primary);
   background-color: var(--bw-surface-container-lowest);
+}
+
+/* Select minimalista — reutiliza tokens --bw-* sin caja de input.
+   Pensado para controles secundarios tipo "ordenar por", no formularios. */
+.bw-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--bw-primary);
+  background-color: transparent;
+  border: none;
+  padding: 0.25rem 1.5rem 0.25rem 0.25rem;
+  cursor: pointer;
+  outline: none;
+}
+.bw-select:focus-visible {
+  outline: 2px solid var(--bw-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* Botón primario BookWise */
