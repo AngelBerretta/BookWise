@@ -59,7 +59,7 @@ const PostDetail = ({ post }) => {
       )}
 
       {/* Título */}
-      <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-h)] leading-tight mb-5">
+      <h1 className="h1-editorial leading-tight mb-5">
         {title}
       </h1>
 
