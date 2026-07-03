@@ -35,7 +35,7 @@ const ProductFilters = ({
         </span>
         <input
           type="search"
-          placeholder="Search the collection..."
+          placeholder="Buscar en el catálogo…"
           value={filters.search}
           onChange={handleSearchChange}
           className="bw-input"
@@ -52,12 +52,12 @@ const ProductFilters = ({
             fontFamily: "'Newsreader', Georgia, serif",
           }}
         >
-          Curated Collections
+          Colecciones curadas
         </h3>
 
         <div className="flex flex-col gap-2">
           <CategoryItem
-            label="All Collections"
+            label="Todas las colecciones"
             active={!filters.category}
             onClick={() => setFilters({ category: '' })}
           />
@@ -82,7 +82,7 @@ const ProductFilters = ({
               fontFamily: "'Newsreader', Georgia, serif",
             }}
           >
-            Price Range
+            Rango de precio
           </h3>
 
           {/* Slider doble con dos inputs range superpuestos */}
@@ -119,7 +119,7 @@ const ProductFilters = ({
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--bw-primary)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'var(--bw-outline)')}
               >
-                Reset price
+                Restablecer precio
               </button>
             )}
           </div>
