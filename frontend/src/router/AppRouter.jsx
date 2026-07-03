@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import Layout from '../components/layout/Layout';
+import AdminLayout from '../components/layout/AdminLayout';
 import ScrollToTop from '../components/ScrollToTop';
 
 // Pages
@@ -35,9 +36,9 @@ const AppRouter = () => {
           </Route>
         </Route>
 
-        {/* Rutas protegidas solo para admin — con layout */}
+        {/* Rutas protegidas solo para admin — layout dedicado (sidebar + breadcrumbs) */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
-          <Route element={<Layout />}>
+          <Route element={<AdminLayout />}>
             <Route path="/admin"          element={<Dashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/blog"     element={<AdminBlog />} />
