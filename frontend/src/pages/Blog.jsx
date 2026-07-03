@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link }      from 'react-router-dom';
 import useBlog       from '../hooks/useBlog';
 import PostCard      from '../components/blog/PostCard';
 import Spinner       from '../components/ui/Spinner';
@@ -24,10 +25,7 @@ const Blog = () => {
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-4">
             Editorial
           </p>
-          <h1
-            className="text-[var(--text-h)] mb-4"
-            style={{ fontFamily: 'var(--heading)', fontWeight: 500 }}
-          >
+          <h1 className="h1-editorial mb-4">
             El diario del curador
           </h1>
           <p className="text-[var(--text)] text-lg leading-relaxed mb-8">
@@ -127,8 +125,8 @@ const FeaturedPost = ({ post }) => {
     : null;
 
   return (
-    <a
-      href={`/blog/${slug}`}
+    <Link
+      to={`/blog/${slug}`}
       className="group grid grid-cols-1 lg:grid-cols-12 gap-0 items-center rounded-xl overflow-hidden border border-[var(--border-subtle)] hover:border-[var(--border)] transition-colors"
       style={{ background: 'var(--bg-subtle)' }}
     >
@@ -176,10 +174,7 @@ const FeaturedPost = ({ post }) => {
           </div>
         )}
 
-        <h2
-          className="text-[var(--text-h)] leading-tight group-hover:opacity-70 transition-opacity"
-          style={{ fontFamily: 'var(--heading)', fontWeight: 500, fontSize: 'clamp(1.4rem, 2.5vw, 2rem)' }}
-        >
+        <h2 className="h2-editorial-sm leading-tight group-hover:opacity-70 transition-opacity">
           {title}
         </h2>
 
@@ -196,7 +191,7 @@ const FeaturedPost = ({ post }) => {
           </svg>
         </span>
       </div>
-    </a>
+    </Link>
   );
 };
 

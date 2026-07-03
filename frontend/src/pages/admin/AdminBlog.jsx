@@ -1,19 +1,31 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import useBlog                 from '../../hooks/useBlog';
 import PostForm                from '../../components/blog/PostForm';
 import Modal                   from '../../components/ui/Modal';
+import ConfirmDialog           from '../../components/ui/ConfirmDialog';
 import Button                  from '../../components/ui/Button';
 import Spinner                 from '../../components/ui/Spinner';
 import Toast                   from '../../components/ui/Toast';
 import EmptyState              from '../../components/ui/EmptyState';
 
 const AdminBlog = () => {
+  const { setExtraCrumb } = useOutletContext();
   const { posts, loading, fetchPosts, deletePost } = useBlog();
 
   const [toast, setToast]         = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editPost, setEditPost]   = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null); // post pendiente de eliminar
+
+  useEffect(() => {
+    if (!modalOpen) { setExtraCrumb(null); return; }
+    setExtraCrumb({
+      label: editPost ? `Editar "${editPost.title}"` : 'Nuevo post',
+    });
+    return () => setExtraCrumb(null);
+  }, [modalOpen, editPost, setExtraCrumb]);
 
   useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
@@ -32,16 +44,19 @@ const AdminBlog = () => {
   };
 
   /* ── Eliminar ── */
-  const handleDelete = async (post) => {
-    if (!window.confirm(`¿Eliminar "${post.title}"? Esta acción no se puede deshacer.`)) return;
-    setDeletingId(post._id);
+  const requestDelete = (post) => setConfirmTarget(post);
+
+  const confirmDelete = async () => {
+    if (!confirmTarget) return;
+    setDeletingId(confirmTarget._id);
     try {
-      await deletePost(post._id);
-      setToast({ type: 'success', message: `"${post.title}" eliminado.` });
+      await deletePost(confirmTarget._id);
+      setToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
     } catch {
       setToast({ type: 'error', message: 'No se pudo eliminar el post.' });
     } finally {
       setDeletingId(null);
+      setConfirmTarget(null);
     }
   };
 
@@ -76,13 +91,22 @@ const AdminBlog = () => {
         </Modal>
       )}
 
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="container py-10">
+      {confirmTarget && (
+        <ConfirmDialog
+          title="Eliminar post"
+          message={`¿Eliminar "${confirmTarget.title}"? Esta acción no se puede deshacer.`}
+          loading={deletingId === confirmTarget._id}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmTarget(null)}
+        />
+      )}
+
+      <div className="container">
 
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--text-h)]">Blog</h1>
+              <h1 className="h1-admin">Blog</h1>
               <p className="mt-1 text-sm text-[var(--text)]">
                 {posts.filter((p) => p.published).length} publicados ·{' '}
                 {posts.filter((p) => !p.published).length} borradores
@@ -197,8 +221,7 @@ const AdminBlog = () => {
                             <Button
                               variant="danger"
                               size="sm"
-                              loading={deletingId === p._id}
-                              onClick={() => handleDelete(p)}
+                              onClick={() => requestDelete(p)}
                             >
                               Eliminar
                             </Button>
@@ -214,7 +237,6 @@ const AdminBlog = () => {
           )}
 
         </div>
-      </div>
     </>
   );
 };

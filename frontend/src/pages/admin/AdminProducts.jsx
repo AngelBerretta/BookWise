@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import * as productService from '../../services/productService';
 import ProductForm from '../../components/product/ProductForm';
 import Modal from '../../components/ui/Modal';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
@@ -9,12 +11,23 @@ import Toast from '../../components/ui/Toast';
 import EmptyState from '../../components/ui/EmptyState';
 
 const AdminProducts = () => {
+  const { setExtraCrumb } = useOutletContext();
   const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [toast, setToast]             = useState(null);
   const [modalOpen, setModalOpen]     = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [deletingId, setDeletingId]   = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null); // producto pendiente de eliminar
+
+  /* Crumb dinámico: refleja el modal abierto, ya que no hay ruta propia */
+   useEffect(() => {
+     if (!modalOpen) { setExtraCrumb(null); return; }
+     setExtraCrumb({
+       label: editProduct ? `Editar "${editProduct.title}"` : 'Nuevo producto',
+     });
+     return () => setExtraCrumb(null);
+   }, [modalOpen, editProduct, setExtraCrumb]);
 
   /* ── Cargar productos ── */
   const fetchProducts = useCallback(async () => {
@@ -47,17 +60,20 @@ const AdminProducts = () => {
   };
 
   /* ── Eliminar ── */
-  const handleDelete = async (product) => {
-    if (!window.confirm(`¿Eliminar "${product.title}"? Esta acción no se puede deshacer.`)) return;
-    setDeletingId(product._id);
+  const requestDelete = (product) => setConfirmTarget(product);
+
+  const confirmDelete = async () => {
+    if (!confirmTarget) return;
+    setDeletingId(confirmTarget._id);
     try {
-      await productService.deleteProduct(product._id);
-      setToast({ type: 'success', message: `"${product.title}" eliminado.` });
+      await productService.deleteProduct(confirmTarget._id);
+      setToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
       fetchProducts();
     } catch {
       setToast({ type: 'error', message: 'No se pudo eliminar el producto.' });
     } finally {
       setDeletingId(null);
+      setConfirmTarget(null);
     }
   };
 
@@ -69,7 +85,7 @@ const AdminProducts = () => {
     }).format(val);
 
   // ✅ Columnas de la tabla — fácil de agregar/quitar
-  const COLUMNS = ['Producto', 'Categoría', 'Precio', 'Stock', 'Publication', 'Pages', 'Acciones'];
+  const COLUMNS = ['Producto', 'Categoría', 'Precio', 'Stock', 'Publicación', 'Páginas', 'Acciones'];
 
   return (
     <>
@@ -91,13 +107,22 @@ const AdminProducts = () => {
         </Modal>
       )}
 
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="container py-10">
+      {confirmTarget && (
+        <ConfirmDialog
+          title="Eliminar producto"
+          message={`¿Eliminar "${confirmTarget.title}"? Esta acción no se puede deshacer.`}
+          loading={deletingId === confirmTarget._id}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmTarget(null)}
+        />
+      )}
+
+      <div className="container">
 
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--text-h)]">Productos</h1>
+              <h1 className="h1-admin">Productos</h1>
               <p className="mt-1 text-sm text-[var(--text)]">
                 {products.length} en el catálogo
               </p>
@@ -242,8 +267,7 @@ const AdminProducts = () => {
                             <Button
                               variant="danger"
                               size="sm"
-                              loading={deletingId === p._id}
-                              onClick={() => handleDelete(p)}
+                              onClick={() => requestDelete(p)}
                             >
                               Eliminar
                             </Button>
@@ -259,7 +283,6 @@ const AdminProducts = () => {
           )}
 
         </div>
-      </div>
     </>
   );
 };
