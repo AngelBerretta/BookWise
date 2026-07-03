@@ -110,7 +110,39 @@ const ProductDetail = () => {
            style={{ backgroundColor: 'var(--bg)', color: 'var(--bw-on-surface)' }}>
 
         {/* ── Main ── */}
-        <main className="flex-grow pt-32 pb-24 px-8 max-w-7xl mx-auto w-full">
+        <main className="flex-grow pt-12 pb-24 px-8 max-w-7xl mx-auto w-full">
+
+          {/* ── Breadcrumb ── */}
+          <div
+            className="flex items-center gap-2 text-xs pb-8 mb-8"
+            style={{
+              borderBottom: '1px solid rgba(196,198,205,0.15)',
+              color: 'var(--bw-outline)',
+            }}
+          >
+            <Link
+              to="/"
+              className="transition-colors hover:opacity-70"
+              style={{ color: 'var(--bw-outline)' }}
+            >
+              Inicio
+            </Link>
+            <span>/</span>
+            <Link
+              to="/products"
+              className="transition-colors hover:opacity-70"
+              style={{ color: 'var(--bw-outline)' }}
+            >
+              Libros
+            </Link>
+            <span>/</span>
+            <span
+              className="line-clamp-1"
+              style={{ color: 'var(--bw-on-surface-variant)' }}
+            >
+              {title}
+            </span>
+          </div>
 
           {/* ── Product grid ── */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24">
@@ -201,15 +233,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Título */}
-              <h1
-                className="font-headline tracking-tight mb-4 leading-tight"
-                style={{
-                  fontFamily: "'Newsreader', Georgia, serif",
-                  fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
-                  color: 'var(--bw-primary)',
-                  letterSpacing: '-0.02em',
-                }}
-              >
+              <h1 className="h1-editorial mb-4">
                 {title}
               </h1>
 
@@ -219,7 +243,7 @@ const ProductDetail = () => {
                   className="text-xl font-headline italic mb-8"
                   style={{ color: 'var(--bw-on-surface-variant)' }}
                 >
-                  by {author}
+                  por {author}
                 </p>
               )}
 
@@ -378,10 +402,10 @@ const ProductDetail = () => {
                   <DetailItem label="Categoría" value={category} />
                 )}
                 {product.publicationDate && (
-                  <DetailItem label="Publication" value={product.publicationDate} />
+                  <DetailItem label="Publicación" value={product.publicationDate} />
                 )}
                 {product.pages && (
-                  <DetailItem label="Pages" value={`${product.pages} págs.`} />
+                  <DetailItem label="Páginas" value={`${product.pages} págs.`} />
                 )}
                 {/* Stock como fallback si no hay publication/pages */}
                 {!product.publicationDate && !product.pages && (
@@ -394,74 +418,7 @@ const ProductDetail = () => {
             </div>
           </section>
 
-          {/* ── Breadcrumb (abajo, estilo sutil) ── */}
-          <div
-            className="flex items-center gap-2 text-xs pt-8"
-            style={{
-              borderTop: '1px solid rgba(196,198,205,0.15)',
-              color: 'var(--bw-outline)',
-            }}
-          >
-            <Link
-              to="/"
-              className="transition-colors hover:opacity-70"
-              style={{ color: 'var(--bw-outline)' }}
-            >
-              Inicio
-            </Link>
-            <span>/</span>
-            <Link
-              to="/products"
-              className="transition-colors hover:opacity-70"
-              style={{ color: 'var(--bw-outline)' }}
-            >
-              Libros
-            </Link>
-            <span>/</span>
-            <span
-              className="line-clamp-1"
-              style={{ color: 'var(--bw-on-surface-variant)' }}
-            >
-              {title}
-            </span>
-          </div>
-
         </main>
-
-        {/* ── Footer ── */}
-        <footer className="w-full mt-24 py-16 px-8"
-                style={{ backgroundColor: 'var(--bw-primary)', color: '#fbf9f4' }}>
-          <div className="max-w-7xl mx-auto">
-            <div
-              className="flex justify-between items-center mb-8 pb-8 flex-wrap gap-4"
-              style={{ borderBottom: '1px solid rgba(251,249,244,0.2)' }}
-            >
-              <span
-                className="text-xl font-headline"
-                style={{ fontFamily: "'Newsreader', Georgia, serif" }}
-              >
-                BookWise
-              </span>
-              <span className="text-sm opacity-80">
-                © {new Date().getFullYear()} BookWise. Todos los derechos reservados.
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-8 text-sm">
-              {['Catálogo', 'Política de envíos', 'Contacto'].map((item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="transition-opacity"
-                  style={{ color: 'rgba(251,249,244,0.65)' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#fbf9f4'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(251,249,244,0.65)'}
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

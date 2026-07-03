@@ -118,7 +118,7 @@ const Register = () => {
                 fontFamily: "'Newsreader', Georgia, serif",
               }}
             >
-              Join the library.
+              Sumate a la biblioteca.
             </h1>
 
             <p
@@ -141,7 +141,7 @@ const Register = () => {
               onMouseEnter={e => e.currentTarget.style.color = 'var(--bw-on-surface)'}
               onMouseLeave={e => e.currentTarget.style.color = 'var(--bw-on-surface-variant)'}
             >
-              Log In
+              Iniciar sesión
             </Link>
 
             {/* Tab activo */}
@@ -153,7 +153,7 @@ const Register = () => {
               }}
               aria-current="page"
             >
-              Register
+              Registrarse
             </button>
           </div>
 
@@ -227,7 +227,7 @@ const RightPanel = () => (
           className="font-label text-xs font-medium tracking-wide"
           style={{ color: 'var(--bw-on-primary)' }}
         >
-          Curated Collection Update
+          Novedades de la colección
         </span>
       </div>
 
@@ -239,10 +239,10 @@ const RightPanel = () => (
           color: 'var(--bw-on-primary)',
         }}
       >
-        Discover stories that transcend{' '}
-        <em style={{ color: 'var(--bw-tertiary-fixed-dim)' }}>time</em>{' '}
-        and{' '}
-        <em style={{ color: 'var(--bw-tertiary-fixed-dim)' }}>space</em>.
+        Descubrí historias que trascienden el{' '}
+        <em style={{ color: 'var(--bw-tertiary-fixed-dim)' }}>tiempo</em>{' '}
+        y el{' '}
+        <em style={{ color: 'var(--bw-tertiary-fixed-dim)' }}>espacio</em>.
       </h2>
 
       {/* Subtítulo */}
@@ -250,9 +250,9 @@ const RightPanel = () => (
         className="font-body text-lg leading-relaxed max-w-xl"
         style={{ color: 'var(--bw-primary-fixed-dim)' }}
       >
-        Join an exclusive community of bibliophiles. Access rare editions,
-        author manuscripts, and a meticulously organized catalog of human
-        knowledge.
+        Sumate a una comunidad exclusiva de bibliófilos. Accedé a ediciones
+        raras, manuscritos de autor y un catálogo meticulosamente organizado
+        del conocimiento humano.
       </p>
 
       {/* Cita */}
@@ -264,13 +264,13 @@ const RightPanel = () => (
           className="font-headline italic text-lg md:text-xl leading-relaxed"
           style={{ color: 'var(--bw-on-primary)' }}
         >
-          "A room without books is like a body without a soul."
+          "Una habitación sin libros es como un cuerpo sin alma."
         </p>
         <p
           className="font-label text-sm mt-2 tracking-widest uppercase"
           style={{ color: 'var(--bw-primary-fixed)' }}
         >
-          — Marcus Tullius Cicero
+          — Marco Tulio Cicerón
         </p>
       </div>
 

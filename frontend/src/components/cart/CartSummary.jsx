@@ -22,7 +22,7 @@ const CartSummary = ({ products, total, itemCount }) => {
     }).format(val);
 
   const handleCheckout = () => {
-    setToast({ type: 'info', message: '🚀 Próximamente: checkout disponible.' });
+    setToast({ type: 'info', message: '🚀 El checkout todavía está en desarrollo — por ahora podés seguir agregando libros.' });
   };
 
   return (
@@ -87,26 +87,19 @@ const CartSummary = ({ products, total, itemCount }) => {
         </div>
 
         {/* Botón checkout */}
-        <Button
-          variant="primary"
-          size="lg"
-          className="w-full"
-          onClick={handleCheckout}
-        >
-          Finalizar compra
-        </Button>
-
-        {/* Nota seguridad */}
-        <p className="text-xs text-center text-[var(--text)] opacity-60 flex items-center justify-center gap-1">
-          <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 shrink-0">
-            <path
-              fillRule="evenodd"
-              d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Pago seguro y encriptado
-        </p>
+        <div className="flex flex-col gap-2">
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full"
+            onClick={handleCheckout}
+          >
+            Finalizar compra
+          </Button>
+          <p className="text-xs text-center text-[var(--text)] opacity-60">
+            El pago está en desarrollo — todavía no procesamos compras reales.
+          </p>
+        </div>
 
       </div>
     </>

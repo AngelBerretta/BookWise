@@ -3,10 +3,10 @@ import ProductFilters from '../components/product/ProductFilters';
 import ProductGrid    from '../components/product/ProductGrid';
 
 const SORT_OPTIONS = [
-  { value: 'newest',     label: 'Newest Additions' },
-  { value: 'price-asc',  label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'title-asc',  label: 'Title: A → Z' },
+  { value: 'newest',     label: 'Más recientes' },
+  { value: 'price-asc',  label: 'Precio: menor a mayor' },
+  { value: 'price-desc', label: 'Precio: mayor a menor' },
+  { value: 'title-asc',  label: 'Título: A → Z' },
 ];
 
 const Products = () => {
@@ -82,7 +82,7 @@ const Products = () => {
                 fontWeight: 500,
               }}
             >
-              {filters.category || filters.search ? 'Resultados' : 'The Catalog'}
+              {filters.category || filters.search ? 'Resultados' : 'El catálogo'}
               <span
                 className="font-body font-normal ml-3"
                 style={{
@@ -100,16 +100,13 @@ const Products = () => {
                 className="font-body text-sm whitespace-nowrap"
                 style={{ color: 'var(--bw-on-surface-variant)' }}
               >
-                Sort by:
+                Ordenar por:
               </span>
               <div className="relative">
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="appearance-none font-body text-sm font-medium
-                             pr-6 pl-1 py-1 bg-transparent border-none
-                             focus:ring-0 cursor-pointer"
-                  style={{ color: 'var(--bw-primary)' }}
+                  className="bw-select"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -118,8 +115,8 @@ const Products = () => {
                 {/* Chevron */}
                 <span
                   className="material-symbols-outlined absolute right-0 top-1/2
-                             -translate-y-1/2 pointer-events-none"
-                  style={{ fontSize: '16px', color: 'var(--bw-outline)' }}
+                            -translate-y-1/2 pointer-events-none text-[16px]
+                            text-[var(--bw-outline)]"
                 >
                   expand_more
                 </span>
@@ -138,52 +135,8 @@ const Products = () => {
 
         </div>
       </main>
-
-      <CatalogFooter />
     </div>
   );
 };
-
-/* ── Footer ── */
-const CatalogFooter = () => (
-  <footer
-    className="w-full mt-24 py-16 font-body text-sm tracking-wide"
-    style={{ backgroundColor: 'var(--bw-primary, #041627)', color: '#fbf9f4' }}
-  >
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-4">
-        <span
-          className="text-xl font-headline"
-          style={{ fontFamily: "'Newsreader', Georgia, serif" }}
-        >
-          BookWise
-        </span>
-        <p style={{ color: 'rgba(251,249,244,0.60)' }}>
-          © {new Date().getFullYear()} BookWise Curator. All rights reserved.
-        </p>
-      </div>
-      {[
-        ['The Manifesto', 'Shipping Policy'],
-        ['Affiliate Program', 'Institutional Access'],
-        ['Contact'],
-      ].map((links, i) => (
-        <div key={i} className="flex flex-col gap-3">
-          {links.map(label => (
-            <a
-              key={label}
-              href="#"
-              className="transition-colors duration-300"
-              style={{ color: 'rgba(251,249,244,0.60)' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#fbf9f4')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(251,249,244,0.60)')}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-      ))}
-    </div>
-  </footer>
-);
 
 export default Products;
