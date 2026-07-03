@@ -122,7 +122,7 @@ const ProductCard = ({ product }) => {
               className="font-body text-sm"
               style={{ color: 'var(--bw-on-surface-variant)' }}
             >
-              by {author}
+              por {author}
             </p>
           )}
 
