@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
 import * as productService from '../../services/productService';
 import Input from '../ui/Input';
+import Select from '../ui/Select';
+import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
 
 const EMPTY_FIELDS = {
@@ -156,33 +158,15 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
         />
 
         {/* Categoría */}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-[var(--text-h)]">
-            Categoría *
-          </label>
-          <select
-            name="category"
-            value={fields.category}
-            onChange={onChange}
-            className={[
-              'w-full rounded-lg border px-3 py-2.5 text-sm',
-              'bg-[var(--bg)] text-[var(--text-h)]',
-              'focus:outline-none focus:ring-2',
-              fieldErrors.category
-                ? 'border-red-500 focus:ring-red-400'
-                : 'border-[var(--border)] focus:ring-[var(--accent)] focus:border-[var(--accent-border)]',
-              'transition-colors duration-150',
-            ].join(' ')}
-          >
-            <option value="">Seleccioná una categoría</option>
-            {PRODUCT_CATEGORIES.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-          {fieldErrors.category && (
-            <p className="text-xs text-red-500">{fieldErrors.category}</p>
-          )}
-        </div>
+        <Select
+          label="Categoría *"
+          name="category"
+          value={fields.category}
+          onChange={onChange}
+          error={fieldErrors.category}
+          placeholder="Seleccioná una categoría"
+          options={PRODUCT_CATEGORIES}
+        />
 
         <Input
           label="Precio (ARS) *"
@@ -264,31 +248,16 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
         />
 
         {/* Descripción */}
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <label className="text-sm font-medium text-[var(--text-h)]">
-            Descripción *
-          </label>
-          <textarea
-            name="description"
-            rows={4}
-            placeholder="Sinopsis o descripción del libro…"
-            value={fields.description}
-            onChange={onChange}
-            className={[
-              'w-full rounded-lg border px-3 py-2.5 text-sm resize-y',
-              'bg-[var(--bg)] text-[var(--text-h)]',
-              'placeholder:text-[var(--text)] placeholder:opacity-60',
-              'focus:outline-none focus:ring-2',
-              fieldErrors.description
-                ? 'border-red-500 focus:ring-red-400'
-                : 'border-[var(--border)] focus:ring-[var(--accent)] focus:border-[var(--accent-border)]',
-              'transition-colors duration-150',
-            ].join(' ')}
-          />
-          {fieldErrors.description && (
-            <p className="text-xs text-red-500">{fieldErrors.description}</p>
-          )}
-        </div>
+        <Textarea
+          label="Descripción *"
+          name="description"
+          rows={4}
+          placeholder="Sinopsis o descripción del libro…"
+          value={fields.description}
+          onChange={onChange}
+          error={fieldErrors.description}
+          className="sm:col-span-2"
+        />
 
       </div>
 

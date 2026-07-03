@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import * as blogService from '../../services/blogService';
 import Input            from '../ui/Input';
+import Textarea         from '../ui/Textarea';
 import Button           from '../ui/Button';
 import PostDetail       from './PostDetail'; // 🆕
 
@@ -181,31 +182,16 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
       />
 
       {/* Contenido */}
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-[var(--text-h)]">
-          Contenido *
-        </label>
-        <textarea
-          name="content"
-          rows={10}
-          placeholder="Escribí el contenido del artículo aquí…"
-          value={fields.content}
-          onChange={onChange}
-          className={[
-            'w-full rounded-lg border px-3 py-2.5 text-sm font-[var(--mono)] resize-y',
-            'bg-[var(--bg)] text-[var(--text-h)]',
-            'placeholder:text-[var(--text)] placeholder:opacity-60 placeholder:font-[var(--sans)]',
-            'focus:outline-none focus:ring-2',
-            fieldErrors.content
-              ? 'border-red-500 focus:ring-red-400'
-              : 'border-[var(--border)] focus:ring-[var(--accent)] focus:border-[var(--accent-border)]',
-            'transition-colors duration-150',
-          ].join(' ')}
-        />
-        {fieldErrors.content && (
-          <p className="text-xs text-red-500">{fieldErrors.content}</p>
-        )}
-      </div>
+      <Textarea
+        label="Contenido *"
+        name="content"
+        rows={10}
+        mono
+        placeholder="Escribí el contenido del artículo aquí…"
+        value={fields.content}
+        onChange={onChange}
+        error={fieldErrors.content}
+      />
 
       {/* Publicado */}
       <label className="flex items-center gap-3 cursor-pointer select-none group">
