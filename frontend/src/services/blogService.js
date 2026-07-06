@@ -16,6 +16,7 @@ export const getPosts = async (filters = {}) => {
     if (filters.limit) params.append('limit', filters.limit);
     if (filters.page) params.append('page', filters.page);
     if (filters.search) params.append('search', filters.search);
+    if (filters.published !== undefined) params.append('published', filters.published);
 
     const queryString = params.toString();
     const url = queryString ? `/blog?${queryString}` : '/blog';
@@ -148,4 +149,22 @@ export const generateExcerpt = (content, maxLength = 160) => {
   return lastSpace > 0 
     ? truncated.substring(0, lastSpace) + '...' 
     : truncated + '...';
+};
+
+export const bulkDeletePosts = async (ids) => {
+  try {
+    const response = await api.delete('/blog/bulk', { data: { ids } });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const bulkUpdatePosts = async (ids, published) => {
+  try {
+    const response = await api.patch('/blog/bulk/publish', { ids, published });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };

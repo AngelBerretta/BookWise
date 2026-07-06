@@ -1,33 +1,72 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as blogService from '../services/blogService';
+
+const PAGE_SIZE = 10;
 
 const useBlog = () => {
   const [posts, setPosts]     = useState([]);
   const [post, setPost]       = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
-  const [search, setSearchRaw] = useState('');
-  const debounceRef           = useRef(null);
+
+  const [search, setSearchRaw]      = useState('');
+  const [page, setPage]             = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalDocs, setTotalDocs]   = useState(0);
+
+  const debounceRef = useRef(null);
+  const didMountRef = useRef(false);
 
   const normalizeError = (err) =>
     err?.response?.data?.message ||
     err?.message ||
     'Ocurrió un error inesperado.';
 
-  /* ── GET todos ── */
+  /* ── GET todos — bajo nivel, admite overrides puntuales ── */
   const fetchPosts = useCallback(async (filters = {}) => {
     setLoading(true);
     setError(null);
     try {
       const data = await blogService.getPosts(filters);
-      setPosts(Array.isArray(data) ? data : (data.posts ?? []));
+      const list = Array.isArray(data) ? data : (data.payload ?? []);
+      setPosts(list);
+      setTotalPages(data.totalPages ?? 1);
+      setTotalDocs(data.totalDocs ?? list.length);
     } catch (err) {
       setError(normalizeError(err));
       setPosts([]);
+      setTotalPages(1);
+      setTotalDocs(0);
     } finally {
       setLoading(false);
     }
   }, []);
+
+  /* Cambiar la búsqueda vuelve a página 1 */
+  useEffect(() => {
+    if (!didMountRef.current) { didMountRef.current = true; return; }
+    setPage(1);
+  }, [search]);
+
+  /* Fetch automático — mount, cambio de página o búsqueda (con debounce) */
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchPosts({
+        search: search.trim() || undefined,
+        page,
+        limit: PAGE_SIZE,
+      });
+    }, search ? 400 : 0);
+    return () => clearTimeout(debounceRef.current);
+  }, [search, page, fetchPosts]);
+
+  const setSearch = useCallback((value) => setSearchRaw(value), []);
+
+  /* Vuelve a pedir la página actual — usar tras crear/editar/eliminar */
+  const refetch = useCallback(() => {
+    fetchPosts({ search: search.trim() || undefined, page, limit: PAGE_SIZE });
+  }, [fetchPosts, search, page]);
 
   /* ── GET por slug ── */
   const fetchPostBySlug = useCallback(async (slug) => {
@@ -47,23 +86,12 @@ const useBlog = () => {
     return () => controller.abort();
   }, []);
 
-  /* ── Search con debounce ── */
-  const setSearch = useCallback((value) => {
-    setSearchRaw(value);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchPosts(value.trim() ? { search: value.trim() } : {});
-    }, 400);
-  }, [fetchPosts]);
-
   /* ── CREATE ── */
   const createPost = useCallback(async (postData) => {
     setLoading(true);
     setError(null);
     try {
-      const created = await blogService.createPost(postData);
-      setPosts((prev) => [created, ...prev]);
-      return created;
+      return await blogService.createPost(postData);
     } catch (err) {
       const msg = normalizeError(err);
       setError(msg);
@@ -78,9 +106,7 @@ const useBlog = () => {
     setLoading(true);
     setError(null);
     try {
-      const updated = await blogService.updatePost(id, postData);
-      setPosts((prev) => prev.map((p) => (p._id === id ? updated : p)));
-      return updated;
+      return await blogService.updatePost(id, postData);
     } catch (err) {
       const msg = normalizeError(err);
       setError(msg);
@@ -96,7 +122,6 @@ const useBlog = () => {
     setError(null);
     try {
       await blogService.deletePost(id);
-      setPosts((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       const msg = normalizeError(err);
       setError(msg);
@@ -107,17 +132,11 @@ const useBlog = () => {
   }, []);
 
   return {
-    posts,
-    post,
-    loading,
-    error,
-    search,
-    setSearch,
-    fetchPosts,
-    fetchPostBySlug,
-    createPost,
-    updatePost,
-    deletePost,
+    posts, post, loading, error,
+    search, setSearch,
+    page, setPage, totalPages, totalDocs,
+    fetchPosts, refetch, fetchPostBySlug,
+    createPost, updatePost, deletePost,
   };
 };
 
