@@ -155,6 +155,26 @@ const updateProductSchema = Joi.object({
     "object.min": "Debés enviar al menos un campo para actualizar",
   });
 
+// ── Bulk actions ──────────────────────────────────────────────────────────────
+
+const bulkIdsSchema = Joi.object({
+  ids: Joi.array().items(Joi.string().required()).min(1).required().messages({
+    "array.min": "Debés seleccionar al menos un elemento",
+    "any.required": "Los ids son requeridos",
+  }),
+});
+
+const bulkPublishSchema = Joi.object({
+  ids: Joi.array().items(Joi.string().required()).min(1).required().messages({
+    "array.min": "Debés seleccionar al menos un elemento",
+    "any.required": "Los ids son requeridos",
+  }),
+  published: Joi.boolean().required().messages({
+    "any.required": "El estado published es requerido",
+  }),
+});
+
+
 // ── Cart ──────────────────────────────────────────────────────────────────────
 
 const addToCartSchema = Joi.object({
@@ -247,4 +267,6 @@ export {
   // Blog
   createPostSchema,
   updatePostSchema,
+  bulkIdsSchema,
+  bulkPublishSchema,
 };

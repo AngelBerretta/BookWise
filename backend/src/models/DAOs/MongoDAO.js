@@ -53,6 +53,34 @@ class MongoDAO extends BaseDAO {
   async findOne(filters) {
     return this.Model.findOne(filters).lean();
   }
+
+ async deleteMany(ids) {
+   const result = await this.Model.deleteMany({ _id: { $in: ids } });
+   return result.deletedCount ?? 0;
+ }
+
+ async updateMany(ids, data) {
+   const result = await this.Model.updateMany(
+     { _id: { $in: ids } },
+     data,
+     { runValidators: true }
+   );
+   return result.modifiedCount ?? 0;
+ }
+
+
+   /**
+  * Precio máximo del catálogo completo (ignora paginación).
+  * Usado por el frontend para calibrar el slider de rango de precio.
+  */
+  async getMaxPrice(filters = {}) {
+    const result = await this.Model.aggregate([
+      { $match: filters },
+      { $group: { _id: null, max: { $max: "$price" } } },
+    ]);
+    return result[0]?.max ?? 0;
+  }
+
 }
 
 export default MongoDAO;
