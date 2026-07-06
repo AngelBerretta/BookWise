@@ -1,6 +1,7 @@
 import useProducts    from '../hooks/useProducts';
 import ProductFilters from '../components/product/ProductFilters';
 import ProductGrid    from '../components/product/ProductGrid';
+import Pagination     from '../components/ui/Pagination';
 
 const SORT_OPTIONS = [
   { value: 'newest',     label: 'Más recientes' },
@@ -22,6 +23,10 @@ const Products = () => {
     priceRange,
     setPriceRange,
     maxPrice,
+    page,
+    setPage,
+    totalPages,
+    totalDocs,
   } = useProducts();
 
   const clearFilters = () => {
@@ -37,7 +42,7 @@ const Products = () => {
     priceRange[0] > 0 ||
     (maxPrice > 0 && priceRange[1] < maxPrice);
 
-  const count = initialLoad ? '…' : products.length;
+  const count = initialLoad ? '…' : totalDocs;
 
   return (
     <div
@@ -132,6 +137,8 @@ const Products = () => {
             error={error}
             onClearFilters={hasFilters ? clearFilters : undefined}
           />
+
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
         </div>
       </main>

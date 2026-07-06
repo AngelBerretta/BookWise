@@ -25,8 +25,8 @@ const Home = () => {
   useEffect(() => {
     getPosts({ limit: 3 })
       .then((d) => {
-        const arr = Array.isArray(d) ? d : (d.posts ?? []);
-        setPosts(arr.filter((p) => p.published).slice(0, 3));
+        const arr = Array.isArray(d) ? d : (d.payload ?? []);
+        setPosts(arr.slice(0, 3)); // el backend ya filtra published=true para no-admins
       })
       .catch(() => {})
       .finally(() => setLoadingB(false));

@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
 import { Link }      from 'react-router-dom';
 import useBlog       from '../hooks/useBlog';
 import PostCard      from '../components/blog/PostCard';
 import Spinner       from '../components/ui/Spinner';
 import EmptyState    from '../components/ui/EmptyState';
+import Pagination    from '../components/ui/Pagination';
 
 const Blog = () => {
-  const { posts, loading, error, fetchPosts, search, setSearch } = useBlog();
-
-  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+  const {
+    posts, loading, error, search, setSearch,
+    page, setPage, totalPages, refetch,
+  } = useBlog();
 
   /* Primer post destacado, el resto en grid */
   const [featured, ...rest] = posts;
@@ -66,7 +67,7 @@ const Blog = () => {
           <EmptyState
             title="No pudimos cargar el blog"
             description={error}
-            action={{ label: 'Reintentar', onClick: () => fetchPosts() }}
+            action={{ label: 'Reintentar', onClick: () => refetch() }}
           />
         )}
 
@@ -84,7 +85,7 @@ const Blog = () => {
         )}
 
         {/* Post destacado */}
-        {posts.length > 0 && !search && featured && (
+        {posts.length > 0 && !search && page === 1 && featured && (
           <div
             className="mb-16"
             style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
@@ -99,12 +100,14 @@ const Blog = () => {
             style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
           >
-            {/* Si hay búsqueda muestra todos, si no muestra desde el segundo */}
-            {(search ? posts : rest).map((post) => (
+            
+            {(search || page > 1 ? posts : rest).map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
           </div>
         )}
+
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
       </div>
     </div>
