@@ -12,6 +12,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
 import Pagination from '../../components/ui/Pagination';
 import BulkActionBar from '../../components/ui/BulkActionBar';
+import TrashIcon from "../../components/ui/icons/TrashIcon";
 
 const PAGE_SIZE = 10;
 const checkboxCls = 'w-4 h-4 rounded cursor-pointer accent-[var(--accent)]';
@@ -315,7 +316,14 @@ const AdminProducts = () => {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Button variant="secondary" size="sm" onClick={() => openEdit(p)}>Editar</Button>
-                          <Button variant="danger" size="sm" onClick={() => requestDelete(p)}>Eliminar</Button>
+                          <button
+                            onClick={() => requestDelete(p)}
+                            className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            title={`Eliminar "${p.title}"`}
+                            aria-label={`Eliminar "${p.title}"`}
+                          >
+                            <TrashIcon />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -393,7 +401,15 @@ const AdminProducts = () => {
 
                 <div className="flex items-center gap-2 pt-1">
                   <Button variant="secondary" size="sm" className="flex-1" onClick={() => openEdit(p)}>Editar</Button>
-                  <Button variant="danger" size="sm" className="flex-1" onClick={() => requestDelete(p)}>Eliminar</Button>
+                  <button
+                    onClick={() => requestDelete(p)}
+                    className="flex-1 p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center gap-2"
+                    title={`Eliminar "${p.title}"`}
+                    aria-label={`Eliminar "${p.title}"`}
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                    <span className="text-xs font-medium">Eliminar</span>
+                  </button>
                 </div>
               </div>
             ))}
