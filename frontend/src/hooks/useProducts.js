@@ -1,99 +1,116 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as productService from '../services/productService';
 
+const PAGE_SIZE = 12;
+
+/**
+ * Paginación, filtros, orden y rango de precio son 100% server-side.
+ * El hook nunca vuelve a filtrar/ordenar en el cliente: lo que llega
+ * en `products` es exactamente lo que hay que pintar.
+ */
 const useProducts = () => {
-  const [allProducts, setAllProducts] = useState([]); // datos crudos del backend
+  const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
-  const [filters, setFiltersRaw] = useState({
-    category: '',
-    search:   '',
-  });
+  const [filters, setFiltersRaw] = useState({ category: '', search: '' });
+  const [sortBy, setSortBy]      = useState('newest');
 
-  // Controles client-side
-  const [sortBy, setSortBy]         = useState('newest');
-  const [priceRange, setPriceRange] = useState([0, 0]); // [min, max] — 0,0 = sin límite
-  const [maxPrice, setMaxPrice]     = useState(0);       // precio máximo real del catálogo
+  const [priceRange, setPriceRangeRaw] = useState([0, 0]);
+  const [maxPrice, setMaxPrice]        = useState(0);
+  const [priceReady, setPriceReady]    = useState(false);
+
+  const [page, setPage]             = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalDocs, setTotalDocs]   = useState(0);
 
   const debounceRef = useRef(null);
+  const didMountRef = useRef(false);
+
+  /* ── Precio máximo global del catálogo — se obtiene UNA sola vez ── */
+  useEffect(() => {
+    productService.getMaxPrice()
+      .then((data) => {
+        const max = data?.maxPrice ?? 0;
+        setMaxPrice(max);
+        setPriceRangeRaw([0, max]);
+      })
+      .catch(() => setMaxPrice(0))
+      .finally(() => setPriceReady(true));
+  }, []);
 
   /* ── Fetch ── */
-  const fetchProducts = useCallback(async (activeFilters) => {
+  const fetchProducts = useCallback(async (params) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await productService.getProducts(activeFilters);
-      const list = Array.isArray(data) ? data : (data.payload ?? []);
-      setAllProducts(list);
-
-      if (list.length) {
-        const max = Math.ceil(Math.max(...list.map(p => p.price ?? 0)));
-        setMaxPrice(max);
-
-        // ✅ Siempre resetea al nuevo rango cuando cambia el catálogo
-        setPriceRange([0, max]);
-      } else {
-        setMaxPrice(0);
-        setPriceRange([0, 0]);
-      }
+      const data = await productService.getProducts(params);
+      setProducts(data.payload ?? []);
+      setTotalPages(data.totalPages ?? 1);
+      setTotalDocs(data.totalDocs ?? 0);
     } catch (err) {
-      const message =
+      setError(
         err?.message ||
         err?.response?.data?.message ||
-        'No se pudieron cargar los productos.';
-      setError(message);
-      setAllProducts([]);
+        'No se pudieron cargar los productos.'
+      );
+      setProducts([]);
+      setTotalPages(1);
+      setTotalDocs(0);
     } finally {
       setLoading(false);
       setInitialLoad(false);
     }
   }, []);
 
-  // Re-fetch cuando cambian los filtros de backend (search/category)
+  /* Cualquier cambio de filtro/orden/precio vuelve a la página 1 */
   useEffect(() => {
+    if (!didMountRef.current) { didMountRef.current = true; return; }
+    setPage(1);
+  }, [filters.category, filters.search, sortBy, priceRange[0], priceRange[1]]);
+
+  /* Fetch real — debounced. Depende también de `page` para paginar. */
+  useEffect(() => {
+    if (!priceReady) return; // espera el rango inicial de precio
+
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      fetchProducts(filters);
-    }, filters.search ? 400 : 0);
+      fetchProducts({
+        category: filters.category,
+        search:   filters.search,
+        sort:     sortBy,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+        limit:    PAGE_SIZE,
+        page,
+      });
+    }, filters.search ? 400 : 150);
+
     return () => clearTimeout(debounceRef.current);
-  }, [filters, fetchProducts]);
-
-  /* ── Filtrado y ordenamiento client-side ── */
-  const products = useMemo(() => {
-    let list = [...allProducts];
-
-    // Filtro de precio
-    if (priceRange[1] > 0) {
-      list = list.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-    }
-
-    // Ordenamiento
-    switch (sortBy) {
-      case 'price-asc':
-        list.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-        break;
-      case 'price-desc':
-        list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-        break;
-      case 'title-asc':
-        list.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
-        break;
-      case 'newest':
-      default:
-        // Mantiene el orden del backend (más reciente primero)
-        break;
-    }
-
-    return list;
-  }, [allProducts, priceRange, sortBy]);
+  }, [
+    filters.category, filters.search, sortBy,
+    priceRange[0], priceRange[1], page,
+    priceReady, fetchProducts,
+  ]);
 
   const setFilters = useCallback((partial) => {
-    setFiltersRaw(prev => ({ ...prev, ...partial }));
+    setFiltersRaw((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const refetch = useCallback(() => fetchProducts(filters), [fetchProducts, filters]);
+  const setPriceRange = useCallback((range) => setPriceRangeRaw(range), []);
+
+  const refetch = useCallback(() => {
+    fetchProducts({
+      category: filters.category,
+      search:   filters.search,
+      sort:     sortBy,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+      limit:    PAGE_SIZE,
+      page,
+    });
+  }, [fetchProducts, filters, sortBy, priceRange, page]);
 
   return {
     products,
@@ -103,12 +120,16 @@ const useProducts = () => {
     filters,
     setFilters,
     refetch,
-    // nuevos
     sortBy,
     setSortBy,
     priceRange,
     setPriceRange,
     maxPrice,
+    // 🆕 paginación
+    page,
+    setPage,
+    totalPages,
+    totalDocs,
   };
 };
 

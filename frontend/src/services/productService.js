@@ -9,10 +9,25 @@ export const getProducts = async (filters = {}) => {
     if (filters.limit)    params.append('limit', filters.limit);
     if (filters.page)     params.append('page', filters.page);
 
+    if (filters.sort)     params.append('sort', filters.sort);
+    if (filters.minPrice !== undefined && filters.minPrice !== null)
+       params.append('minPrice', filters.minPrice);
+     if (filters.maxPrice !== undefined && filters.maxPrice !== null)
+       params.append('maxPrice', filters.maxPrice);
+
     const queryString = params.toString();
     const url = queryString ? `/products?${queryString}` : '/products';
 
     const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getMaxPrice = async () => {
+  try {
+    const response = await api.get('/products/meta/max-price');
     return response.data;
   } catch (error) {
     throw error;
@@ -54,6 +69,16 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
+
+export const bulkDeleteProducts = async (ids) => {
+  try {
+    const response = await api.delete('/products/bulk', { data: { ids } });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const getProductsByCategory = async (category) => getProducts({ category });
 export const searchProducts = async (searchTerm) => getProducts({ search: searchTerm });
