@@ -122,24 +122,24 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [productsData, postsData] = await Promise.allSettled([
-          getProducts({ limit: 100 }),
-          getPosts(),
+        // limit: 1 → solo interesa el metadato totalDocs, no la lista
+        const [productsData, postsData, publishedData] = await Promise.allSettled([
+          getProducts({ limit: 1 }),
+          getPosts({ limit: 1 }),
+          getPosts({ limit: 1, published: true }),
         ]);
 
         const products = productsData.status === 'fulfilled'
-          ? (Array.isArray(productsData.value) ? productsData.value : (productsData.value?.payload ?? []))
-          : [];
-
+          ? (productsData.value?.totalDocs ?? 0)
+          : 0;
         const posts = postsData.status === 'fulfilled'
-          ? (Array.isArray(postsData.value) ? postsData.value : (postsData.value?.posts ?? []))
-          : [];
+          ? (postsData.value?.totalDocs ?? 0)
+          : 0;
+        const publishedPosts = publishedData.status === 'fulfilled'
+          ? (publishedData.value?.totalDocs ?? 0)
+          : 0;
 
-        setStats({
-          products: products.length,
-          posts: posts.length,
-          publishedPosts: posts.filter((p) => p.published).length,
-        });
+        setStats({ products, posts, publishedPosts });
       } finally {
         setLoading(false);
       }
