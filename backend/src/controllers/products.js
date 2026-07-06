@@ -12,6 +12,8 @@ const getProducts = catchAsync(async (req, res) => {
     query,          // filtro por categoría o disponibilidad (status=true/false)
     sort,
     search,   // 🆕 búsqueda por texto (title, description)           // "asc" | "desc" — por precio
+    minPrice,
+    maxPrice,
   } = req.query;
 
   const limitNum = Math.max(1, parseInt(limit, 10)  || 10);
@@ -36,10 +38,25 @@ const getProducts = catchAsync(async (req, res) => {
     ];
   }
 
+  // 🆕 Filtro por rango de precio
+  const min = minPrice !== undefined ? Number(minPrice) : null;
+  const max = maxPrice !== undefined ? Number(maxPrice) : null;
+  if ((min !== null && !isNaN(min)) || (max !== null && !isNaN(max))) {
+    filters.price = {};
+    if (min !== null && !isNaN(min)) filters.price.$gte = min;
+    if (max !== null && !isNaN(max)) filters.price.$lte = max;
+  } 
+
   // ── Ordenamiento ───────────────────────────────────────────────────────────
   const sortObj = {};
-  if (sort === "asc")  sortObj.price = 1;
-  if (sort === "desc") sortObj.price = -1;
+   switch (sort) {
+   case "price-asc":  sortObj.price = 1;  break;
+   case "price-desc": sortObj.price = -1; break;
+   case "title-asc":  sortObj.title = 1;  break;
+   case "newest":
+   default:
+     sortObj.createdAt = -1;
+ }
 
   // ── Paginación ─────────────────────────────────────────────────────────────
   const { docs, totalDocs, totalPages } = await productDAO.paginate(filters, {
@@ -54,6 +71,8 @@ const getProducts = catchAsync(async (req, res) => {
     if (query) params.set("query", query);
     if (sort)  params.set("sort",  sort);
     if (search) params.set("search", search); // 🆕 preservar search en links
+    if (min !== null)  params.set("minPrice", min);
+    if (max !== null)  params.set("maxPrice", max);
     return `/api/products?${params.toString()}`;
   };
 
@@ -128,4 +147,27 @@ const deleteProduct = catchAsync(async (req, res) => {
   });
 });
 
-export { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
+// ── GET /api/products/meta/max-price ──────────────────────────────────────────
+
+const getMaxPrice = catchAsync(async (req, res) => {
+  const maxPrice = await productDAO.getMaxPrice();
+  return res.status(200).json({ status: "success", maxPrice });
+});
+
+ // ── DELETE /api/products/bulk ─────────────────────────────────────────────────
+
+const bulkDeleteProducts = catchAsync(async (req, res) => {
+  const { ids } = req.body;
+  const deletedCount = await productDAO.deleteMany(ids);
+
+  const io = req.app.get("io");
+  if (io) io.emit("product:bulkDeleted", { ids });
+
+  return res.status(200).json({
+    message: `${deletedCount} producto${deletedCount !== 1 ? "s" : ""} eliminado${deletedCount !== 1 ? "s" : ""}`,
+    deletedCount,
+  });
+});
+
+
+export { getProducts, getMaxPrice, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts };

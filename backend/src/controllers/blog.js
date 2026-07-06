@@ -6,6 +6,11 @@ import ApiError      from "../utils/ApiError.js";
 // ── GET /api/blog ─────────────────────────────────────────────────────────────
 
 const getPosts = catchAsync(async (req, res) => {
+
+  const { limit = 10, page = 1 } = req.query;
+  const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+  const pageNum  = Math.max(1, parseInt(page, 10)  || 1);
+
   const filters = {};
 
   if (req.user?.role === 'admin') {
@@ -15,7 +20,7 @@ const getPosts = catchAsync(async (req, res) => {
     filters.published = true;
   }
 
-  // 🆕 búsqueda por texto en título o contenido
+  
   const { search } = req.query;
   if (search && search.trim()) {
     const regex = new RegExp(search.trim(), 'i');
@@ -26,8 +31,27 @@ const getPosts = catchAsync(async (req, res) => {
     ];
   }
 
-  const posts = await postDAO.getAll(filters);
-  return res.status(200).json(posts.map(toPostDTO));
+
+  const { docs, totalDocs, totalPages } = await postDAO.paginate(filters, {
+    page:  pageNum,
+    limit: limitNum,
+    sort:  { createdAt: -1 },
+  });
+
+  const hasPrevPage = pageNum > 1;
+  const hasNextPage = pageNum < totalPages;
+
+  return res.status(200).json({
+    status:    "success",
+    payload:   docs.map(toPostDTO),
+    totalDocs,
+    totalPages,
+    page:      pageNum,
+    hasPrevPage,
+    hasNextPage,
+    prevPage:  hasPrevPage ? pageNum - 1 : null,
+    nextPage:  hasNextPage ? pageNum + 1 : null,
+  });
 });
 
 // ── GET /api/blog/:slug ───────────────────────────────────────────────────────
@@ -72,4 +96,26 @@ const deletePost = catchAsync(async (req, res) => {
   return res.status(200).json({ message: "Post eliminado", post: toPostDTO(deleted) });
 });
 
-export { getPosts, getPostBySlug, createPost, updatePost, deletePost };
+ // ── DELETE /api/blog/bulk ──────────────────────────────────────────────────────
+
+ const bulkDeletePosts = catchAsync(async (req, res) => {
+   const { ids } = req.body;
+   const deletedCount = await postDAO.deleteMany(ids);
+   return res.status(200).json({
+     message: `${deletedCount} post${deletedCount !== 1 ? "s" : ""} eliminado${deletedCount !== 1 ? "s" : ""}`,
+     deletedCount,
+   });
+ });
+
+ // ── PATCH /api/blog/bulk/publish ────────────────────────────────────────────────
+
+ const bulkUpdatePosts = catchAsync(async (req, res) => {
+   const { ids, published } = req.body;
+   const modifiedCount = await postDAO.updateMany(ids, { published });
+   return res.status(200).json({
+     message: `${modifiedCount} post${modifiedCount !== 1 ? "s" : ""} actualizado${modifiedCount !== 1 ? "s" : ""}`,
+     modifiedCount,
+   });
+ });
+
+export { getPosts, getPostBySlug, createPost, updatePost, deletePost, bulkDeletePosts, bulkUpdatePosts };

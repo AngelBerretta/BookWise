@@ -1,25 +1,41 @@
 import { Router } from "express";
+import jwt from "jsonwebtoken";
+import config from "../../config.js";
 import {
   getPosts,
   getPostBySlug,
   createPost,
   updatePost,
   deletePost,
+  bulkDeletePosts,
+  bulkUpdatePosts,
 }                                                  from "../controllers/blog.js";
 import { authMiddleware }                          from "../middlewares/auth.middleware.js";
 import { roleMiddleware }                          from "../middlewares/role.middleware.js";
 import { validate }                                from "../middlewares/validate.middleware.js";
-import { createPostSchema, updatePostSchema }      from "../models/schemas/index.js";
+import { createPostSchema, updatePostSchema, bulkIdsSchema, bulkPublishSchema } from "../models/schemas/index.js";
 
 const router = Router();
 
 // Middleware de auth OPCIONAL — setea req.user si hay token, no falla si no hay
-const optionalAuth = (req, res, next) => {
+/**  * Middleware de auth OPCIONAL — para rutas públicas que quieren
+  * reconocer al admin si viene autenticado, pero NUNCA deben bloquear
+  * a un usuario anónimo o con token vencido/inválido.
+  * A diferencia de authMiddleware, acá un token malo simplemente
+  * se ignora (req.user queda undefined) en vez de responder 401.
+  */
+const optionalAuth = (req, _res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(); // sin token → req.user queda undefined → OK
+    return next();
   }
-  return authMiddleware(req, res, next); // con token → verifica y setea req.user
+  const token = authHeader.split(" ")[1];
+  try {
+    req.user = jwt.verify(token, config.jwt.secret);
+  } catch {
+    // Token inválido o expirado en ruta pública → seguir como anónimo
+  }
+  return next();
 };
 
 // GET /api/blog — público pero reconoce al admin si manda token
@@ -44,6 +60,24 @@ router.put(
   roleMiddleware(["admin"]),
   validate(updatePostSchema),
   updatePost
+);
+
+ // DELETE /api/blog/bulk — debe ir ANTES de /:id
+router.delete(
+  "/bulk",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  validate(bulkIdsSchema),
+  bulkDeletePosts
+);
+
+// PATCH /api/blog/bulk/publish
+router.patch(
+  "/bulk/publish",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  validate(bulkPublishSchema),
+  bulkUpdatePosts
 );
 
 // DELETE /api/blog/:id — solo admin

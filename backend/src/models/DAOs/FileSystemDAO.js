@@ -112,6 +112,34 @@ class FileSystemDAO extends BaseDAO {
       ) || null
     );
   }
+
+   async deleteMany(ids) {
+   const data = this._read();
+   const idSet = new Set(ids);
+   const remaining = data.filter((item) => !idSet.has(item._id));
+   this._write(remaining);
+   return data.length - remaining.length;
+ }
+
+   async updateMany(ids, updates) {
+   const data = this._read();
+   const idSet = new Set(ids);
+   let modifiedCount = 0;
+   const updated = data.map((item) => {
+     if (!idSet.has(item._id)) return item;
+     modifiedCount++;
+     return { ...item, ...updates, updatedAt: new Date().toISOString() };
+   });
+   this._write(updated);
+   return modifiedCount;
+ }
+
+    async getMaxPrice(filters = {}) {
+    const data = await this.getAll(filters);
+    if (!data.length) return 0;
+    return Math.max(...data.map((d) => d.price ?? 0));
+  }
+
 }
 
 export default FileSystemDAO;

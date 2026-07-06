@@ -26,6 +26,20 @@ class BaseDAO {
   async findOne(filters) {
     throw new Error("findOne() not implemented");
   }
+
+  async deleteMany(ids) {
+    throw new Error("deleteMany() not implemented");
+  }
+
+  async updateMany(ids, data) {
+    throw new Error("updateMany() not implemented");
+  }
+
+
+  async getMaxPrice(filters = {}) {
+    throw new Error("getMaxPrice() not implemented");
+    }
+  
 }
 
 export default BaseDAO;
