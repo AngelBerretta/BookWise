@@ -8,6 +8,12 @@
 const Pagination = ({ page, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
 
+  const handleChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages || newPage === page) return;
+    onPageChange(newPage);
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }
+
   const getPageList = () => {
     const delta = 1;
     const middle = [];
@@ -30,7 +36,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
   return (
     <nav className="flex items-center justify-center gap-1 pt-10" aria-label="Paginación">
       <button
-        onClick={() => onPageChange(page - 1)}
+        onClick={() => handleChange(page - 1)}
         disabled={page <= 1}
         aria-label="Página anterior"
         className={`${btnBase} disabled:opacity-30 disabled:cursor-not-allowed`}
@@ -47,7 +53,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
         ) : (
           <button
             key={p}
-            onClick={() => onPageChange(p)}
+            onClick={() => handleChange(p)}
             aria-current={p === page ? 'page' : undefined}
             className={btnBase}
             style={
@@ -62,7 +68,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
       )}
 
       <button
-        onClick={() => onPageChange(page + 1)}
+        onClick={() => handleChange(page + 1)}
         disabled={page >= totalPages}
         aria-label="Página siguiente"
         className={`${btnBase} disabled:opacity-30 disabled:cursor-not-allowed`}
