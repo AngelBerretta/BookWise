@@ -1,61 +1,93 @@
 import axios from 'axios';
 
-// Crear instancia de axios con configuración base
+/* ------------------------------------------------------------------ */
+/*  Rutas 100 % públicas — nunca necesitan token (ni siquiera para     */
+/*  reconocer al usuario). Se comparan por prefijo.                    */
+/* ------------------------------------------------------------------ */
+const ALWAYS_PUBLIC_PREFIXES = ['/products'];
+
+const isAlwaysPublic = (url = '') =>
+  ALWAYS_PUBLIC_PREFIXES.some((prefix) => url.startsWith(prefix));
+
+/* ------------------------------------------------------------------ */
+/*  Decodifica el payload de un JWT sin verificar firma (solo para     */
+/*  chequeo de expiración en cliente — la verificación real la hace    */
+/*  el backend).                                                       */
+/* ------------------------------------------------------------------ */
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.exp) return false;
+    return Date.now() >= payload.exp * 1000;
+  } catch {
+    return true; // token malformado → tratarlo como inválido
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/*  Instancia base                                                     */
+/* ------------------------------------------------------------------ */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 });
 
-// Interceptor de request: agrega el token JWT si existe
+/* ------------------------------------------------------------------ */
+/*  Interceptor de request                                             */
+/* ------------------------------------------------------------------ */
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Endpoints explícitamente públicos → nunca adjuntar token
+    if (isAlwaysPublic(config.url)) {
+      return config;
     }
-    
+
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      if (isTokenExpired(token)) {
+        // Token vencido — limpiar sesión y NO mandarlo.
+        // Evita 401 en cascada en rutas con auth opcional (ej: /blog).
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor de response: maneja errores globalmente
+/* ------------------------------------------------------------------ */
+/*  Interceptor de response                                            */
+/* ------------------------------------------------------------------ */
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Manejo de errores comunes
     if (error.response) {
-      // El servidor respondió con un código de error
       const { status, data } = error.response;
 
       switch (status) {
         case 401:
-          // Token inválido o expirado — limpiar sesión sin forzar recarga
-          // El AuthContext y ProtectedRoute se encargan de redirigir
+          // El backend rechazó el token → limpiar sesión
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           break;
 
         case 403:
-          // Sin permisos
           console.error('No tienes permisos para realizar esta acción');
           break;
 
         case 404:
-          // Recurso no encontrado
           console.error('Recurso no encontrado');
           break;
 
         case 500:
-          // Error del servidor
           console.error('Error del servidor. Intenta de nuevo más tarde');
           break;
 
@@ -63,27 +95,26 @@ api.interceptors.response.use(
           console.error(data.message || 'Ocurrió un error inesperado');
       }
 
-      // Devolver el mensaje de error del backend si existe
       return Promise.reject({
         message: data.message || 'Error en la solicitud',
         status,
-        data
+        data,
       });
-    } else if (error.request) {
-      // La request se hizo pero no hubo respuesta
+    }
+
+    if (error.request) {
       console.error('No se pudo conectar con el servidor');
       return Promise.reject({
         message: 'No se pudo conectar con el servidor',
-        status: 0
-      });
-    } else {
-      // Error al configurar la request
-      console.error('Error al realizar la solicitud');
-      return Promise.reject({
-        message: error.message || 'Error al realizar la solicitud',
-        status: 0
+        status: 0,
       });
     }
+
+    console.error('Error al realizar la solicitud');
+    return Promise.reject({
+      message: error.message || 'Error al realizar la solicitud',
+      status: 0,
+    });
   }
 );
 
