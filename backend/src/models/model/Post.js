@@ -27,6 +27,12 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    thumbnailPublicId: {
+      type: String,
+      default: "",
+    },
+
     published: {
       type: Boolean,
       default: false,

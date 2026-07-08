@@ -23,6 +23,7 @@ const toProductDTO = (product) => ({
   category: product.category,
   thumbnails: product.thumbnails ?? [],
   thumbnail: product.thumbnails?.[0] ?? product.url ?? '',
+  thumbnailPublicId: product.thumbnailPublicId ?? '',
   // campos de compatibilidad del proyecto original
   url: product.url,
   author: product.author,
@@ -56,6 +57,7 @@ const toPostDTO = (post) => ({
   slug: post.slug,
   tags: post.tags,
   thumbnail: post.thumbnail,
+  thumbnailPublicId: post.thumbnailPublicId ?? '',
   published: post.published,
   author: post.author && post.author._id ? toUserDTO(post.author) : post.author,
   createdAt: post.createdAt,

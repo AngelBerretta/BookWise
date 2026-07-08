@@ -1,4 +1,5 @@
 import api from './api';
+import { stripMarkdown } from '../utils/markdown';
 
 /**
  * Servicio del blog
@@ -135,8 +136,7 @@ export const generateSlug = (title) => {
 export const generateExcerpt = (content, maxLength = 160) => {
   if (!content) return '';
 
-  // Eliminar etiquetas HTML si las hay
-  const plainText = content.replace(/<[^>]*>/g, '');
+  const plainText = stripMarkdown(content);
 
   if (plainText.length <= maxLength) {
     return plainText;

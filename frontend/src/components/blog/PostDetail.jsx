@@ -1,3 +1,5 @@
+import MarkdownContent from './MarkdownContent';
+
 /**
  * Muestra el contenido completo de un post del blog.
  *
@@ -88,22 +90,8 @@ const PostDetail = ({ post }) => {
         </div>
       </div>
 
-      {/* Contenido completo — respeta saltos de línea */}
-      <div className="prose-bookwise">
-        {(content ?? '').split('\n').map((paragraph, i) =>
-          paragraph.trim() ? (
-            <p
-              key={i}
-              className="text-[var(--text)] leading-relaxed text-base mb-5 last:mb-0"
-            >
-              {paragraph}
-            </p>
-          ) : (
-            /* Línea en blanco → espacio visual entre bloques */
-            <div key={i} className="h-2" aria-hidden="true" />
-          )
-        )}
-      </div>
+      {/* Contenido en Markdown */}
+      <MarkdownContent content={content} />
 
     </article>
   );
