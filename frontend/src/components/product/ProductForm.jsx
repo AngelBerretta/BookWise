@@ -5,6 +5,7 @@ import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
+import ImageUploader from '../ui/ImageUploader';
 
 const EMPTY_FIELDS = {
   title:           '',
@@ -15,6 +16,7 @@ const EMPTY_FIELDS = {
   stock:           '',
   url:             '',
   thumbnail:       '',
+  thumbnailPublicId: '',
   code:            '',
   pages:           '',        // ✅ nuevo
   publicationDate: '',        // ✅ nuevo
@@ -39,9 +41,10 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
         stock:           product.stock           ?? '',
         url:             product.url             ?? '',
         thumbnail:       product.thumbnails?.[0] ?? '',
+        thumbnailPublicId: product.thumbnailPublicId ?? '',
         code:            product.code            ?? '',
-        pages:           product.pages           ?? '',   // ✅
-        publicationDate: product.publicationDate ?? '',   // ✅
+        pages:           product.pages           ?? '',   
+        publicationDate: product.publicationDate ?? '',   
       });
     } else {
       setFields({ ...EMPTY_FIELDS });
@@ -101,7 +104,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
       url:         fields.url.trim(),
       code:        fields.code.trim(),
       thumbnails:  fields.thumbnail?.trim() ? [fields.thumbnail.trim()] : [],
-      // ✅ Solo incluye si tienen valor
+      thumbnailPublicId: fields.thumbnailPublicId || '',
       pages:           fields.pages !== '' ? Number(fields.pages) : null,
       publicationDate: fields.publicationDate?.trim() || null,
     };
@@ -236,16 +239,16 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
           className="sm:col-span-2"
         />
 
-        <Input
-          label="URL de imagen (thumbnail)"
-          name="thumbnail"
-          type="url"
-          placeholder="https://covers.openlibrary.org/b/isbn/..."
-          value={fields.thumbnail}
-          onChange={onChange}
-          error={fieldErrors.thumbnail}
-          className="sm:col-span-2"
-        />
+        <div className="sm:col-span-2">
+          <ImageUploader
+            label="Imagen de portada"
+            value={fields.thumbnail}
+            onChange={(url, publicId) =>
+              setFields((prev) => ({ ...prev, thumbnail: url, thumbnailPublicId: publicId }))
+            }
+            type="product"
+          />
+        </div>
 
         {/* Descripción */}
         <Textarea

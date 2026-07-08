@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import * as blogService from '../../services/blogService';
 import Input            from '../ui/Input';
-import Textarea         from '../ui/Textarea';
 import Button           from '../ui/Button';
-import PostDetail       from './PostDetail'; // 🆕
+import PostDetail       from './PostDetail'; // 
+import MarkdownEditor   from './MarkdownEditor';
+import ImageUploader    from '../ui/ImageUploader';
 
 const PostForm = ({ post, onSuccess, onCancel }) => {
   const isEditing = !!post;
@@ -12,6 +13,7 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
     title:     '',
     content:   '',
     thumbnail: '',
+    thumbnailPublicId: '',
     tags:      '',
     published: false,
   };
@@ -28,6 +30,7 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
         title:     post.title     ?? '',
         content:   post.content   ?? '',
         thumbnail: post.thumbnail ?? '',
+        thumbnailPublicId: post.thumbnailPublicId ?? '',
         tags:      Array.isArray(post.tags) ? post.tags.join(', ') : '',
         published: post.published ?? false,
       });
@@ -63,6 +66,7 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
       title:     fields.title.trim(),
       content:   fields.content.trim(),
       thumbnail: fields.thumbnail.trim(),
+      thumbnailPublicId: fields.thumbnailPublicId || '',
       tags:      tagsArray,
       published: fields.published,
       slug,
@@ -162,14 +166,13 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
         error={fieldErrors.title}
       />
 
-      <Input
-        label="URL de imagen de portada"
-        name="thumbnail"
-        type="url"
-        placeholder="https://..."
+      <ImageUploader
+        label="Imagen de portada"
         value={fields.thumbnail}
-        onChange={onChange}
-        error={fieldErrors.thumbnail}
+        onChange={(url, publicId) =>
+          setFields((prev) => ({ ...prev, thumbnail: url, thumbnailPublicId: publicId }))
+        }
+        type="post"
       />
 
       <Input
@@ -182,12 +185,11 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
       />
 
       {/* Contenido */}
-      <Textarea
+      <MarkdownEditor
         label="Contenido *"
         name="content"
-        rows={10}
-        mono
-        placeholder="Escribí el contenido del artículo aquí…"
+        rows={12}
+        placeholder="Escribí el contenido del artículo aquí… (admite Markdown)"
         value={fields.content}
         onChange={onChange}
         error={fieldErrors.content}
