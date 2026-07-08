@@ -2,6 +2,7 @@ import { postDAO }   from "../models/DAOs/index.js";
 import { toPostDTO } from "../models/DTOs/index.js";
 import catchAsync    from "../utils/catchAsync.js";   // ← limpio, sin .default
 import ApiError      from "../utils/ApiError.js";
+import { deleteImage } from "../services/cloudinary.service.js";
 
 // ── GET /api/blog ─────────────────────────────────────────────────────────────
 
@@ -76,15 +77,24 @@ const createPost = catchAsync(async (req, res) => {
 // ── PUT /api/blog/:id ─────────────────────────────────────────────────────────
 
 const updatePost = catchAsync(async (req, res) => {
+  const currentPost = await postDAO.getById(req.params.id);
+  if (!currentPost) throw new ApiError(404, "Post no encontrado");
+
   if (req.body.slug) {
-    const existing = await postDAO.findOne({ slug: req.body.slug });
-    if (existing && String(existing._id) !== String(req.params.id)) {
+    const existingSlug = await postDAO.findOne({ slug: req.body.slug });
+    if (existingSlug && String(existingSlug._id) !== String(req.params.id)) {
       throw new ApiError(409, "Ya existe un post con ese slug");
     }
   }
 
   const updated = await postDAO.update(req.params.id, req.body);
   if (!updated) throw new ApiError(404, "Post no encontrado");
+
+  const oldPublicId = currentPost.thumbnailPublicId;
+  if (oldPublicId && oldPublicId !== updated.thumbnailPublicId) {
+    await deleteImage(oldPublicId);
+  }
+
   return res.status(200).json(toPostDTO(updated));
 });
 
@@ -93,6 +103,11 @@ const updatePost = catchAsync(async (req, res) => {
 const deletePost = catchAsync(async (req, res) => {
   const deleted = await postDAO.delete(req.params.id);
   if (!deleted) throw new ApiError(404, "Post no encontrado");
+
+  if (deleted.thumbnailPublicId) {
+    await deleteImage(deleted.thumbnailPublicId);
+  }
+
   return res.status(200).json({ message: "Post eliminado", post: toPostDTO(deleted) });
 });
 
@@ -100,7 +115,14 @@ const deletePost = catchAsync(async (req, res) => {
 
  const bulkDeletePosts = catchAsync(async (req, res) => {
    const { ids } = req.body;
+   
+   const docs = await Promise.all(ids.map((id) => postDAO.getById(id)));
+   const publicIds = docs.filter(Boolean).map((d) => d.thumbnailPublicId).filter(Boolean);
+
    const deletedCount = await postDAO.deleteMany(ids);
+
+   await Promise.all(publicIds.map((pid) => deleteImage(pid)));
+
    return res.status(200).json({
      message: `${deletedCount} post${deletedCount !== 1 ? "s" : ""} eliminado${deletedCount !== 1 ? "s" : ""}`,
      deletedCount,

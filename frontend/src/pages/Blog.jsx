@@ -4,6 +4,7 @@ import PostCard      from '../components/blog/PostCard';
 import Spinner       from '../components/ui/Spinner';
 import EmptyState    from '../components/ui/EmptyState';
 import Pagination    from '../components/ui/Pagination';
+import { stripMarkdown } from '../utils/markdown';
 
 const Blog = () => {
   const {
@@ -118,7 +119,7 @@ const Blog = () => {
 const FeaturedPost = ({ post }) => {
   const { title, content, slug, thumbnail, tags, createdAt } = post;
 
-  const plainText = (content ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const plainText = stripMarkdown(content);
   const excerpt   = plainText.length <= 200
     ? plainText
     : plainText.substring(0, plainText.lastIndexOf(' ', 200)) + '…';

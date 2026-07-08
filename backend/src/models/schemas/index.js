@@ -102,6 +102,7 @@ const createProductSchema = Joi.object({
   thumbnails: Joi.array().items(Joi.string().uri()).optional().default([]).messages({
     "array.base": "thumbnails debe ser un array de URLs",
   }),
+  thumbnailPublicId: Joi.string().optional().allow(""),
   // campos opcionales de compatibilidad
   url: Joi.string().optional().allow(""),
   author: Joi.string().optional().allow(""),
@@ -138,6 +139,7 @@ const updateProductSchema = Joi.object({
   thumbnails: Joi.array().items(Joi.string().uri()).optional().messages({
     "array.base": "thumbnails debe ser un array de URLs",
   }),
+  thumbnailPublicId: Joi.string().optional().allow(""),
   url: Joi.string().optional().allow(""),
   author: Joi.string().optional().allow(""),
 
@@ -223,6 +225,7 @@ const createPostSchema = Joi.object({
   thumbnail: Joi.string().uri().optional().allow("").messages({
     "string.uri": "El thumbnail debe ser una URL válida",
   }),
+  thumbnailPublicId: Joi.string().optional().allow(""),
   published: Joi.boolean().optional(),
 });
 
@@ -243,6 +246,7 @@ const updatePostSchema = Joi.object({
   thumbnail: Joi.string().uri().optional().allow("").messages({
     "string.uri": "El thumbnail debe ser una URL válida",
   }),
+  thumbnailPublicId: Joi.string().optional().allow(""),
   published: Joi.boolean().optional(),
 })
   .min(1)

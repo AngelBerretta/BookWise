@@ -2,6 +2,7 @@ import { productDAO }   from "../models/DAOs/index.js";
 import { toProductDTO } from "../models/DTOs/index.js";
 import catchAsync       from "../utils/catchAsync.js";
 import ApiError         from "../utils/ApiError.js";
+import { deleteImage }  from "../services/cloudinary.service.js";
 
 // ── GET /api/products ─────────────────────────────────────────────────────────
 
@@ -120,11 +121,20 @@ const createProduct = catchAsync(async (req, res) => {
 // ── PUT /api/products/:pid ────────────────────────────────────────────────────
 
 const updateProduct = catchAsync(async (req, res) => {
-  // Evitar que se modifique el _id
+  
   delete req.body._id;
+
+  const existing = await productDAO.getById(req.params.pid);
+  if (!existing) throw new ApiError(404, "Producto no encontrado");
 
   const updated = await productDAO.update(req.params.pid, req.body);
   if (!updated) throw new ApiError(404, "Producto no encontrado");
+
+  // Si se reemplazó o quitó la imagen, borrar la anterior de Cloudinary
+  const oldPublicId = existing.thumbnailPublicId;
+  if (oldPublicId && oldPublicId !== updated.thumbnailPublicId) {
+    await deleteImage(oldPublicId);
+  }
 
   const io = req.app.get("io");
   if (io) io.emit("product:updated", toProductDTO(updated));
@@ -137,6 +147,10 @@ const updateProduct = catchAsync(async (req, res) => {
 const deleteProduct = catchAsync(async (req, res) => {
   const deleted = await productDAO.delete(req.params.pid);
   if (!deleted) throw new ApiError(404, "Producto no encontrado");
+
+  if (deleted.thumbnailPublicId) {
+    await deleteImage(deleted.thumbnailPublicId);
+  }
 
   const io = req.app.get("io");
   if (io) io.emit("product:deleted", { _id: deleted._id });
@@ -158,7 +172,14 @@ const getMaxPrice = catchAsync(async (req, res) => {
 
 const bulkDeleteProducts = catchAsync(async (req, res) => {
   const { ids } = req.body;
+
+  // Buscar publicIds antes de borrar los documentos
+  const docs = await Promise.all(ids.map((id) => productDAO.getById(id)));
+  const publicIds = docs.filter(Boolean).map((d) => d.thumbnailPublicId).filter(Boolean);
+
   const deletedCount = await productDAO.deleteMany(ids);
+
+  await Promise.all(publicIds.map((pid) => deleteImage(pid)));
 
   const io = req.app.get("io");
   if (io) io.emit("product:bulkDeleted", { ids });

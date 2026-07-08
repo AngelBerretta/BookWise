@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import { stripMarkdown } from '../../utils/markdown';
 
 const PostCard = ({ post }) => {
   const { title, content, slug, thumbnail, tags, createdAt, author } = post;
 
-  const plainText = (content ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const plainText = stripMarkdown(content);
   const excerpt   = plainText.length <= 130
     ? plainText
     : plainText.substring(0, plainText.lastIndexOf(' ', 130)) + '…';
@@ -22,7 +23,7 @@ const PostCard = ({ post }) => {
       <Link
         to={`/blog/${slug}`}
         className="block rounded-xl overflow-hidden mb-5 bg-[var(--bg-container)]"
-        style={{ aspectRatio: '4/5' }}
+        style={{ aspectRatio: '16/9' }}
       >
         {thumbnail ? (
           <img
