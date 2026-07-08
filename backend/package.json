@@ -15,6 +15,7 @@
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -27,7 +28,9 @@
     "minimist": "^1.2.8",
     "mongodb": "^7.2.0",
     "mongoose": "^8.23.1",
-    "socket.io": "^4.8.3"
+    "multer": "^2.2.0",
+    "socket.io": "^4.8.3",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.3"

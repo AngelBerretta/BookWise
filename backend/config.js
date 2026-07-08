@@ -32,6 +32,13 @@ const config = {
     from:   process.env.SENDGRID_FROM    || "no-reply@bookwise.com",
   },
 
+  // ── Cloudinary ─────────────────────────────────────────────────────────────
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
+    apiKey:    process.env.CLOUDINARY_API_KEY    || "",
+    apiSecret: process.env.CLOUDINARY_API_SECRET || "",
+  },
+
   // ── Cliente (CORS) ─────────────────────────────────────────────────────────
   client: {
     url: process.env.CLIENT_URL || "http://localhost:5173",
