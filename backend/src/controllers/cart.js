@@ -25,7 +25,7 @@ const populateCart = async (cart) => {
 // Crear carrito con ID autogenerado
 
 const createCart = catchAsync(async (req, res) => {
-  const cart = await cartDAO.create({ products: [] });
+  const cart = await cartDAO.create({ user: req.user?._id || null, products: [] });
   return res.status(201).json(toCartDTO(cart));
 });
 
