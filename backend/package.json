@@ -9,7 +9,8 @@
     "dev": "nodemon src/app.js",
     "seed": "node src/scripts/seedProducts.js",
     "seed:blog": "node src/scripts/seedBlog.js",
-    "seed:all": "npm run seed && npm run seed:blog",
+    "seed:demo": "node src/scripts/seedDemo.js",
+    "seed:all": "npm run seed && npm run seed:blog && npm run seed:demo",
     "dev:fs": "nodemon src/app.js --mode fs"
   },
   "dependencies": {

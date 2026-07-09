@@ -2,6 +2,7 @@ import { Router }                                          from "express";
 import { getAllUsers, getUserById, updateUser, deleteUser } from "../controllers/users.js";
 import { authMiddleware }                                  from "../middlewares/auth.middleware.js";
 import { roleMiddleware }                                  from "../middlewares/role.middleware.js";
+import { demoGuard }                                        from "../middlewares/demoGuard.middleware.js";
 import { validate }                                        from "../middlewares/validate.middleware.js";
 import { updateUserSchema }                                from "../models/schemas/index.js";
 
@@ -21,6 +22,6 @@ router.get("/:id", getUserById);
 router.put("/:id", validate(updateUserSchema), updateUser);
 
 // DELETE /api/users/:id  — solo admin
-router.delete("/:id", roleMiddleware(["admin"]), deleteUser);
+router.delete("/:id", roleMiddleware(["admin"]), demoGuard, deleteUser);
 
 export default router;

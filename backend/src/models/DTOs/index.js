@@ -7,6 +7,7 @@ const toUserDTO = (user) => ({
   phone: user.phone,
   role: user.role,
   isVerified: user.isVerified,
+  isDemo: user.isDemo ?? false,
   createdAt: user.createdAt,
 });
 

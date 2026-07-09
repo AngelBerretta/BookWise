@@ -12,6 +12,7 @@ import {
 }                                                  from "../controllers/blog.js";
 import { authMiddleware }                          from "../middlewares/auth.middleware.js";
 import { roleMiddleware }                          from "../middlewares/role.middleware.js";
+import { demoGuard }                                from "../middlewares/demoGuard.middleware.js";
 import { validate }                                from "../middlewares/validate.middleware.js";
 import { createPostSchema, updatePostSchema, bulkIdsSchema, bulkPublishSchema } from "../models/schemas/index.js";
 
@@ -67,6 +68,7 @@ router.delete(
   "/bulk",
   authMiddleware,
   roleMiddleware(["admin"]),
+  demoGuard,
   validate(bulkIdsSchema),
   bulkDeletePosts
 );
@@ -85,6 +87,7 @@ router.delete(
   "/:id",
   authMiddleware,
   roleMiddleware(["admin"]),
+  demoGuard,
   deletePost
 );
 
