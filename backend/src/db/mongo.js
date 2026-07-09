@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 import config   from "../../config.js";
 
+const redactUri = (uri) => uri.replace(/\/\/([^:]+):([^@]+)@/, "//$1:****@");
+
 const connectDB = async () => {
   try {
     await mongoose.connect(config.mongo.uri);
-    console.log("🍃  MongoDB connected:", config.mongo.uri);
+    console.log("🍃  MongoDB connected:", redactUri(config.mongo.uri));
   } catch (err) {
     console.error("❌  MongoDB connection error:", err.message);
     process.exit(1);
