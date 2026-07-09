@@ -26,7 +26,7 @@ const Register = () => {
             {/* Ícono éxito */}
             <div
               className="flex h-16 w-16 items-center justify-center rounded-full"
-              style={{ backgroundColor: 'var(--bw-secondary-container, ***REMOVED***b9eeab)' }}
+              style={{ backgroundColor: 'var(--secondary-bg)' }}
             >
               <span
                 className="material-symbols-outlined"

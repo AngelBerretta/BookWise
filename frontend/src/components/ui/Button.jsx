@@ -17,6 +17,7 @@ const Button = ({
     'focus:outline-none focus:ring-2 focus:ring-offset-2',
     'disabled:opacity-40 disabled:cursor-not-allowed',
     'select-none whitespace-nowrap',
+    'cursor-pointer',
   ].join(' ');
 
   const variants = {
