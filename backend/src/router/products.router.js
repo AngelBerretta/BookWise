@@ -13,6 +13,8 @@ import { createProductSchema, updateProductSchema, bulkIdsSchema } from "../mode
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 import { demoGuard }      from "../middlewares/demoGuard.middleware.js";
+import { demoContentFilter } from "../middlewares/demoContentFilter.middleware.js";
+import { rateLimitDemoWrite } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -26,11 +28,10 @@ router.get("/meta/max-price", getMaxPrice);
 router.get("/:pid", getProductById);
 
 // POST /api/products — solo admin
-router.post("/", authMiddleware, roleMiddleware(["admin"]), validate(createProductSchema), createProduct);
+router.post("/" ,authMiddleware, roleMiddleware(["admin"]), rateLimitDemoWrite, demoContentFilter, validate(createProductSchema), createProduct);
 
 // PUT  /api/products/:pid — solo admin
-router.put("/:pid", authMiddleware, roleMiddleware(["admin"]), validate(updateProductSchema), updateProduct);
-
+router.put("/:pid", authMiddleware, roleMiddleware(["admin"]), rateLimitDemoWrite, demoContentFilter, validate(updateProductSchema), updateProduct);
 // DELETE /api/products/bulk — solo admin, bloqueado en modo demo
 router.delete("/bulk", authMiddleware, roleMiddleware(["admin"]), demoGuard, validate(bulkIdsSchema), bulkDeleteProducts);
 
