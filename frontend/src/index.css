@@ -97,6 +97,32 @@
 }
 
 /* ─────────────────────────────────────────────
+   Marca fija — NO se invierte en dark mode.
+   Uso exclusivo: superficies de identidad visual fuerte
+   (sidebar admin, panel de login/register). Para texto o
+   fondos que deban adaptarse al tema, usar --accent, --bg, etc.
+───────────────────────────────────────────── */
+:root {
+  --brand:            #041627;
+  --brand-hover:      #1a2b3c;
+  --brand-fixed:      #d2e4fb;
+  --brand-fixed-dim:  #b7c8de;
+  --brand-tertiary:   #eebd8e;
+
+  --error:      #ba1a1a;
+  --error-bg:   #ffdad6;
+  --error-text: #93000a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --error:      #ffb4ab;
+    --error-bg:   rgba(255, 180, 171, 0.14);
+    --error-text: #ffb4ab;
+  }
+}
+
+/* ─────────────────────────────────────────────
    Reset & Base
 ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
@@ -251,20 +277,21 @@ img, svg { display: block; }
 .font-body     { font-family: 'Inter', system-ui, sans-serif; }
 .font-label    { font-family: 'Inter', system-ui, sans-serif; }
 
-/* ─────────────────────────────────────────────
-   Colores BookWise como custom properties
-   (usados via clase bg-bw-* / text-bw-*)
-───────────────────────────────────────────── */
+/* ⚠️ SHIM DE COMPATIBILIDAD — Etapa 1.
+   Login/Register/Sidebar admin son superficies de MARCA fija,
+   no de contenido: no se adaptan a dark mode a propósito
+   (igual que el panel derecho, que ya usa rgba hardcodeado). */
 :root {
-  --bw-primary:                  #041627;
-  --bw-primary-container:        #1a2b3c;
+  --bw-primary:                  var(--brand);
+  --bw-primary-container:        var(--brand-hover);
   --bw-on-primary:               #ffffff;
-  --bw-primary-fixed-dim:        #b7c8de;
-  --bw-primary-fixed:            #d2e4fb;
+  --bw-primary-fixed-dim:        var(--brand-fixed-dim);
+  --bw-primary-fixed:            var(--brand-fixed);
 
   --bw-secondary:                #3b6934;
-  --bw-tertiary-fixed-dim:       #eebd8e;
+  --bw-tertiary-fixed-dim:       var(--brand-tertiary);
 
+  /* Fijos — NO alias a --bg-*, para no invertirse en dark mode */
   --bw-surface-container-lowest: #ffffff;
   --bw-surface-container-low:    #f5f3ee;
   --bw-surface-container-high:   #eae8e3;
@@ -323,7 +350,7 @@ img, svg { display: block; }
   font-family: var(--sans);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--bw-primary);
+  color: var(--accent);
   background-color: transparent;
   border: none;
   padding: 0.25rem 1.5rem 0.25rem 0.25rem;
@@ -331,7 +358,7 @@ img, svg { display: block; }
   outline: none;
 }
 .bw-select:focus-visible {
-  outline: 2px solid var(--bw-primary);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }

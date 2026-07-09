@@ -47,7 +47,7 @@ const Products = () => {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: 'var(--bw-surface-container-lowest, #fbf9f4)' }}
+      style={{ backgroundColor: 'var(--bg)' }}
     >
       <main
         className="flex-grow max-w-7xl mx-auto w-full px-4 md:px-8 py-12
@@ -82,7 +82,7 @@ const Products = () => {
               className="font-headline tracking-tight"
               style={{
                 fontSize:   'clamp(1.6rem, 3vw, 2rem)',
-                color:      'var(--bw-primary, #041627)',
+                color:      'var(--text-h)',
                 fontFamily: "'Newsreader', Georgia, serif",
                 fontWeight: 500,
               }}
@@ -92,7 +92,7 @@ const Products = () => {
                 className="font-body font-normal ml-3"
                 style={{
                   fontSize: '1rem',
-                  color:    'var(--bw-on-surface-variant, #44474c)',
+                  color:    'var(--text)',
                 }}
               >
                 ({count} {count === 1 ? 'título' : 'títulos'})
@@ -103,7 +103,7 @@ const Products = () => {
             <div className="flex items-center gap-3">
               <span
                 className="font-body text-sm whitespace-nowrap"
-                style={{ color: 'var(--bw-on-surface-variant)' }}
+                style={{ color: 'var(--text)' }}
               >
                 Ordenar por:
               </span>

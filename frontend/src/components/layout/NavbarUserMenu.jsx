@@ -78,7 +78,7 @@ const NavbarUserMenu = () => {
           to="/register"
           className={[
             'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150',
-            'bg-[var(--accent)] text-white',
+            'bg-[var(--brand)] text-white',
             'hover:brightness-110 active:brightness-95',
           ].join(' ')}
         >

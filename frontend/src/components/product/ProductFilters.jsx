@@ -29,7 +29,7 @@ const ProductFilters = ({
         <span
           className="material-symbols-outlined absolute left-3 top-1/2
                      -translate-y-1/2 pointer-events-none transition-colors"
-          style={{ fontSize: '20px', color: 'var(--bw-outline)' }}
+          style={{ fontSize: '20px', color: 'var(--text-muted)' }}
         >
           search
         </span>
@@ -48,7 +48,7 @@ const ProductFilters = ({
         <h3
           className="font-headline text-lg italic tracking-tight"
           style={{
-            color:      'var(--bw-primary)',
+            color:      'var(--text-h)',
             fontFamily: "'Newsreader', Georgia, serif",
           }}
         >
@@ -78,7 +78,7 @@ const ProductFilters = ({
           <h3
             className="font-headline text-lg italic tracking-tight"
             style={{
-              color:      'var(--bw-primary)',
+              color:      'var(--text-h)',
               fontFamily: "'Newsreader', Georgia, serif",
             }}
           >
@@ -98,13 +98,13 @@ const ProductFilters = ({
             <div className="flex justify-between">
               <span
                 className="font-body text-xs"
-                style={{ color: 'var(--bw-on-surface-variant)' }}
+                style={{ color: 'var(--text)' }}
               >
                 {fmt(priceRange[0])}
               </span>
               <span
                 className="font-body text-xs"
-                style={{ color: 'var(--bw-on-surface-variant)' }}
+                style={{ color: 'var(--text)' }}
               >
                 {fmt(priceRange[1])}
               </span>
@@ -115,9 +115,9 @@ const ProductFilters = ({
               <button
                 onClick={() => setPriceRange([0, maxPrice])}
                 className="font-label text-xs w-fit transition-colors"
-                style={{ color: 'var(--bw-outline)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--bw-primary)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--bw-outline)')}
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-h)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
                 Restablecer precio
               </button>
@@ -132,9 +132,9 @@ const ProductFilters = ({
           onClick={onClear}
           className="flex items-center gap-2 font-label text-sm
                      transition-colors w-fit"
-          style={{ color: 'var(--bw-on-surface-variant)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--bw-primary)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--bw-on-surface-variant)')}
+          style={{ color: 'var(--text)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-h)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
             filter_alt_off
@@ -171,7 +171,7 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
       {/* Track de fondo */}
       <div
         className="absolute w-full h-1 rounded-full"
-        style={{ backgroundColor: 'var(--bw-outline-variant, #c4c6cd)' }}
+        style={{ backgroundColor: 'var(--border)' }}
       />
 
       {/* Track activo (coloreado entre los dos thumbs) */}
@@ -180,7 +180,7 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
         style={{
           left:            `${pctLo}%`,
           width:           `${pctHi - pctLo}%`,
-          backgroundColor: 'var(--bw-primary, #041627)',
+          backgroundColor: 'var(--accent)',
         }}
       />
 
@@ -216,14 +216,14 @@ const CategoryItem = ({ label, active, onClick }) => (
     <span
       className="w-1 h-4 rounded-full flex-shrink-0 transition-all duration-200"
       style={{
-        backgroundColor: active ? 'var(--bw-primary)' : 'transparent',
-        border:          active ? 'none' : '1px solid var(--bw-outline-variant, #c4c6cd)',
+        backgroundColor: active ? 'var(--accent)' : 'transparent',
+        border:          active ? 'none' : '1px solid var(--border)',
       }}
     />
     <span
       className="font-body text-sm transition-colors"
       style={{
-        color:      active ? 'var(--bw-primary)' : 'var(--bw-on-surface-variant)',
+        color:      active ? 'var(--accent)' : 'var(--text)',
         fontWeight: active ? 500 : 400,
       }}
     >

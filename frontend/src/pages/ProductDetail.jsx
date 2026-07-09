@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/ui/Toast';
 import EmptyState from '../components/ui/EmptyState';
+import Button from '../components/ui/Button';
+import Badge from '../components/ui/Badge';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -107,7 +109,7 @@ const ProductDetail = () => {
       )}
 
       <div className="antialiased min-h-screen flex flex-col font-body"
-           style={{ backgroundColor: 'var(--bg)', color: 'var(--bw-on-surface)' }}>
+           style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
 
         {/* ── Main ── */}
         <main className="flex-grow pt-12 pb-24 px-8 max-w-7xl mx-auto w-full">
@@ -117,13 +119,13 @@ const ProductDetail = () => {
             className="flex items-center gap-2 text-xs pb-8 mb-8"
             style={{
               borderBottom: '1px solid rgba(196,198,205,0.15)',
-              color: 'var(--bw-outline)',
+              color: 'var(--text-muted)',
             }}
           >
             <Link
               to="/"
               className="transition-colors hover:opacity-70"
-              style={{ color: 'var(--bw-outline)' }}
+              style={{ color: 'var(--text-muted)' }}
             >
               Inicio
             </Link>
@@ -131,14 +133,14 @@ const ProductDetail = () => {
             <Link
               to="/products"
               className="transition-colors hover:opacity-70"
-              style={{ color: 'var(--bw-outline)' }}
+              style={{ color: 'var(--text-muted)' }}
             >
               Libros
             </Link>
             <span>/</span>
             <span
               className="line-clamp-1"
-              style={{ color: 'var(--bw-on-surface-variant)' }}
+              style={{ color: 'var(--text)' }}
             >
               {title}
             </span>
@@ -154,7 +156,7 @@ const ProductDetail = () => {
                   className="relative rounded-xl p-8 flex items-center justify-center"
                   style={{
                     backgroundColor: 'var(--bg-container)',
-                    boxShadow: '0 12px 40px rgba(27,28,25,0.06)',
+                    boxShadow: 'var(--shadow)',
                   }}
                 >
                   {thumbnail ? (
@@ -210,22 +212,14 @@ const ProductDetail = () => {
 
               {/* Tags / categoría */}
               <div className="flex items-center gap-3 mb-6 text-sm flex-wrap"
-                   style={{ color: 'var(--bw-on-surface-variant)' }}>
+                   style={{ color: 'var(--text)' }}>
                 {category && (
-                  <span
-                    className="px-3 py-1 rounded-full font-medium text-xs"
-                    style={{
-                      backgroundColor: 'var(--secondary-bg)',
-                      color: 'var(--secondary-text)',
-                    }}
-                  >
-                    {category}
-                  </span>
+                  <Badge category={category} />
                 )}
                 {author && (
                   <>
                     <span style={{ color: 'var(--border)' }}>•</span>
-                    <span className="text-sm" style={{ color: 'var(--bw-on-surface-variant)' }}>
+                    <span className="text-sm" style={{ color: 'var(--text)' }}>
                       {author}
                     </span>
                   </>
@@ -241,7 +235,7 @@ const ProductDetail = () => {
               {author && (
                 <p
                   className="text-xl font-headline italic mb-8"
-                  style={{ color: 'var(--bw-on-surface-variant)' }}
+                  style={{ color: 'var(--text)' }}
                 >
                   por {author}
                 </p>
@@ -253,7 +247,7 @@ const ProductDetail = () => {
                 style={{
                   backgroundColor: 'var(--bg-lowest)',
                   border: '1px solid rgba(196,198,205,0.15)',
-                  boxShadow: '0 4px 20px rgba(4,22,39,0.05)',
+                  boxShadow: 'var(--shadow)',
                 }}
               >
                 {/* Gradiente decorativo */}
@@ -261,7 +255,7 @@ const ProductDetail = () => {
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background:
-                      'radial-gradient(ellipse at top right, rgba(245,243,238,0.5), transparent)',
+                      'radial-gradient(ellipse at top right, color-mix(in srgb, var(--bg-subtle) 50%, transparent), transparent)',
                   }}
                 />
 
@@ -270,13 +264,13 @@ const ProductDetail = () => {
                   <div>
                     <p
                       className="font-headline text-3xl"
-                      style={{ color: 'var(--bw-primary)' }}
+                      style={{ color: 'var(--text-h)' }}
                     >
                       {fmt(price)}
                     </p>
                     <p
                       className="text-sm mt-1"
-                      style={{ color: 'var(--bw-on-surface-variant)' }}
+                      style={{ color: 'var(--text)' }}
                     >
                       {outOfStock
                         ? 'Sin stock disponible'
@@ -306,7 +300,7 @@ const ProductDetail = () => {
                         <span
                           className="px-4 py-3 text-sm font-medium min-w-[3rem] text-center"
                           style={{
-                            color: 'var(--bw-primary)',
+                            color: 'var(--text-h)',
                             borderLeft: '1px solid var(--border)',
                             borderRight: '1px solid var(--border)',
                           }}
@@ -328,39 +322,23 @@ const ProductDetail = () => {
 
                     {/* Botón agregar / sin stock */}
                     {!outOfStock ? (
-                      <button
+                      <Button
+                        variant="primary"
+                        size="lg"
+                        loading={adding}
                         onClick={handleAddToCart}
-                        disabled={adding}
-                        className="flex items-center gap-2 px-8 py-4 rounded-lg font-medium
-                                   text-sm tracking-wide transition-all duration-300 disabled:opacity-60"
-                        style={{
-                          backgroundColor: 'var(--bw-primary)',
-                          color: '#ffffff',
-                          boxShadow: '0 2px 8px rgba(4,22,39,0.25)',
-                        }}
-                        onMouseEnter={e => {
-                          if (!adding) e.currentTarget.style.backgroundColor = 'var(--bw-primary-container)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.backgroundColor = 'var(--bw-primary)';
-                        }}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                          {adding ? 'hourglass_empty' : 'shopping_bag'}
-                        </span>
+                        {!adding && (
+                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                            shopping_bag
+                          </span>
+                        )}
                         {adding ? 'Agregando…' : 'Agregar al carrito'}
-                      </button>
+                      </Button>
                     ) : (
-                      <button
-                        disabled
-                        className="px-8 py-4 rounded-lg font-medium text-sm tracking-wide opacity-50 cursor-not-allowed"
-                        style={{
-                          border: '1px solid var(--border)',
-                          color: 'var(--bw-primary)',
-                        }}
-                      >
+                      <Button variant="secondary" size="lg" disabled>
                         Sin stock
-                      </button>
+                      </Button>
                     )}
 
                     {/* Guardar / bookmark */}
@@ -369,7 +347,7 @@ const ProductDetail = () => {
                       className="px-4 py-4 rounded-lg transition-colors duration-300"
                       style={{
                         border: '1px solid rgba(196,198,205,0.5)',
-                        color: saved ? 'var(--bw-primary)' : 'var(--bw-on-surface-variant)',
+                        color: saved ? 'var(--accent)' : 'var(--text)',
                       }}
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-container)'}
                       onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -387,7 +365,7 @@ const ProductDetail = () => {
               {description && (
                 <div
                   className="mb-12 leading-relaxed text-base"
-                  style={{ color: 'var(--bw-on-surface)' }}
+                  style={{ color: 'var(--text)' }}
                 >
                   <p>{description}</p>
                 </div>
@@ -429,13 +407,13 @@ const DetailItem = ({ label, value }) => (
   <div>
     <p
       className="text-xs uppercase tracking-widest mb-1"
-      style={{ color: 'var(--bw-on-surface-variant)', letterSpacing: '0.1em' }}
+      style={{ color: 'var(--text)', letterSpacing: '0.1em' }}
     >
       {label}
     </p>
     <p
       className="text-sm font-medium"
-      style={{ color: 'var(--bw-primary)' }}
+      style={{ color: 'var(--text-h)' }}
     >
       {value}
     </p>
