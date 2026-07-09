@@ -12,6 +12,7 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 import connectDB           from "./db/mongo.js";
 import router              from "./router/index.js";
 import viewsRouter         from "./router/views.router.js";
+import { startScheduledReseed } from "./services/scheduler.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -97,6 +98,11 @@ app.use(errorMiddleware);
 // ── Conectar DB y levantar servidor ──────────────────────────────────────────
 if (config.mode !== "fs") {
   await connectDB();
+}
+
+// Solo se activa si vos explícitamente lo prendés en el host de producción
+if (process.env.ENABLE_DEMO_RESEED === "true") {
+  startScheduledReseed();
 }
 
 const PORT = config.server.port;
