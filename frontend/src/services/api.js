@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-/* ------------------------------------------------------------------ */
-/*  Rutas 100 % públicas — nunca necesitan token (ni siquiera para     */
-/*  reconocer al usuario). Se comparan por prefijo.                    */
-/* ------------------------------------------------------------------ */
-const ALWAYS_PUBLIC_PREFIXES = ['/products'];
+/*  Rutas de LECTURA 100 % públicas — nunca necesitan token, ni         */
+/*  siquiera para reconocer al usuario. Solo aplica a GET: las mismas   */
+/*  rutas por POST/PUT/DELETE (crear/editar/borrar) sí requieren auth.  */
+const ALWAYS_PUBLIC_GET_PREFIXES = ['/products'];
 
-const isAlwaysPublic = (url = '') =>
-  ALWAYS_PUBLIC_PREFIXES.some((prefix) => url.startsWith(prefix));
+const isAlwaysPublicGet = (config) =>
+  config.method?.toLowerCase() === 'get' &&
+  ALWAYS_PUBLIC_GET_PREFIXES.some((prefix) => config.url?.startsWith(prefix));
 
 /* ------------------------------------------------------------------ */
 /*  Decodifica el payload de un JWT sin verificar firma (solo para     */
@@ -40,8 +40,8 @@ const api = axios.create({
 /* ------------------------------------------------------------------ */
 api.interceptors.request.use(
   (config) => {
-    // Endpoints explícitamente públicos → nunca adjuntar token
-    if (isAlwaysPublic(config.url)) {
+    // Lecturas explícitamente públicas → nunca adjuntar token
+    if (isAlwaysPublicGet(config)) {
       return config;
     }
 
