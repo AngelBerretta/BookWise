@@ -21,6 +21,12 @@ const getUserById = catchAsync(async (req, res) => {
 // ── PUT /api/users/:id ────────────────────────────────────────────────────────
 
 const updateUser = catchAsync(async (req, res) => {
+  const target = await userDAO.getById(req.params.id);
+  if (!target) throw new ApiError(404, "Usuario no encontrado");
+  if (target.isDemo) {
+    throw new ApiError(403, "La cuenta demo no se puede modificar.");
+  }
+
   // Solo un admin puede cambiar el role de otro usuario
   if (req.body.role && req.user.role !== "admin") {
     throw new ApiError(403, "No tenés permisos para cambiar el rol");
@@ -37,6 +43,12 @@ const deleteUser = catchAsync(async (req, res) => {
   // Evita que un admin se elimine a sí mismo
   if (String(req.params.id) === String(req.user._id)) {
     throw new ApiError(400, "No podés eliminar tu propia cuenta");
+  }
+
+  const target = await userDAO.getById(req.params.id);
+  if (!target) throw new ApiError(404, "Usuario no encontrado");
+  if (target.isDemo) {
+    throw new ApiError(403, "La cuenta demo no se puede eliminar.");
   }
 
   const deleted = await userDAO.delete(req.params.id);
