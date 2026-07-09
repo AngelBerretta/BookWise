@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/auth/LoginForm';
 
 const Login = () => {
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, user, login } = useAuth();
   const navigate = useNavigate();
+  const [demoLoading, setDemoLoading] = useState(null); // 'user' | 'admin' | null
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -24,6 +25,19 @@ const Login = () => {
       navigate('/products', { replace: true });
     }
   };
+
+  const handleDemoLogin = async (kind) => {
+    setDemoLoading(kind);
+    try {
+      const credentials = kind === 'admin'
+        ? { email: 'admin-demo@bookwise.com', password: 'Demo1234!' }
+        : { email: 'demo@bookwise.com', password: 'Demo1234!' };
+      const result = await login(credentials);
+      handleLoginSuccess(result?.user);
+    } catch {
+      setDemoLoading(null);
+    }
+  };  
 
   if (loading) return null;
 
@@ -65,7 +79,6 @@ const Login = () => {
               style={{
                 fontSize: 'clamp(1.4rem, 3vw, 1.875rem)',
                 color: 'var(--bw-on-surface)',
-                /* Sobreescribe el h1 global del index.css */
                 fontFamily: "'Newsreader', Georgia, serif",
               }}
             >
@@ -86,7 +99,6 @@ const Login = () => {
             className="flex"
             style={{ borderBottom: '1px solid rgba(196,198,205,0.3)' }}
           >
-            {/* Tab activo */}
             <button
               className="flex-1 pb-4 text-center font-label text-sm font-medium transition-colors"
               style={{
@@ -98,7 +110,6 @@ const Login = () => {
               Iniciar sesión
             </button>
 
-            {/* Tab inactivo → navega a /register */}
             <Link
               to="/register"
               className="flex-1 pb-4 text-center font-label text-sm font-medium transition-colors"
@@ -108,6 +119,36 @@ const Login = () => {
             >
               Registrarse
             </Link>
+          </div>
+
+          {/* ── Acceso rápido — cuentas demo para portfolio ── */}
+          <div
+            className="rounded-lg p-4 flex flex-col gap-3"
+            style={{ backgroundColor: 'var(--bw-surface-container-low)', border: '1px solid rgba(196,198,205,0.3)' }}
+          >
+            <p className="font-label text-xs" style={{ color: 'var(--bw-on-surface-variant)' }}>
+              ¿Solo estás explorando? Entrá sin registrarte:
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('user')}
+                disabled={!!demoLoading}
+                className="flex-1 font-label text-xs font-medium py-2 rounded-lg border transition-colors disabled:opacity-50"
+                style={{ borderColor: 'var(--bw-outline-variant)', color: 'var(--bw-on-surface)' }}
+              >
+                {demoLoading === 'user' ? 'Ingresando…' : 'Ver como lector'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('admin')}
+                disabled={!!demoLoading}
+                className="flex-1 font-label text-xs font-medium py-2 rounded-lg text-white transition-colors disabled:opacity-50"
+                style={{ backgroundColor: 'var(--bw-primary)' }}
+              >
+                {demoLoading === 'admin' ? 'Ingresando…' : 'Ver como admin'}
+              </button>
+            </div>
           </div>
 
           {/* ── Formulario ── */}
@@ -132,7 +173,6 @@ const Login = () => {
             className="w-full h-full object-cover"
             style={{ opacity: 0.8, mixBlendMode: 'multiply' }}
           />
-          {/* Overlays de color */}
           <div
             className="absolute inset-0"
             style={{
@@ -150,10 +190,7 @@ const Login = () => {
           />
         </div>
 
-        {/* Contenido sobre la imagen */}
         <div className="relative z-10 w-full max-w-2xl px-12 lg:px-24 text-left">
-
-          {/* Badge */}
           <div
             className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8"
             style={{
@@ -176,7 +213,6 @@ const Login = () => {
             </span>
           </div>
 
-          {/* Headline */}
           <h2
             className="font-headline font-semibold tracking-tight leading-tight mb-6"
             style={{
@@ -190,7 +226,6 @@ const Login = () => {
             <em style={{ color: 'var(--bw-tertiary-fixed-dim)' }}>espacio</em>.
           </h2>
 
-          {/* Subtítulo */}
           <p
             className="font-body text-lg leading-relaxed max-w-xl"
             style={{ color: 'var(--bw-primary-fixed-dim)' }}
@@ -200,7 +235,6 @@ const Login = () => {
             organizado del conocimiento humano.
           </p>
 
-          {/* Cita */}
           <div
             className="mt-16 pl-6"
             style={{ borderLeft: '2px solid rgba(238,189,142,0.50)' }}

@@ -152,6 +152,11 @@ const AdminLayout = () => {
           <Breadcrumbs extra={extraCrumb ? [extraCrumb] : []} />
 
           <div className="flex items-center gap-2 shrink-0">
+            {user?.isDemo && (
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                Demo
+              </span>
+            )}
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-bg)] text-[var(--accent)] text-xs font-semibold uppercase">
               {user?.username?.[0] ?? '?'}
             </span>

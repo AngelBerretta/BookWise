@@ -148,6 +148,13 @@ const NavbarUserMenu = () => {
           'bg-[var(--bg-subtle)] border border-[var(--border)]',
         ].join(' ')}
       >
+        {/* Badge Demo */}
+        {user?.isDemo && (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+            Demo
+          </span>
+        )}
+
         {/* Avatar inicial */}
         <span
           className={[

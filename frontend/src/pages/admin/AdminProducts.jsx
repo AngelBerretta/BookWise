@@ -98,8 +98,11 @@ const AdminProducts = () => {
       await productService.deleteProduct(confirmTarget._id);
       setToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
       fetchProducts();
-    } catch {
-      setToast({ type: 'error', message: 'No se pudo eliminar el producto.' });
+    } catch (err) {
+      setToast({
+        type: 'error',
+        message: err?.response?.data?.message || err?.message || 'No se pudo eliminar el producto.',
+      });
     } finally {
       setDeletingId(null);
       setConfirmTarget(null);
@@ -131,8 +134,11 @@ const AdminProducts = () => {
       });
       setSelected(new Set());
       fetchProducts();
-    } catch {
-      setToast({ type: 'error', message: 'No se pudieron eliminar los productos seleccionados.' });
+    } catch (err) {
+      setToast({
+        type: 'error',
+        message: err?.response?.data?.message || err?.message || 'No se pudieron eliminar los productos seleccionados.',
+      });
     } finally {
       setBulkDeleting(false);
       setBulkDeleteOpen(false);

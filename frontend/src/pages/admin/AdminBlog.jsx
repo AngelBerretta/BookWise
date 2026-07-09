@@ -60,8 +60,8 @@ const AdminBlog = () => {
       await deletePost(confirmTarget._id);
       setToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
       refetch();
-    } catch {
-      setToast({ type: 'error', message: 'No se pudo eliminar el post.' });
+    } catch (err) {
+      setToast({ type: 'error', message: err?.message || 'No se pudo eliminar el post.' });
     } finally {
       setDeletingId(null);
       setConfirmTarget(null);
@@ -90,8 +90,11 @@ const AdminBlog = () => {
       setToast({ type: 'success', message: `${count} post${count !== 1 ? 's' : ''} eliminado${count !== 1 ? 's' : ''}.` });
       setSelected(new Set());
       refetch();
-    } catch {
-      setToast({ type: 'error', message: 'No se pudieron eliminar los posts seleccionados.' });
+    } catch (err) {
+      setToast({
+        type: 'error',
+        message: err?.response?.data?.message || err?.message || 'No se pudieron eliminar los posts seleccionados.',
+      });
     } finally {
       setBulkWorking(false);
       setBulkDeleteOpen(false);
