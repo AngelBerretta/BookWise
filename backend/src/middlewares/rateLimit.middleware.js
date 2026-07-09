@@ -31,3 +31,38 @@ const rateLimitAuth = rateLimit({
 });
 
 export { rateLimitGeneral, rateLimitAuth };
+
+/**
+ * Límite específico para escrituras (crear/editar) hechas por la cuenta
+ * demo. Se salta por completo para usuarios reales — `skip` evalúa
+ * req.user, por eso este middleware debe ir DESPUÉS de authMiddleware.
+ */
+const rateLimitDemoWrite = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutos
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !req.user?.isDemo,
+  message: {
+    status: "error",
+    message: "Demasiadas acciones en modo demo. Esperá unos minutos y volvé a intentar.",
+  },
+});
+
+/**
+ * Límite más estricto para subida de imágenes en modo demo — es el vector
+ * más directo para intentar colar contenido inapropiado.
+ */
+const rateLimitDemoUpload = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !req.user?.isDemo,
+  message: {
+    status: "error",
+    message: "Demasiadas imágenes subidas en modo demo. Esperá unos minutos.",
+  },
+});
+
+export { rateLimitDemoWrite, rateLimitDemoUpload };

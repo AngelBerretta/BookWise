@@ -13,6 +13,8 @@ import {
 import { authMiddleware }                          from "../middlewares/auth.middleware.js";
 import { roleMiddleware }                          from "../middlewares/role.middleware.js";
 import { demoGuard }                                from "../middlewares/demoGuard.middleware.js";
+import { demoContentFilter }                        from "../middlewares/demoContentFilter.middleware.js";
+import { rateLimitDemoWrite }                       from "../middlewares/rateLimit.middleware.js";
 import { validate }                                from "../middlewares/validate.middleware.js";
 import { createPostSchema, updatePostSchema, bulkIdsSchema, bulkPublishSchema } from "../models/schemas/index.js";
 
@@ -50,6 +52,8 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware(["admin"]),
+  rateLimitDemoWrite,
+  demoContentFilter,
   validate(createPostSchema),
   createPost
 );
@@ -59,6 +63,8 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware(["admin"]),
+  rateLimitDemoWrite,
+  demoContentFilter,
   validate(updatePostSchema),
   updatePost
 );

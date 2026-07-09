@@ -67,7 +67,7 @@ const login = catchAsync(async (req, res) => {
   const token = jwt.sign(
     { _id: user._id, email: user.email, role: user.role, isDemo: user.isDemo ?? false },
     config.jwt.secret,
-    { expiresIn: config.jwt.expiresIn }
+    { expiresIn: user.isDemo ? "1h" : config.jwt.expiresIn }
   );
 
   return res.status(200).json({ token, user: toUserDTO(user) });
