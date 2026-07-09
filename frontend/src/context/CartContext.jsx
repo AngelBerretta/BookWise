@@ -99,14 +99,12 @@ export const CartProvider = ({ children }) => {
     if (!cartId) return;
     setLoading(true);
     try {
-      await cartService.clearCart(cartId);
-      setCart(null);
-      localStorage.removeItem(`cartId_${user?._id}`);
-      setCartId(null);
+      const data = await cartService.clearCart(cartId);
+      setCart(data.cart ?? data.payload ?? data);
     } finally {
       setLoading(false);
     }
-  }, [cartId, user?._id]);
+  }, [cartId]);
 
   const value = {
     cart,
