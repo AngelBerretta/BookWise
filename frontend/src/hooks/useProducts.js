@@ -27,6 +27,7 @@ const useProducts = () => {
 
   const debounceRef = useRef(null);
   const didMountRef = useRef(false);
+  const requestIdRef = useRef(0);
 
   /* ── Precio máximo global del catálogo — se obtiene UNA sola vez ── */
   useEffect(() => {
@@ -36,20 +37,23 @@ const useProducts = () => {
         setMaxPrice(max);
         setPriceRangeRaw([0, max]);
       })
-      .catch(() => setMaxPrice(0))
+      .catch(() => setMaxPrice(0)) // maxPrice se queda en 0 → filtro de precio deshabilitado, no "rango 0-0"
       .finally(() => setPriceReady(true));
   }, []);
 
   /* ── Fetch ── */
   const fetchProducts = useCallback(async (params) => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
     try {
       const data = await productService.getProducts(params);
+      if (requestId !== requestIdRef.current) return; // llegó una respuesta vieja, se descarta
       setProducts(data.payload ?? []);
       setTotalPages(data.totalPages ?? 1);
       setTotalDocs(data.totalDocs ?? 0);
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setError(
         err?.message ||
         err?.response?.data?.message ||
@@ -59,8 +63,10 @@ const useProducts = () => {
       setTotalPages(1);
       setTotalDocs(0);
     } finally {
-      setLoading(false);
-      setInitialLoad(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        setInitialLoad(false);
+      }
     }
   }, []);
 
@@ -80,8 +86,7 @@ const useProducts = () => {
         category: filters.category,
         search:   filters.search,
         sort:     sortBy,
-        minPrice: priceRange[0],
-        maxPrice: priceRange[1],
+        ...(maxPrice > 0 ? { minPrice: priceRange[0], maxPrice: priceRange[1] } : {}),
         limit:    PAGE_SIZE,
         page,
       });
@@ -91,7 +96,7 @@ const useProducts = () => {
   }, [
     filters.category, filters.search, sortBy,
     priceRange[0], priceRange[1], page,
-    priceReady, fetchProducts,
+    priceReady, maxPrice, fetchProducts,
   ]);
 
   const setFilters = useCallback((partial) => {
@@ -105,12 +110,11 @@ const useProducts = () => {
       category: filters.category,
       search:   filters.search,
       sort:     sortBy,
-      minPrice: priceRange[0],
-      maxPrice: priceRange[1],
+      ...(maxPrice > 0 ? { minPrice: priceRange[0], maxPrice: priceRange[1] } : {}),
       limit:    PAGE_SIZE,
       page,
     });
-  }, [fetchProducts, filters, sortBy, priceRange, page]);
+  }, [fetchProducts, filters, sortBy, priceRange, maxPrice, page]);
 
   return {
     products,

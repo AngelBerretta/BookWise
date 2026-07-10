@@ -6,7 +6,7 @@ import EmptyState      from '../ui/EmptyState';
  * Grid responsivo de productos — estilo BookWise.
  * Lógica idéntica al original.
  */
-const ProductGrid = ({ products, loading, initialLoad, error, onClearFilters }) => {
+const ProductGrid = ({ products, loading, error, onClearFilters }) => {
 
   /* ── Error ── */
   if (error) {
@@ -23,8 +23,8 @@ const ProductGrid = ({ products, loading, initialLoad, error, onClearFilters }) 
     );
   }
 
-  /* ── Primera carga → skeletons ── */
-  if (initialLoad && loading) {
+  /* ── Cualquier carga (inicial, cambio de filtro o página) → skeletons ── */
+  if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -55,14 +55,7 @@ const ProductGrid = ({ products, loading, initialLoad, error, onClearFilters }) 
 
   /* ── Grid ── */
   return (
-    <div
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"
-      style={{
-        opacity:    loading ? 0.5 : 1,
-        transition: 'opacity 0.2s ease',
-        minHeight:  '200px',
-      }}
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
       {products.map((product) => (
         <ProductCard key={product._id} product={product} />
       ))}

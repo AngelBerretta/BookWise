@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import Toast from '../ui/Toast';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import { formatPrice } from '../../utils/formatPrice';
 
 const ProductCard = ({ product }) => {
   const { addToCart, loading: cartLoading } = useCart();
@@ -20,11 +21,7 @@ const ProductCard = ({ product }) => {
 
   const outOfStock = stock === 0;
 
-  const formattedPrice = new Intl.NumberFormat('es-AR', {
-    style:               'currency',
-    currency:            'ARS',
-    maximumFractionDigits: 0,
-  }).format(price);
+  const formattedPrice = formatPrice(price, false);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -59,7 +56,7 @@ const ProductCard = ({ product }) => {
         {/* ── Portada ── */}
         <Link to={`/products/${_id}`} className="block">
           <div
-            className="relative rounded-lg p-6 flex justify-center items-center
+            className="relative rounded-lg p-4 sm:p-6 flex justify-center items-center
                        aspect-[3/4] overflow-hidden"
             style={{ backgroundColor: 'var(--bg-subtle)' }}
           >
@@ -68,6 +65,8 @@ const ProductCard = ({ product }) => {
                 src={thumbnail}
                 alt={`Portada de ${title}`}
                 onError={() => setImgError(true)}
+                loading="lazy"
+                decoding="async"                
                 className="w-4/5 h-auto object-cover rounded-md
                            group-hover:-translate-y-2 transition-transform duration-500"
                 style={{ boxShadow: 'var(--shadow-lg)' }}
@@ -142,11 +141,20 @@ const ProductCard = ({ product }) => {
               onClick={handleAddToCart}
             >
               {!adding && (
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: '14px' }}
+                  aria-hidden="true"
+                >
                   {outOfStock ? 'remove_shopping_cart' : 'add_shopping_cart'}
                 </span>
               )}
-              {outOfStock ? 'Sin stock' : 'Agregar'}
+              <span className="hidden sm:inline">
+                {outOfStock ? 'Sin stock' : 'Agregar'}
+              </span>
+              <span className="sr-only sm:hidden">
+                {outOfStock ? 'Sin stock' : 'Agregar al carrito'}
+              </span>
             </Button>
           </div>
 

@@ -7,7 +7,7 @@ const ProductSkeleton = () => (
     {/* Portada */}
     <div
       className="rounded-lg aspect-[3/4] w-full"
-      style={{ backgroundColor: 'var(--bw-surface-container-high, #eae8e3)' }}
+      style={{ backgroundColor: 'var(--bg-container)' }}
     />
 
     {/* Info */}
@@ -16,36 +16,36 @@ const ProductSkeleton = () => (
       {/* Categoría */}
       <div
         className="h-2.5 w-16 rounded"
-        style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+        style={{ backgroundColor: 'var(--bg-container)' }}
       />
 
       {/* Título — dos líneas */}
       <div className="flex flex-col gap-1.5">
         <div
           className="h-5 w-full rounded"
-          style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+          style={{ backgroundColor: 'var(--bg-container)' }}
         />
         <div
           className="h-5 w-3/4 rounded"
-          style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+          style={{ backgroundColor: 'var(--bg-container)' }}
         />
       </div>
 
       {/* Autor */}
       <div
         className="h-3.5 w-1/2 rounded"
-        style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+        style={{ backgroundColor: 'var(--bg-container)' }}
       />
 
       {/* Precio + botón */}
       <div className="flex items-center justify-between gap-2 mt-2">
         <div
           className="h-4 w-1/4 rounded"
-          style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+          style={{ backgroundColor: 'var(--bg-container)' }}
         />
         <div
           className="h-7 w-24 rounded-sm"
-          style={{ backgroundColor: 'var(--bw-surface-container-high)' }}
+          style={{ backgroundColor: 'var(--bg-container)' }}
         />
       </div>
 

@@ -7,6 +7,7 @@ import ProductCard             from '../components/product/ProductCard';
 import PostCard                from '../components/blog/PostCard';
 import Button                  from '../components/ui/Button';
 import Spinner                 from '../components/ui/Spinner';
+import heroImage                from '../assets/hero.png';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -14,11 +15,13 @@ const Home = () => {
   const [posts, setPosts]       = useState([]);
   const [loadingP, setLoadingP] = useState(true);
   const [loadingB, setLoadingB] = useState(true);
+  const [errorP, setErrorP]     = useState(false);
+  const [errorB, setErrorB]     = useState(false);
 
   useEffect(() => {
     getProducts({ limit: 4 })
       .then((d) => setProducts(Array.isArray(d) ? d : (d.payload ?? [])))
-      .catch(() => {})
+      .catch(() => setErrorP(true))
       .finally(() => setLoadingP(false));
   }, []);
 
@@ -28,7 +31,7 @@ const Home = () => {
         const arr = Array.isArray(d) ? d : (d.payload ?? []);
         setPosts(arr.slice(0, 3)); // el backend ya filtra published=true para no-admins
       })
-      .catch(() => {})
+      .catch(() => setErrorB(true))
       .finally(() => setLoadingB(false));
   }, []);
 
@@ -38,7 +41,7 @@ const Home = () => {
       {/* ── Hero ── */}
       <section className="border-b border-[var(--border-subtle)]">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center py-14 sm:py-28">
 
             {/* Texto */}
             <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-6">
@@ -94,8 +97,10 @@ const Home = () => {
                 }}
               >
                 <img
-                  src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&auto=format&fit=crop"
+                  src={heroImage}
                   alt="Biblioteca BookWise"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 />
                 <div
@@ -112,7 +117,7 @@ const Home = () => {
       </section>
 
       {/* ── Productos destacados ── */}
-      <section className="container py-20">
+      <section className="container py-14 sm:py-20">
         <div className="flex items-end justify-between gap-4 mb-10">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-2">
@@ -138,9 +143,13 @@ const Home = () => {
             <Spinner size="lg" />
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {products.map((p) => <ProductCard key={p._id} product={p} />)}
           </div>
+        ) : errorP ? (
+           <p className="text-center text-[var(--text)] py-12">
+             No pudimos cargar los productos. Probá recargar la página.
+           </p>
         ) : (
           <p className="text-center text-[var(--text)] py-12">
             Todavía no hay productos disponibles.
@@ -153,7 +162,7 @@ const Home = () => {
 
       {/* ── Blog ── */}
       <section
-        className="py-20"
+        className="py-14 sm:py-20"
         style={{ background: 'var(--bg-subtle)' }}
       >
         <div className="container">
@@ -185,9 +194,13 @@ const Home = () => {
               <Spinner size="lg" />
             </div>
           ) : posts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {posts.map((post) => <PostCard key={post._id} post={post} />)}
             </div>
+          ) : errorB ? (
+           <p className="text-center text-[var(--text)] py-12">
+             No pudimos cargar los artículos. Probá recargar la página.
+           </p>  
           ) : (
             <p className="text-center text-[var(--text)] py-12">
               Todavía no hay artículos publicados.
@@ -199,7 +212,7 @@ const Home = () => {
       {/* ── CTA final ── */}
       {!isAuthenticated && (
         <section className="border-t border-[var(--border-subtle)]">
-          <div className="container py-24 flex flex-col items-center text-center gap-6">
+          <div className="container py-16 sm:py-24 flex flex-col items-center text-center gap-6">
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)]">
               Comenzá hoy
             </p>
