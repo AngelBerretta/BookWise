@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
 
 const ProductFilters = ({
@@ -13,14 +14,6 @@ const ProductFilters = ({
   const handleSearchChange   = (e) => setFilters({ search: e.target.value });
   const handleCategoryChange = (category) =>
     setFilters({ category: filters.category === category ? '' : category });
-
-  // Formatea precio en ARS
-  const fmt = (n) =>
-    new Intl.NumberFormat('es-AR', {
-      style:               'currency',
-      currency:            'ARS',
-      maximumFractionDigits: 0,
-    }).format(n);
 
   return (
     <>
@@ -94,21 +87,13 @@ const ProductFilters = ({
               onChange={setPriceRange}
             />
 
-            {/* Etiquetas */}
-            <div className="flex justify-between">
-              <span
-                className="font-body text-xs"
-                style={{ color: 'var(--text)' }}
-              >
-                {fmt(priceRange[0])}
-              </span>
-              <span
-                className="font-body text-xs"
-                style={{ color: 'var(--text)' }}
-              >
-                {fmt(priceRange[1])}
-              </span>
-            </div>
+            {/* Inputs editables — permiten tipear un valor exacto */}
+            <PriceNumberInputs
+              min={0}
+              max={maxPrice}
+              value={priceRange}
+              onChange={setPriceRange}
+            />
 
             {/* Reset precio */}
             {(priceRange[0] > 0 || priceRange[1] < maxPrice) && (
@@ -203,6 +188,78 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
         onChange={handleHi}
         className="dual-range-input"
       />
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   Inputs numéricos de precio — con buffer local
+   para no pelear con el clamp mientras se tipea.
+───────────────────────────────────────────── */
+const PriceNumberInputs = ({ min, max, value, onChange }) => {
+  const [lo, hi] = value;
+  const [draftLo, setDraftLo] = useState(String(lo));
+  const [draftHi, setDraftHi] = useState(String(hi));
+  const [editingLo, setEditingLo] = useState(false);
+  const [editingHi, setEditingHi] = useState(false);
+
+  // Sincroniza el buffer con el valor real SOLO si el usuario no está
+  // tipeando ahí en ese momento (evita pisar lo que está escribiendo).
+  useEffect(() => { if (!editingLo) setDraftLo(String(lo)); }, [lo, editingLo]);
+  useEffect(() => { if (!editingHi) setDraftHi(String(hi)); }, [hi, editingHi]);
+
+  const commitLo = () => {
+    setEditingLo(false);
+    const parsed  = Number(draftLo);
+    const clamped = Number.isNaN(parsed) ? lo : Math.min(Math.max(parsed, min), hi);
+    onChange([clamped, hi]);
+    setDraftLo(String(clamped));
+  };
+
+  const commitHi = () => {
+    setEditingHi(false);
+    const parsed  = Number(draftHi);
+    const clamped = Number.isNaN(parsed) ? hi : Math.max(Math.min(parsed, max), lo);
+    onChange([lo, clamped]);
+    setDraftHi(String(clamped));
+  };
+
+  const inputCls = "bw-input text-xs";
+  const labelCls = "text-[10px] uppercase tracking-wide";
+
+  return (
+    <div className="flex items-center gap-3">
+      <label className="flex flex-col gap-1 flex-1">
+        <span className={labelCls} style={{ color: 'var(--text-muted)' }}>Mín.</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          value={draftLo}
+          onFocus={() => setEditingLo(true)}
+          onChange={(e) => setDraftLo(e.target.value)}
+          onBlur={commitLo}
+          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+          aria-label="Precio mínimo exacto"
+          className={inputCls}
+          style={{ padding: '0.4rem 0.6rem' }}
+        />
+      </label>
+      <span className="mt-4 text-sm" style={{ color: 'var(--text-muted)' }}>–</span>
+      <label className="flex flex-col gap-1 flex-1">
+        <span className={labelCls} style={{ color: 'var(--text-muted)' }}>Máx.</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          value={draftHi}
+          onFocus={() => setEditingHi(true)}
+          onChange={(e) => setDraftHi(e.target.value)}
+          onBlur={commitHi}
+          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+          aria-label="Precio máximo exacto"
+          className={inputCls}
+          style={{ padding: '0.4rem 0.6rem' }}
+        />
+      </label>
     </div>
   );
 };

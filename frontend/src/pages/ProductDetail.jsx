@@ -8,6 +8,7 @@ import Toast from '../components/ui/Toast';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import { formatPrice } from '../utils/formatPrice';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -63,12 +64,7 @@ const ProductDetail = () => {
     }
   };
 
-  const fmt = (n) =>
-    new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      maximumFractionDigits: 0,
-    }).format(n);
+  const fmt = (n) => formatPrice(n, false);
 
   /* ── Estados UI ── */
   if (loading) {
