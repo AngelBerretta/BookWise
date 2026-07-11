@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import useCart from '../hooks/useCart';
 import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
@@ -78,6 +79,17 @@ const Cart = () => {
 
       <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+          {/* Seguir comprando */}
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text)] hover:text-[var(--text-h)] transition-colors mb-6 w-fit"
+          >
+            <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M9.78 4.22a.75.75 0 0 1 0 1.06L7.06 8l2.72 2.72a.75.75 0 1 1-1.06 1.06L5.47 8.53a.75.75 0 0 1 0-1.06l3.25-3.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+            </svg>
+            Seguir comprando
+          </Link>
 
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
