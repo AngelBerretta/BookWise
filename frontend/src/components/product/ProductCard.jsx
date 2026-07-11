@@ -51,7 +51,7 @@ const ProductCard = ({ product }) => {
         <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />
       )}
 
-      <article className="group flex flex-col gap-4 h-full">
+      <article className="group flex flex-col gap-4 h-full min-w-0">
 
         {/* ── Portada ── */}
         <Link to={`/products/${_id}`} className="block">
@@ -94,7 +94,7 @@ const ProductCard = ({ product }) => {
         </Link>
 
         {/* ── Info ── */}
-        <div className="flex flex-col gap-1 flex-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
 
           {/* Categoría */}
           {category && <Badge category={category} />}

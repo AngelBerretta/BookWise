@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useProducts    from '../hooks/useProducts';
 import ProductFilters from '../components/product/ProductFilters';
 import ProductGrid    from '../components/product/ProductGrid';
@@ -8,10 +8,10 @@ import { PRODUCT_CATEGORIES } from '../utils/constants';
 import { formatPrice }        from '../utils/formatPrice';
 
 const SORT_OPTIONS = [
-  { value: 'newest',     label: 'Más recientes' },
-  { value: 'price-asc',  label: 'Precio: menor a mayor' },
-  { value: 'price-desc', label: 'Precio: mayor a menor' },
-  { value: 'title-asc',  label: 'Título: A → Z' },
+  { value: 'newest',     label: 'Más recientes',          shortLabel: 'Recientes' },
+  { value: 'price-asc',  label: 'Precio: menor a mayor',  shortLabel: 'Precio ↑' },
+  { value: 'price-desc', label: 'Precio: mayor a menor',  shortLabel: 'Precio ↓' },
+  { value: 'title-asc',  label: 'Título: A → Z',          shortLabel: 'Título A-Z' },
 ];
 
 const Products = () => {
@@ -33,6 +33,16 @@ const Products = () => {
     totalDocs,
   } = useProducts();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const clearFilters = () => {
     setFilters({ search: '', category: '' });
@@ -89,7 +99,22 @@ const Products = () => {
         </div>
 
         {mobileFiltersOpen && (
-          <Modal title="Filtros" size="md" onClose={() => setMobileFiltersOpen(false)}>
+          <Modal
+            title="Filtros"
+            size="md"
+            onClose={() => setMobileFiltersOpen(false)}
+            footer={
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen(false)}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-opacity disabled:opacity-60"
+                style={{ backgroundColor: 'var(--brand)', color: '#fff' }}
+              >
+                {loading ? 'Buscando…' : `Ver ${count} ${count === 1 ? 'resultado' : 'resultados'}`}
+              </button>
+            }
+          >
             <div className="flex flex-col gap-10">
               <ProductFilters
                 filters={filters}
@@ -102,7 +127,7 @@ const Products = () => {
               />
             </div>
           </Modal>
-        )}        
+        )}       
 
         {/* ── Sidebar ── */}
         <aside className="hidden md:flex md:flex-col md:w-64 flex-shrink-0 gap-10">
@@ -122,11 +147,8 @@ const Products = () => {
 
           {/* Encabezado + sort */}
           <div
-            className="flex flex-col sm:flex-row justify-between items-start
-                       sm:items-center gap-4 pb-4"
-            style={{
-              borderBottom: '1px solid var(--border-subtle)',
-            }}
+            className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4"
+            style={{ borderBottom: '1px solid var(--border-subtle)' }}
           >
             <h2
               className="font-headline tracking-tight"
@@ -140,34 +162,33 @@ const Products = () => {
               {filters.category || filters.search ? 'Resultados' : 'El catálogo'}
               <span
                 className="font-body font-normal ml-3"
-                style={{
-                  fontSize: '1rem',
-                  color:    'var(--text)',
-                }}
+                style={{ fontSize: '1rem', color: 'var(--text)' }}
               >
                 ({count} {count === 1 ? 'título' : 'títulos'})
               </span>
             </h2>
 
             {/* Sort selector */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
               <span
-                className="font-body text-sm whitespace-nowrap"
+                className="font-body text-sm whitespace-nowrap hidden sm:inline"
                 style={{ color: 'var(--text)' }}
               >
                 Ordenar por:
               </span>
-              <div className="relative">
+              <div className="relative min-w-0 flex-1 sm:flex-none">
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bw-select"
+                  className="bw-select w-full sm:w-auto pr-6"
+                  aria-label="Ordenar productos por"
                 >
                   {SORT_OPTIONS.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {isMobile ? o.shortLabel : o.label}
+                    </option>
                   ))}
                 </select>
-                {/* Chevron */}
                 <span
                   className="material-symbols-outlined absolute right-0 top-1/2
                             -translate-y-1/2 pointer-events-none text-[16px]

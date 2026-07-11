@@ -17,37 +17,53 @@ const ProductFilters = ({
 
   return (
     <>
-      {/* ── Búsqueda ── */}
-      <div className="relative group">
-        <span
-          className="material-symbols-outlined absolute left-3 top-1/2
-                     -translate-y-1/2 pointer-events-none transition-colors"
-          style={{ fontSize: '20px', color: 'var(--text-muted)' }}
-        >
-          search
-        </span>
-        <input
-          type="search"
-          placeholder="Buscar en el catálogo…"
-          value={filters.search}
-          onChange={handleSearchChange}
-          className="bw-input"
-          style={{ paddingLeft: '2.5rem' }}
-        />
+      {/* ── Limpiar todo (alcance global) — siempre visible, sin scroll ── */}
+      <div className="flex flex-col gap-3">
+        {hasActiveFilters && (
+          <div className="flex justify-end">
+            <button
+              onClick={onClear}
+              className="flex items-center gap-1.5 font-label text-xs font-medium transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-h)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                filter_alt_off
+              </span>
+              Limpiar filtros
+            </button>
+          </div>
+        )}
+
+        {/* ── Búsqueda ── */}
+        <div className="relative group">
+          <span
+            className="material-symbols-outlined absolute left-3 top-1/2
+                       -translate-y-1/2 pointer-events-none transition-colors"
+            style={{ fontSize: '20px', color: 'var(--text-muted)' }}
+          >
+            search
+          </span>
+          <input
+            type="search"
+            placeholder="Buscar en el catálogo…"
+            value={filters.search}
+            onChange={handleSearchChange}
+            className="bw-input"
+            style={{ paddingLeft: '2.5rem' }}
+          />
+        </div>
       </div>
 
       {/* ── Categorías ── */}
       <div className="flex flex-col gap-4">
         <h3
           className="font-headline text-lg italic tracking-tight"
-          style={{
-            color:      'var(--text-h)',
-            fontFamily: "'Newsreader', Georgia, serif",
-          }}
+          style={{ color: 'var(--text-h)', fontFamily: "'Newsreader', Georgia, serif" }}
         >
           Colecciones curadas
         </h3>
-
         <div className="flex flex-col gap-2">
           <CategoryItem
             label="Todas las colecciones"
@@ -70,32 +86,15 @@ const ProductFilters = ({
         <div className="flex flex-col gap-4">
           <h3
             className="font-headline text-lg italic tracking-tight"
-            style={{
-              color:      'var(--text-h)',
-              fontFamily: "'Newsreader', Georgia, serif",
-            }}
+            style={{ color: 'var(--text-h)', fontFamily: "'Newsreader', Georgia, serif" }}
           >
             Rango de precio
           </h3>
-
-          {/* Slider doble con dos inputs range superpuestos */}
           <div className="flex flex-col gap-3">
-            <DualRangeSlider
-              min={0}
-              max={maxPrice}
-              value={priceRange}
-              onChange={setPriceRange}
-            />
+            <DualRangeSlider min={0} max={maxPrice} value={priceRange} onChange={setPriceRange} />
+            <PriceNumberInputs min={0} max={maxPrice} value={priceRange} onChange={setPriceRange} />
 
-            {/* Inputs editables — permiten tipear un valor exacto */}
-            <PriceNumberInputs
-              min={0}
-              max={maxPrice}
-              value={priceRange}
-              onChange={setPriceRange}
-            />
-
-            {/* Reset precio */}
+            {/* Reset local — solo precio, queda pegado a su sección */}
             {(priceRange[0] > 0 || priceRange[1] < maxPrice) && (
               <button
                 onClick={() => setPriceRange([0, maxPrice])}
@@ -110,26 +109,11 @@ const ProductFilters = ({
           </div>
         </div>
       )}
-
-      {/* ── Limpiar todos los filtros ── */}
-      {hasActiveFilters && (
-        <button
-          onClick={onClear}
-          className="flex items-center gap-2 font-label text-sm
-                     transition-colors w-fit"
-          style={{ color: 'var(--text)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-h)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-            filter_alt_off
-          </span>
-          Limpiar filtros
-        </button>
-      )}
     </>
   );
 };
+
+      
 
 /* ─────────────────────────────────────────────
    Slider doble (min / max)
@@ -147,29 +131,21 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
     if (v >= lo) onChange([lo, v]);
   };
 
-  // Porcentajes para la barra coloreada
   const pctLo = ((lo - min) / (max - min)) * 100;
   const pctHi = ((hi - min) / (max - min)) * 100;
 
-  return (
-    <div className="relative h-5 flex items-center">
-      {/* Track de fondo */}
-      <div
-        className="absolute w-full h-1 rounded-full"
-        style={{ backgroundColor: 'var(--border)' }}
-      />
+  // Cuando el thumb "lo" está en la mitad derecha del rango, es el que
+  // más probablemente el usuario quiera tocar ahí → sube su prioridad táctil.
+  const loOnTop = pctLo > 50;
 
-      {/* Track activo (coloreado entre los dos thumbs) */}
+  return (
+    <div className="relative h-6 sm:h-5 flex items-center touch-none">
+      <div className="absolute w-full h-1 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
       <div
         className="absolute h-1 rounded-full"
-        style={{
-          left:            `${pctLo}%`,
-          width:           `${pctHi - pctLo}%`,
-          backgroundColor: 'var(--accent)',
-        }}
+        style={{ left: `${pctLo}%`, width: `${pctHi - pctLo}%`, backgroundColor: 'var(--accent)' }}
       />
 
-      {/* Input MIN */}
       <input
         type="range"
         min={min}
@@ -177,9 +153,9 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
         value={lo}
         onChange={handleLo}
         className="dual-range-input"
+        style={{ zIndex: loOnTop ? 5 : 3 }}
+        aria-label="Precio mínimo"
       />
-
-      {/* Input MAX */}
       <input
         type="range"
         min={min}
@@ -187,6 +163,8 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
         value={hi}
         onChange={handleHi}
         className="dual-range-input"
+        style={{ zIndex: loOnTop ? 3 : 5 }}
+        aria-label="Precio máximo"
       />
     </div>
   );

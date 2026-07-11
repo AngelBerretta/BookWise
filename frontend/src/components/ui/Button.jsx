@@ -9,6 +9,7 @@ const Button = ({
   onClick,
   children,
   className = '',
+  ...rest
 }) => {
   const base = [
     'inline-flex items-center justify-center gap-2',
@@ -27,19 +28,16 @@ const Button = ({
       'focus:ring-[var(--text-h)]',
       'shadow-[0_4px_20px_rgba(4,22,39,0.15)]',
     ].join(' '),
-
     secondary: [
       'bg-transparent text-[var(--text-h)] border-[var(--border)]',
       'hover:bg-[var(--bg-container)] hover:border-[var(--border)]',
       'focus:ring-[var(--text-h)]',
     ].join(' '),
-
     danger: [
       'bg-red-700 text-white border-transparent',
       'hover:bg-red-800',
       'focus:ring-red-600',
     ].join(' '),
-
     ghost: [
       'bg-transparent text-[var(--text)] border-transparent',
       'hover:bg-[var(--bg-container)] hover:text-[var(--text-h)]',
@@ -59,6 +57,7 @@ const Button = ({
       onClick={onClick}
       disabled={disabled || loading}
       className={[base, variants[variant], sizes[size], className].join(' ')}
+      {...rest}
     >
       {loading && <Spinner size={size === 'lg' ? 'md' : 'sm'} />}
       {children}

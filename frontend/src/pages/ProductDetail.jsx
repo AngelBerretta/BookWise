@@ -9,6 +9,7 @@ import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import { formatPrice } from '../utils/formatPrice';
+import { PRODUCT_CATEGORIES } from '../utils/constants';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -108,11 +109,11 @@ const ProductDetail = () => {
            style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
 
         {/* ── Main ── */}
-        <main className="flex-grow pt-12 pb-24 px-8 max-w-7xl mx-auto w-full">
+        <main className="flex-grow pt-8 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto w-full">
 
           {/* ── Breadcrumb ── */}
           <div
-            className="flex items-center gap-2 text-xs pb-8 mb-8"
+            className="flex items-center gap-2 text-xs pb-6 sm:pb-8 mb-6 sm:mb-8"
             style={{
               borderBottom: '1px solid rgba(196,198,205,0.15)',
               color: 'var(--text-muted)',
@@ -143,13 +144,13 @@ const ProductDetail = () => {
           </div>
 
           {/* ── Product grid ── */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 mb-14 sm:mb-24">
 
             {/* ── Columna imagen ── */}
             <div className="lg:col-span-5 relative">
-              <div className="sticky top-32">
+              <div className="lg:sticky lg:top-32">
                 <div
-                  className="relative rounded-xl p-8 flex items-center justify-center"
+                  className="relative rounded-xl p-5 sm:p-8 flex items-center justify-center"
                   style={{
                     backgroundColor: 'var(--bg-container)',
                     boxShadow: 'var(--shadow)',
@@ -239,7 +240,7 @@ const ProductDetail = () => {
 
               {/* ── Card precio + acciones ── */}
               <div
-                className="rounded-xl p-8 mb-10 relative overflow-hidden"
+                className="rounded-xl p-5 sm:p-8 mb-8 sm:mb-10 relative overflow-hidden"
                 style={{
                   backgroundColor: 'var(--bg-lowest)',
                   border: '1px solid rgba(196,198,205,0.15)',
@@ -255,7 +256,7 @@ const ProductDetail = () => {
                   }}
                 />
 
-                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   {/* Precio + stock */}
                   <div>
                     <p
@@ -280,9 +281,8 @@ const ProductDetail = () => {
                     {/* Selector cantidad */}
                     {!outOfStock && (
                       <div
-                        className="flex items-center rounded-lg overflow-hidden"
-                        style={{ border: '1px solid var(--border)' }}
-                      >
+                        className="flex items-center rounded-lg overflow-hidden shrink-0"
+                        style={{ border: '1px solid var(--border)' }}>
                         <button
                           onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                           disabled={quantity <= 1}
@@ -316,31 +316,10 @@ const ProductDetail = () => {
                       </div>
                     )}
 
-                    {/* Botón agregar / sin stock */}
-                    {!outOfStock ? (
-                      <Button
-                        variant="primary"
-                        size="lg"
-                        loading={adding}
-                        onClick={handleAddToCart}
-                      >
-                        {!adding && (
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                            shopping_bag
-                          </span>
-                        )}
-                        {adding ? 'Agregando…' : 'Agregar al carrito'}
-                      </Button>
-                    ) : (
-                      <Button variant="secondary" size="lg" disabled>
-                        Sin stock
-                      </Button>
-                    )}
-
-                    {/* Guardar / bookmark */}
+                    {/* Guardar / bookmark — único, ubicado antes del CTA */}
                     <button
                       onClick={() => setSaved(s => !s)}
-                      className="px-4 py-4 rounded-lg transition-colors duration-300"
+                      className="px-4 py-4 rounded-lg transition-colors duration-300 shrink-0"
                       style={{
                         border: '1px solid rgba(196,198,205,0.5)',
                         color: saved ? 'var(--accent)' : 'var(--text)',
@@ -353,6 +332,33 @@ const ProductDetail = () => {
                         {saved ? 'bookmark' : 'bookmark_border'}
                       </span>
                     </button>
+
+                    {/* Botón agregar / sin stock */}
+                    {!outOfStock ? (
+                      <Button
+                        variant="primary"
+                        size="lg"
+                        loading={adding}
+                        onClick={handleAddToCart}
+                        className="flex-1 justify-center min-w-[200px]"
+                      >
+                        {!adding && (
+                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                            shopping_bag
+                          </span>
+                        )}
+                        {adding ? 'Agregando…' : 'Agregar al carrito'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="lg"
+                        disabled
+                        className="flex-1 justify-center min-w-[200px]"
+                      >
+                        Sin stock
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -373,7 +379,7 @@ const ProductDetail = () => {
                 style={{ borderTop: '1px solid rgba(196,198,205,0.15)' }}
               >
                 {category && (
-                  <DetailItem label="Categoría" value={category} />
+                  <DetailItem label="Categoría" value={PRODUCT_CATEGORIES.find(c => c.value === category)?.label ?? category}/>
                 )}
                 {product.publicationDate && (
                   <DetailItem label="Publicación" value={product.publicationDate} />
