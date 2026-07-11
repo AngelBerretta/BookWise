@@ -68,7 +68,24 @@ api.interceptors.request.use(
 /* ------------------------------------------------------------------ */
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+    /* ------------------------------------------------------------------ */
+    /*  Reintento automático ante timeout/caída de conexión — típico de    */
+    /*  un "cold start" en hosts free (Render duerme tras inactividad y    */
+    /*  puede tardar 30-60s en responder la primera petición).             */
+    /* ------------------------------------------------------------------ */
+    const isTimeoutOrNetworkError = error.code === 'ECONNABORTED' || !error.response;
+
+    if (isTimeoutOrNetworkError && config && !config._retriedColdStart) {
+      config._retriedColdStart = true;
+      config.timeout = 45000; // margen suficiente para que el server despierte
+      try {
+        return await api(config);
+      } catch (retryErr) {
+        error = retryErr;
+      }
+    }
     if (error.response) {
       const { status, data } = error.response;
 

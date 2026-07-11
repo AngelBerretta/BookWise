@@ -83,6 +83,11 @@ app.use(express.urlencoded({ extended: true }));
 // ── Rutas de vistas ───────────────────────────────────────────────────────────
 app.use("/", viewsRouter);
 
+// ── Health check — usado por el ping externo para evitar el cold start ────────
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
+
 // ── API REST ──────────────────────────────────────────────────────────────────
 app.use("/api", router);
 
