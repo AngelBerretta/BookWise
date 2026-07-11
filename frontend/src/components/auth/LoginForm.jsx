@@ -68,10 +68,10 @@ const LoginForm = ({ onSuccess }) => {
         <Toast type="error" message={error} onClose={() => setToast(null)} />
       )}
 
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[clamp(0.6rem,2dvh,1rem)]">
 
         {/* ── Email ── */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <label
             htmlFor="email"
             className="font-label text-xs font-medium uppercase tracking-wider"
@@ -108,7 +108,7 @@ const LoginForm = ({ onSuccess }) => {
         </div>
 
         {/* ── Password ── */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center">
             <label
               htmlFor="password"

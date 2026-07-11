@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 
 const FOOTER_LINKS = {
   Tienda: [
-    { to: '/products',                    label: 'Catálogo completo' },
-    { to: '/products?query=ficcion',      label: 'Ficción' },
-    { to: '/products?query=no-ficcion',   label: 'No Ficción' },
-    { to: '/products?query=ebooks',       label: 'E-books' },
+    { to: '/products',                       label: 'Catálogo completo' },
+    { to: '/products?category=ficcion',      label: 'Ficción' },
+    { to: '/products?category=no-ficcion',   label: 'No Ficción' },
+    { to: '/products?category=ebooks',       label: 'E-books' },
   ],
   Explorar: [
     { to: '/blog',  label: 'Diario del curador' },

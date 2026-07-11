@@ -85,7 +85,7 @@ const RegisterForm = ({ onSuccess }) => {
         <Toast type="error" message={error} onClose={() => setToast(null)} />
       )}
 
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[clamp(0.45rem,1.6dvh,0.85rem)]">
 
         {/* ── Username ── */}
         <BwField
@@ -227,7 +227,7 @@ const RegisterForm = ({ onSuccess }) => {
 
 /** Wrapper de campo con icono izquierdo + label + error */
 const BwField = ({ id, label, icon, error, children }) => (
-  <div className="flex flex-col gap-1.5">
+  <div className="flex flex-col gap-1">
     <label
       htmlFor={id}
       className="font-label text-xs font-medium uppercase tracking-wider"

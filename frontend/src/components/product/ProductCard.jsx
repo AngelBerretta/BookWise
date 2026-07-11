@@ -25,7 +25,6 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
-    console.log('Click en agregar', { isAuthenticated, outOfStock, _id });
     if (!isAuthenticated) {
       setToast({ type: 'warning', message: 'Iniciá sesión para agregar al carrito.' });
       return;
@@ -33,12 +32,9 @@ const ProductCard = ({ product }) => {
     if (outOfStock) return;
     setAdding(true);
     try {
-      console.log('Llamando a addToCart...');
       await addToCart(_id, 1);
-      console.log('addToCart exitoso');
       setToast({ type: 'success', message: `"${title}" agregado al carrito.` });
     } catch {
-      console.error('Error en addToCart:');
       setToast({ type: 'error', message: 'No pudimos agregar el producto. Intentá de nuevo.' });
     } finally {
       setAdding(false);

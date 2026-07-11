@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import * as productService from '../services/productService';
 
 const PAGE_SIZE = 12;
@@ -7,14 +8,23 @@ const PAGE_SIZE = 12;
  * Paginación, filtros, orden y rango de precio son 100% server-side.
  * El hook nunca vuelve a filtrar/ordenar en el cliente: lo que llega
  * en `products` es exactamente lo que hay que pintar.
+ *
+ * La categoría vive también en el query param `?category=`, así los
+ * links del footer / navbar pueden llegar con un filtro aplicado y
+ * el catálogo filtrado es compartible/bookmarkeable.
  */
 const useProducts = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
-  const [filters, setFiltersRaw] = useState({ category: '', search: '' });
+  const [filters, setFiltersRaw] = useState({
+    category: searchParams.get('category') ?? '',
+    search: '',
+  });
   const [sortBy, setSortBy]      = useState('newest');
 
   const [priceRange, setPriceRangeRaw] = useState([0, 0]);
@@ -75,6 +85,17 @@ const useProducts = () => {
     if (!didMountRef.current) { didMountRef.current = true; return; }
     setPage(1);
   }, [filters.category, filters.search, sortBy, priceRange[0], priceRange[1]]);
+
+  /* Mantiene ?category= en la URL en sync con el filtro activo
+     (replace, no push: no queremos ensuciar el historial en cada click) */
+  useEffect(() => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (filters.category) next.set('category', filters.category);
+      else next.delete('category');
+      return next;
+    }, { replace: true });
+  }, [filters.category, setSearchParams]);
 
   /* Fetch real — debounced. Depende también de `page` para paginar. */
   useEffect(() => {
