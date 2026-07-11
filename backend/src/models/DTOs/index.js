@@ -65,4 +65,6 @@ const toPostDTO = (post) => ({
   updatedAt: post.updatedAt,
 });
 
-export { toUserDTO, toProductDTO, toCartDTO, toPostDTO };
+const toWishlistDTO = (products) => (products || []).map(toProductDTO);
+
+export { toUserDTO, toProductDTO, toCartDTO, toPostDTO, toWishlistDTO };

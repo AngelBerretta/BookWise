@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getProductById } from '../services/productService';
+import { getProductById, getProducts } from '../services/productService';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/ui/Toast';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import ProductCard from '../components/product/ProductCard';
 import { formatPrice } from '../utils/formatPrice';
 import { PRODUCT_CATEGORIES } from '../utils/constants';
 
@@ -16,6 +18,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
 
   const { addToCart } = useCart();
+  const { isSaved, toggleWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
 
   const [product, setProduct]   = useState(null);
@@ -25,6 +28,9 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast]       = useState(null);
   const [saved, setSaved]       = useState(false);
+  const [savingWish, setSavingWish] = useState(false);
+  const [related, setRelated] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   /* ── Fetch ── */
   useEffect(() => {
@@ -47,6 +53,34 @@ const ProductDetail = () => {
     };
     load();
   }, [id]);
+
+  /* ── Fetch relacionados — depende del producto ya cargado ── */
+  useEffect(() => {
+    if (!product?.category) return;
+    setLoadingRelated(true);
+    getProducts({ category: product.category, limit: 5 })
+      .then((d) => {
+        const arr = Array.isArray(d) ? d : (d.payload ?? []);
+        setRelated(arr.filter((p) => p._id !== product._id).slice(0, 4));
+      })
+      .catch(() => setRelated([]))
+      .finally(() => setLoadingRelated(false));
+  }, [product?._id, product?.category]);  
+
+    const handleToggleWishlist = async () => {
+    if (!isAuthenticated) {
+      setToast({ type: 'warning', message: 'Iniciá sesión para guardar productos.' });
+      return;
+    }
+    setSavingWish(true);
+    try {
+      await toggleWishlist(product._id);
+    } catch {
+      setToast({ type: 'error', message: 'No pudimos actualizar tus guardados.' });
+    } finally {
+      setSavingWish(false);
+    }
+  };
 
   /* ── Add to cart ── */
   const handleAddToCart = async () => {
@@ -318,18 +352,19 @@ const ProductDetail = () => {
 
                     {/* Guardar / bookmark — único, ubicado antes del CTA */}
                     <button
-                      onClick={() => setSaved(s => !s)}
+                      onClick={handleToggleWishlist}
+                      disabled={savingWish}
                       className="px-4 py-4 rounded-lg transition-colors duration-300 shrink-0"
                       style={{
                         border: '1px solid rgba(196,198,205,0.5)',
-                        color: saved ? 'var(--accent)' : 'var(--text)',
+                        color: isSaved(product._id) ? 'var(--accent)' : 'var(--text)',
                       }}
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-container)'}
                       onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-                      aria-label={saved ? 'Quitar de guardados' : 'Guardar'}
+                      aria-label={isSaved(product._id) ? 'Quitar de guardados' : 'Guardar'}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                        {saved ? 'bookmark' : 'bookmark_border'}
+                        {savingWish ? 'hourglass_empty' : (isSaved(product._id) ? 'bookmark' : 'bookmark_border')}
                       </span>
                     </button>
 
@@ -397,6 +432,15 @@ const ProductDetail = () => {
               </div>
             </div>
           </section>
+
+          {related.length > 0 && (
+            <section className="mt-16 sm:mt-24 pt-8 sm:pt-12" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <h2 className="h2-editorial-sm mb-8">También te puede interesar</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {related.map((p) => <ProductCard key={p._id} product={p} />)}
+              </div>
+            </section>
+          )}
 
         </main>
       </div>

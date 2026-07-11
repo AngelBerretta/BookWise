@@ -47,7 +47,15 @@ const userSchema = new mongoose.Schema(
     isDemo: {
       type: Boolean,
       default: false,
-    },    
+    },
+    
+   // ── Wishlist ──────────────────────────────────────────────────────────────
+   // Array de referencias a Product. En modo `fs` se guardan como strings
+   // planos (mismo criterio que Cart.products en ese modo).
+   wishlist: {
+     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+     default: [],
+   },
   },
   { timestamps: true }
 );
