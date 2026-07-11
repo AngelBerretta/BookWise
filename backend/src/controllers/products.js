@@ -58,6 +58,7 @@ const getProducts = catchAsync(async (req, res) => {
    default:
      sortObj.createdAt = -1;
  }
+ sortObj._id = -1;
 
   // ── Paginación ─────────────────────────────────────────────────────────────
   const { docs, totalDocs, totalPages } = await productDAO.paginate(filters, {
