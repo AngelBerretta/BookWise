@@ -22,13 +22,26 @@ const EMPTY_FIELDS = {
   publicationDate: '',        // ✅ nuevo
 };
 
-const ProductForm = ({ product, onSuccess, onCancel }) => {
+const ProductForm = ({
+  product,
+  onSuccess,
+  onCancel,
+  formId        = 'product-form',
+  showActions   = true,
+  onLoadingChange,
+}) => {
   const isEditing = !!product;
 
   const [fields, setFields]           = useState({ ...EMPTY_FIELDS });
   const [fieldErrors, setFieldErrors] = useState({});
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoadingState]    = useState(false);
   const [error, setError]             = useState(null);
+
+  // Notifica al padre (footer externo del Modal) cuando cambia el loading
+  const setLoading = (val) => {
+    setLoadingState(val);
+    onLoadingChange?.(val);
+  };
 
   useEffect(() => {
     if (product) {
@@ -130,7 +143,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
   };
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+    <form id={formId} onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
 
       {error && (
         <div className="rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200
@@ -264,15 +277,17 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
 
       </div>
 
-      {/* Acciones */}
-      <div className="flex justify-end gap-3 pt-2 border-t border-[var(--border)]">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
-          Cancelar
-        </Button>
-        <Button type="submit" variant="primary" loading={loading}>
-          {isEditing ? 'Guardar cambios' : 'Crear producto'}
-        </Button>
-      </div>
+      {/* Acciones internas — solo si NO hay footer externo (uso standalone) */}
+      {showActions && (
+        <div className="flex justify-end gap-3 pt-2 border-t border-[var(--border)]">
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary" loading={loading}>
+            {isEditing ? 'Guardar cambios' : 'Crear producto'}
+          </Button>
+        </div>
+      )}
 
     </form>
   );

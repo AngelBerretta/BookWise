@@ -34,6 +34,7 @@ const AdminProducts = () => {
   const [selected, setSelected]             = useState(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkDeleting, setBulkDeleting]     = useState(false);
+  const [formLoading, setFormLoading]       = useState(false);
 
   useEffect(() => {
     if (!modalOpen) { setExtraCrumb(null); return; }
@@ -165,8 +166,36 @@ const AdminProducts = () => {
           title={editProduct ? 'Editar producto' : 'Nuevo producto'}
           onClose={closeModal}
           size="lg"
+          footer={
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={closeModal}
+                disabled={formLoading}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                form="product-form"
+                variant="primary"
+                loading={formLoading}
+                className="w-full sm:w-auto"
+              >
+                {editProduct ? 'Guardar cambios' : 'Crear producto'}
+              </Button>
+            </div>
+          }
         >
-          <ProductForm product={editProduct} onSuccess={handleSuccess} onCancel={closeModal} />
+          <ProductForm
+            product={editProduct}
+            onSuccess={handleSuccess}
+            onCancel={closeModal}
+            showActions={false}
+            onLoadingChange={setFormLoading}
+          />
         </Modal>
       )}
 

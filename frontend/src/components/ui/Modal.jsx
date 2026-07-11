@@ -12,15 +12,13 @@ import { createPortal } from 'react-dom';
  *   size?: 'md'|'lg'|'xl'
  * }} props
  */
-const Modal = ({ title, children, onClose, size = 'lg' }) => {
-  /* Cerrar con Escape */
+const Modal = ({ title, children, onClose, size = 'lg', footer = null }) => {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  /* Bloquear scroll del body */
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -35,14 +33,8 @@ const Modal = ({ title, children, onClose, size = 'lg' }) => {
       aria-modal="true"
       aria-label={title}
     >
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-      {/* Panel */}
       <div
         className={[
           'relative w-full rounded-2xl',
@@ -70,6 +62,13 @@ const Modal = ({ title, children, onClose, size = 'lg' }) => {
         <div className="overflow-y-auto px-6 py-5 flex-1">
           {children}
         </div>
+
+        {/* Footer opcional — fijo, no scrollea con el contenido */}
+        {footer && (
+          <div className="px-6 py-4 border-t border-[var(--border)] shrink-0">
+            {footer}
+          </div>
+        )}
       </div>
     </div>,
     document.body

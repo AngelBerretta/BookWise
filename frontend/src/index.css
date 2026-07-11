@@ -457,3 +457,13 @@ img, svg { display: block; }
 .dual-range-input::-moz-range-track {
   background: transparent;
 }
+
+/* Oculta los steppers nativos de input[type=number] — usados en filtros de precio */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
