@@ -14,14 +14,12 @@ const Register = () => {
         {/* Panel izquierdo — éxito */}
         <div
           className="w-full md:w-1/2 lg:w-5/12 xl:w-[480px]
-                     flex flex-col justify-center
+                     auth-panel
                      px-8 md:px-16 lg:px-24
-                     shrink-0 h-full overflow-y-auto hide-scrollbar relative z-10"
+                     shrink-0 max-h-full self-center md:self-auto md:h-full overflow-y-auto hide-scrollbar relative z-10"
           style={{
             backgroundColor: 'var(--bw-surface-container-lowest)',
             boxShadow: '0 12px 40px rgba(27,28,25,0.06)',
-            paddingTop: 'clamp(0.75rem, 3dvh, 2rem)',
-            paddingBottom: 'clamp(0.75rem, 3dvh, 2rem)',
           }}
         >
           <div className="max-w-sm w-full mx-auto flex flex-col items-center gap-6 text-center">
@@ -75,6 +73,14 @@ const Register = () => {
             </div>
 
           </div>
+
+          {/* Pie de marca — solo mobile, ver nota en Login.jsx */}
+          <p
+            className="md:hidden mt-[clamp(1.5rem,5dvh,3rem)] text-center font-label text-xs"
+            style={{ color: 'var(--bw-outline)' }}
+          >
+            "Una habitación sin libros es como un cuerpo sin alma." — Cicerón
+          </p>
         </div>
 
         {/* Panel derecho — igual que login */}
@@ -92,14 +98,12 @@ const Register = () => {
       ══════════════════════════════════════ */}
       <div
         className="w-full md:w-1/2 lg:w-5/12 xl:w-[480px]
-                   flex flex-col justify-center
+                   auth-panel
                    px-8 md:px-16 lg:px-24
-                   shrink-0 h-full overflow-y-auto hide-scrollbar relative z-10"
+                   shrink-0 max-h-full self-center md:self-auto md:h-full overflow-y-auto hide-scrollbar relative z-10"
         style={{
           backgroundColor: 'var(--bw-surface-container-lowest)',
           boxShadow: '0 12px 40px rgba(27,28,25,0.06)',
-          paddingTop: 'clamp(0.75rem, 3dvh, 2rem)',
-          paddingBottom: 'clamp(0.75rem, 3dvh, 2rem)',
         }}
       >
         <div className="max-w-sm w-full mx-auto flex flex-col gap-[clamp(0.5rem,1.8dvh,1rem)]">
@@ -166,6 +170,14 @@ const Register = () => {
           <RegisterForm onSuccess={() => setRegistered(true)} />
 
         </div>
+
+        {/* Pie de marca — solo mobile, ver nota en Login.jsx */}
+        <p
+          className="md:hidden mt-[clamp(1.5rem,5dvh,3rem)] text-center font-label text-xs"
+          style={{ color: 'var(--bw-outline)' }}
+        >
+          "Una habitación sin libros es como un cuerpo sin alma." — Cicerón
+        </p>
       </div>
 
       {/* ══════════════════════════════════════

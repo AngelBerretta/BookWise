@@ -111,7 +111,7 @@ const RegisterForm = ({ onSuccess }) => {
         {/* ── Email ── */}
         <BwField
           id="email"
-          label="Email Address"
+          label="Correo electrónico"
           icon="mail"
           error={fieldErrors.email}
         >
@@ -120,7 +120,7 @@ const RegisterForm = ({ onSuccess }) => {
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="reader@example.com"
+            placeholder="lector@ejemplo.com"
             value={fields.email}
             onChange={onChange}
             className="bw-input"
@@ -131,7 +131,7 @@ const RegisterForm = ({ onSuccess }) => {
         {/* ── Password ── */}
         <BwField
           id="password"
-          label="Password"
+          label="Contraseña"
           icon="lock"
           error={fieldErrors.password}
         >
@@ -155,7 +155,7 @@ const RegisterForm = ({ onSuccess }) => {
         {/* ── Confirm Password ── */}
         <BwField
           id="confirmPassword"
-          label="Confirm Password"
+          label="Confirmar contraseña"
           icon="lock_reset"
           error={fieldErrors.confirmPassword}
         >
@@ -205,8 +205,9 @@ const RegisterForm = ({ onSuccess }) => {
             </>
           ) : (
             <>
-              Create Account
+              Crear mi cuenta
               <span
+                aria-hidden="true"
                 className="material-symbols-outlined ml-2"
                 style={{ fontSize: '18px' }}
               >
@@ -238,6 +239,7 @@ const BwField = ({ id, label, icon, error, children }) => (
     <div className="relative">
       {/* Icono izquierdo */}
       <span
+        aria-hidden="true"
         className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
                    pointer-events-none select-none"
         style={{ fontSize: '20px', color: 'var(--bw-outline)' }}
@@ -259,7 +261,7 @@ const TogglePassword = ({ show, onToggle }) => (
     style={{ color: 'var(--bw-outline)' }}
     aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
   >
-    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: '20px' }}>
       {show ? 'visibility' : 'visibility_off'}
     </span>
   </button>

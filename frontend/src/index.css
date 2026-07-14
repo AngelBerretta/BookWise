@@ -313,6 +313,46 @@ img, svg { display: block; }
   display: flex;
   overflow: hidden;
 }
+@media (max-width: 767.98px) {
+  /* En mobile la tarjeta ya no se estira a fuerza (ver .auth-panel más abajo);
+     este fondo es lo que se ve arriba/abajo de la tarjeta en pantallas muy
+     altas, en vez de un rectángulo blanco vacío. */
+  .login-page-root {
+    background-color: var(--bw-surface-container-low);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Panel izquierdo de Login/Register.
+
+   Problema que resuelve:
+   1) Desktop: con `justify-content: center` clásico, si el contenido
+      supera la altura del viewport, el navegador "recorta" el bloque
+      centrado desde arriba (el primer elemento queda pegado al borde
+      superior y aparece un scroll mínimo). `safe center` evita el
+      recorte: cuando no entra, se comporta como `flex-start` en vez
+      de cortar por arriba.
+   2) Mobile: centrar siempre deja huecos enormes arriba Y abajo en
+      teléfonos muy altos (p. ej. ~480×1069). Por eso en mobile el
+      panel se ancla arriba con un padding fijo, y el excedente de
+      alto se resuelve con el pie de marca (`.auth-mobile-footer`,
+      `margin-top: auto`) en vez de repartirse como hueco ciego.
+───────────────────────────────────────────── */
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: clamp(1.5rem, 6dvh, 3rem);
+  padding-bottom: clamp(1rem, 3dvh, 2rem);
+}
+@media (min-width: 768px) {
+  .auth-panel {
+    justify-content: center;      /* fallback si el navegador no soporta "safe" */
+    justify-content: safe center;
+    padding-top: clamp(0.75rem, 3dvh, 2rem);
+    padding-bottom: clamp(0.75rem, 3dvh, 2rem);
+  }
+}
 
 /* ─────────────────────────────────────────────
    Componentes reutilizables BookWise
@@ -480,4 +520,25 @@ input[type='number'] {
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Tarjetas de acceso demo (Login) */
+.demo-role-btn {
+  cursor: pointer;
+}
+.demo-role-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.demo-role-btn:focus-visible {
+  outline: 2px solid var(--bw-primary);
+  outline-offset: 2px;
+}
+/* Variante outline (Lector): resalta el borde al pasar el mouse */
+.demo-role-btn--outline:hover:not(:disabled) {
+  border-color: var(--bw-primary) !important;
+  background-color: rgba(4, 22, 39, 0.03);
+}
+/* Variante rellena (Administrador): sombra más marcada al pasar el mouse */
+.demo-role-btn--filled:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(4, 22, 39, 0.35) !important;
 }
