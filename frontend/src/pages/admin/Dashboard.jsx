@@ -213,7 +213,7 @@ const Dashboard = () => {
         }
       `}</style>
 
-      <div className="min-h-screen bg-[var(--bg)]">
+      <div className="bg-[var(--bg)]">
         <div className="max-w-4xl">
 
           {/* ── Encabezado ───────────────────────────────────────────────── */}

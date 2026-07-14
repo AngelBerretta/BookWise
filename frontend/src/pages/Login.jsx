@@ -52,16 +52,14 @@ const Login = () => {
       <div
         className="
           w-full md:w-1/2 lg:w-5/12 xl:w-[480px]
-          flex flex-col justify-center
+          auth-panel
           px-8 md:px-16 lg:px-24
-          shrink-0 h-full overflow-y-auto hide-scrollbar
+          shrink-0 max-h-full self-center md:self-auto md:h-full overflow-y-auto hide-scrollbar
           relative z-10
         "
         style={{
           backgroundColor: 'var(--bw-surface-container-lowest)',
           boxShadow: '0 12px 40px rgba(27,28,25,0.06)',
-          paddingTop: 'clamp(0.75rem, 3dvh, 2rem)',
-          paddingBottom: 'clamp(0.75rem, 3dvh, 2rem)',
         }}
       >
         <div className="max-w-sm w-full mx-auto flex flex-col gap-[clamp(0.6rem,2dvh,1.25rem)]">
@@ -127,30 +125,70 @@ const Login = () => {
 
           {/* ── Acceso rápido — cuentas demo para portfolio ── */}
           <div
-            className="demo-quick-access rounded-lg p-2.5 flex flex-col gap-1.5"
-            style={{ backgroundColor: 'var(--bw-surface-container-low)', border: '1px solid rgba(196,198,205,0.3)' }}
+            className="demo-quick-access rounded-xl p-2.5 flex flex-col gap-2"
+            style={{
+              backgroundColor: 'var(--bw-surface-container-low)',
+              border: '1px solid rgba(196,198,205,0.3)',
+            }}
           >
-            <p className="font-label text-xs" style={{ color: 'var(--bw-on-surface-variant)' }}>
-              ¿Solo estás explorando? Entrá sin registrarte:
+            <p
+              className="font-label text-xs leading-snug flex items-center gap-1"
+              style={{ color: 'var(--bw-on-surface-variant)' }}
+            >
+              <span
+                aria-hidden="true"
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px', color: 'var(--bw-primary)' }}
+              >
+                bolt
+              </span>
+              Acceso demo con un clic, sin registrarte:
             </p>
-            <div className="flex gap-2">
+
+            <div className="grid grid-cols-2 gap-2">
+              {/* ── Lector ── */}
               <button
                 type="button"
                 onClick={() => handleDemoLogin('user')}
                 disabled={!!demoLoading}
-                className="flex-1 font-label text-xs font-medium py-1.5 rounded-lg border transition-colors disabled:opacity-50"
+                aria-busy={demoLoading === 'user'}
+                className="demo-role-btn demo-role-btn--outline flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--bw-outline-variant)', color: 'var(--bw-on-surface)' }}
               >
-                {demoLoading === 'user' ? 'Ingresando…' : 'Ver como lector'}
+                {demoLoading === 'user' ? (
+                  <DemoSpinner small />
+                ) : (
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--bw-primary)' }}>
+                    person
+                  </span>
+                )}
+                <span className="font-label text-xs font-medium">
+                  {demoLoading === 'user' ? 'Ingresando…' : 'Lector'}
+                </span>
               </button>
+
+              {/* ── Administrador ── */}
               <button
                 type="button"
                 onClick={() => handleDemoLogin('admin')}
                 disabled={!!demoLoading}
-                className="flex-1 font-label text-xs font-medium py-1.5 rounded-lg text-white transition-colors disabled:opacity-50"
-                style={{ backgroundColor: 'var(--bw-primary)' }}
+                aria-busy={demoLoading === 'admin'}
+                className="demo-role-btn demo-role-btn--filled flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(135deg, var(--bw-primary) 0%, var(--bw-primary-container) 100%)',
+                  boxShadow: '0 2px 8px rgba(4, 22, 39, 0.25)',
+                }}
               >
-                {demoLoading === 'admin' ? 'Ingresando…' : 'Ver como admin'}
+                {demoLoading === 'admin' ? (
+                  <DemoSpinner small light />
+                ) : (
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    admin_panel_settings
+                  </span>
+                )}
+                <span className="font-label text-xs font-medium">
+                  {demoLoading === 'admin' ? 'Ingresando…' : 'Administrador'}
+                </span>
               </button>
             </div>
           </div>
@@ -159,6 +197,16 @@ const Login = () => {
           <LoginForm onSuccess={handleLoginSuccess} />
 
         </div>
+
+        {/* Pie de marca — solo mobile. Ancla el bloque al fondo cuando
+            sobra alto en pantallas muy altas, en vez de dejar un hueco
+            ciego repartido arriba y abajo. */}
+        <p
+          className="md:hidden mt-[clamp(1.5rem,5dvh,3rem)] text-center font-label text-xs"
+          style={{ color: 'var(--bw-outline)' }}
+        >
+          "Una habitación sin libros es como un cuerpo sin alma." — Cicerón
+        </p>
       </div>
 
       {/* ══════════════════════════════════════
@@ -168,5 +216,19 @@ const Login = () => {
     </div>
   );
 };
+
+/* ── Spinner compacto para los botones de acceso demo ── */
+const DemoSpinner = ({ light = false, small = false }) => (
+  <svg
+    className={small ? 'animate-spin h-[18px] w-[18px]' : 'animate-spin h-5 w-5'}
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    style={{ color: light ? '#ffffff' : 'var(--bw-primary)' }}
+  >
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+  </svg>
+);
 
 export default Login;

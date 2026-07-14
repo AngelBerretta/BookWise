@@ -14,6 +14,7 @@ const LoginForm = ({ onSuccess }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [toast, setToast]             = useState(null);
+  const [infoToast, setInfoToast]     = useState(false);
 
   /* ── Validación local ── */
   const validate = () => {
@@ -67,6 +68,13 @@ const LoginForm = ({ onSuccess }) => {
       {showToast && (
         <Toast type="error" message={error} onClose={() => setToast(null)} />
       )}
+      {infoToast && (
+        <Toast
+          type="info"
+          message="La recuperación de contraseña estará disponible próximamente. Mientras tanto, probá el acceso demo para explorar la plataforma."
+          onClose={() => setInfoToast(false)}
+        />
+      )}
 
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[clamp(0.6rem,2dvh,1rem)]">
 
@@ -77,12 +85,13 @@ const LoginForm = ({ onSuccess }) => {
             className="font-label text-xs font-medium uppercase tracking-wider"
             style={{ color: 'var(--bw-on-surface)' }}
           >
-            Email Address
+            Correo electrónico
           </label>
 
           <div className="relative">
             {/* Icono izquierdo */}
             <span
+              aria-hidden="true"
               className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
                          pointer-events-none select-none"
               style={{ fontSize: '20px', color: 'var(--bw-outline)' }}
@@ -96,7 +105,7 @@ const LoginForm = ({ onSuccess }) => {
               type="email"
               autoComplete="email"
               autoFocus
-              placeholder="reader@example.com"
+              placeholder="lector@ejemplo.com"
               value={fields.email}
               onChange={onChange}
               className="bw-input"
@@ -115,20 +124,22 @@ const LoginForm = ({ onSuccess }) => {
               className="font-label text-xs font-medium uppercase tracking-wider"
               style={{ color: 'var(--bw-on-surface)' }}
             >
-              Password
+              Contraseña
             </label>
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() => setInfoToast(true)}
               className="font-label text-xs font-medium transition-opacity hover:opacity-70"
               style={{ color: 'var(--bw-primary)' }}
             >
-              Forgot password?
-            </a>
+              ¿Olvidaste tu contraseña?
+            </button>
           </div>
 
           <div className="relative">
             {/* Icono izquierdo */}
             <span
+              aria-hidden="true"
               className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
                          pointer-events-none select-none"
               style={{ fontSize: '20px', color: 'var(--bw-outline)' }}
@@ -157,7 +168,7 @@ const LoginForm = ({ onSuccess }) => {
               style={{ color: 'var(--bw-outline)' }}
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: '20px' }}>
                 {showPassword ? 'visibility' : 'visibility_off'}
               </span>
             </button>
@@ -191,12 +202,12 @@ const LoginForm = ({ onSuccess }) => {
                   d="M4 12a8 8 0 018-8v8H4z"
                 />
               </svg>
-              Signing in…
+              Ingresando…
             </>
           ) : (
             <>
-              Sign In to Curate
-              <span className="material-symbols-outlined ml-2" style={{ fontSize: '18px' }}>
+              Ingresar a mi biblioteca
+              <span aria-hidden="true" className="material-symbols-outlined ml-2" style={{ fontSize: '18px' }}>
                 arrow_forward
               </span>
             </>
