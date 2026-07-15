@@ -11,6 +11,7 @@
     "seed:blog": "node src/scripts/seedBlog.js",
     "seed:demo": "node src/scripts/seedDemo.js",
     "seed:all": "npm run seed && npm run seed:blog && npm run seed:demo",
+    "cleanup:images": "node src/scripts/cleanupCloudinaryOrphans.js",
     "dev:fs": "nodemon src/app.js --mode fs"
   },
   "dependencies": {
