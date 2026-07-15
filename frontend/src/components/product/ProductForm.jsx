@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
 import * as productService from '../../services/productService';
+import { uploadImage } from '../../services/uploadService';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Textarea from '../ui/Textarea';
@@ -37,6 +38,10 @@ const ProductForm = ({
   const [loading, setLoadingState]    = useState(false);
   const [error, setError]             = useState(null);
 
+  // Imagen pendiente de subir: no se sube a Cloudinary hasta el submit.
+  const [imageFile, setImageFile]     = useState(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+
   // Notifica al padre (footer externo del Modal) cuando cambia el loading
   const setLoading = (val) => {
     setLoadingState(val);
@@ -62,6 +67,10 @@ const ProductForm = ({
     } else {
       setFields({ ...EMPTY_FIELDS });
     }
+    // Cambió el producto (o se pasó a modo "crear") → descartar cualquier
+    // selección de imagen pendiente que quedara del producto anterior.
+    setImageFile(null);
+    setImageRemoved(false);
   }, [product]);
 
   /* ── Validación ── */
@@ -107,24 +116,39 @@ const ProductForm = ({
     const errs = validate();
     if (Object.keys(errs).length) { setFieldErrors(errs); return; }
 
-    const payload = {
-      title:       fields.title.trim(),
-      author:      fields.author.trim(),
-      price:       Number(fields.price),
-      category:    fields.category,
-      description: fields.description.trim(),
-      stock:       Number(fields.stock),
-      url:         fields.url.trim(),
-      code:        fields.code.trim(),
-      thumbnails:  fields.thumbnail?.trim() ? [fields.thumbnail.trim()] : [],
-      thumbnailPublicId: fields.thumbnailPublicId || '',
-      pages:           fields.pages !== '' ? Number(fields.pages) : null,
-      publicationDate: fields.publicationDate?.trim() || null,
-    };
-
     setLoading(true);
     setError(null);
     try {
+      // La imagen se sube a Cloudinary recién acá, en el guardado real.
+      // Así, si el usuario prueba/cambia/cancela una imagen antes de
+      // confirmar el formulario, nunca llega a subirse nada huérfano.
+      let thumbnail       = fields.thumbnail;
+      let thumbnailPublicId = fields.thumbnailPublicId;
+
+      if (imageFile) {
+        const uploaded = await uploadImage(imageFile, 'product');
+        thumbnail = uploaded.url;
+        thumbnailPublicId = uploaded.publicId;
+      } else if (imageRemoved) {
+        thumbnail = '';
+        thumbnailPublicId = '';
+      }
+
+      const payload = {
+        title:       fields.title.trim(),
+        author:      fields.author.trim(),
+        price:       Number(fields.price),
+        category:    fields.category,
+        description: fields.description.trim(),
+        stock:       Number(fields.stock),
+        url:         fields.url.trim(),
+        code:        fields.code.trim(),
+        thumbnails:  thumbnail?.trim() ? [thumbnail.trim()] : [],
+        thumbnailPublicId: thumbnailPublicId || '',
+        pages:           fields.pages !== '' ? Number(fields.pages) : null,
+        publicationDate: fields.publicationDate?.trim() || null,
+      };
+
       if (isEditing) {
         await productService.updateProduct(product._id, payload);
       } else {
@@ -254,12 +278,17 @@ const ProductForm = ({
 
         <div className="sm:col-span-2">
           <ImageUploader
+            key={product?._id || 'new'}
             label="Imagen de portada"
             value={fields.thumbnail}
-            onChange={(url, publicId) =>
-              setFields((prev) => ({ ...prev, thumbnail: url, thumbnailPublicId: publicId }))
-            }
-            type="product"
+            onFileSelect={(file) => {
+              setImageFile(file);
+              setImageRemoved(false);
+            }}
+            onRemove={() => {
+              setImageFile(null);
+              setImageRemoved(true);
+            }}
           />
         </div>
 

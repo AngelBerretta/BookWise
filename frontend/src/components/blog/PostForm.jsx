@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as blogService from '../../services/blogService';
+import { uploadImage } from '../../services/uploadService';
 import Input            from '../ui/Input';
 import Button           from '../ui/Button';
 import PostDetail       from './PostDetail'; // 
@@ -24,6 +25,11 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
   const [error, setError]             = useState(null);
   const [preview, setPreview]         = useState(false); // 🆕
 
+  // Imagen pendiente de subir: no se sube a Cloudinary hasta el submit.
+  const [imageFile, setImageFile]         = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [imageRemoved, setImageRemoved]   = useState(false);
+
   useEffect(() => {
     if (post) {
       setFields({
@@ -35,6 +41,11 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
         published: post.published ?? false,
       });
     }
+    // Cambió el post (o se pasó a modo "crear") → descartar cualquier
+    // selección de imagen pendiente que quedara del post anterior.
+    setImageFile(null);
+    setImagePreviewUrl('');
+    setImageRemoved(false);
   }, [post]);
 
   const validate = () => {
@@ -62,19 +73,34 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
       .map((t) => t.trim())
       .filter(Boolean);
 
-    const payload = {
-      title:     fields.title.trim(),
-      content:   fields.content.trim(),
-      thumbnail: fields.thumbnail.trim(),
-      thumbnailPublicId: fields.thumbnailPublicId || '',
-      tags:      tagsArray,
-      published: fields.published,
-      slug,
-    };
-
     setLoading(true);
     setError(null);
     try {
+      // La imagen se sube a Cloudinary recién acá, en el guardado real.
+      // Así, si el usuario prueba/cambia/cancela una imagen antes de
+      // confirmar el formulario, nunca llega a subirse nada huérfano.
+      let thumbnail       = fields.thumbnail;
+      let thumbnailPublicId = fields.thumbnailPublicId;
+
+      if (imageFile) {
+        const uploaded = await uploadImage(imageFile, 'post');
+        thumbnail = uploaded.url;
+        thumbnailPublicId = uploaded.publicId;
+      } else if (imageRemoved) {
+        thumbnail = '';
+        thumbnailPublicId = '';
+      }
+
+      const payload = {
+        title:     fields.title.trim(),
+        content:   fields.content.trim(),
+        thumbnail: thumbnail?.trim() ? thumbnail.trim() : '',
+        thumbnailPublicId: thumbnailPublicId || '',
+        tags:      tagsArray,
+        published: fields.published,
+        slug,
+      };
+
       if (isEditing) {
         await blogService.updatePost(post._id, payload);
       } else {
@@ -96,7 +122,7 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
   const previewPost = {
     title:     fields.title     || 'Sin título',
     content:   fields.content   || '',
-    thumbnail: fields.thumbnail || '',
+    thumbnail: imageRemoved ? '' : (imagePreviewUrl || fields.thumbnail || ''),
     tags:      fields.tags.split(',').map((t) => t.trim()).filter(Boolean),
     published: fields.published,
     createdAt: new Date().toISOString(),
@@ -167,12 +193,19 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
       />
 
       <ImageUploader
+        key={post?._id || 'new'}
         label="Imagen de portada"
         value={fields.thumbnail}
-        onChange={(url, publicId) =>
-          setFields((prev) => ({ ...prev, thumbnail: url, thumbnailPublicId: publicId }))
-        }
-        type="post"
+        onFileSelect={(file, previewUrl) => {
+          setImageFile(file);
+          setImagePreviewUrl(previewUrl);
+          setImageRemoved(false);
+        }}
+        onRemove={() => {
+          setImageFile(null);
+          setImagePreviewUrl('');
+          setImageRemoved(true);
+        }}
       />
 
       <Input

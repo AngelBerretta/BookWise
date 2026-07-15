@@ -1,31 +1,39 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { uploadImage } from '../../services/uploadService';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 /**
  * Widget de carga de imágenes con preview inmediato.
- * Sube el archivo apenas se selecciona/arrastra y devuelve la URL
- * optimizada de Cloudinary vía onChange(url).
  *
- * @param {string}   value  - URL actual (para edición)
- * @param {Function} onChange - (url: string) => void
- * @param {'product'|'post'} type - carpeta destino en Cloudinary
+ * OJO: este componente YA NO sube nada a Cloudinary. Solo valida el
+ * archivo, genera un preview local (blob URL) y se lo pasa al padre
+ * vía onFileSelect(file, previewUrl). El padre es responsable de subir
+ * ese File a Cloudinary recién en el submit real del formulario.
+ *
+ * Por qué: si el upload se dispara apenas se elige el archivo (como
+ * antes), cada vez que el usuario prueba/cambia/cancela una imagen
+ * ANTES de guardar, esa imagen queda subida y huérfana en Cloudinary
+ * — nunca queda asociada a ningún producto/post, así que nada la
+ * borra. Subiendo recién al guardar, solo existe UN upload por cada
+ * imagen que realmente termina persistida.
+ *
+ * @param {string}   value        - URL actual ya persistida (modo edición)
+ * @param {Function} onFileSelect - (file: File, previewUrl: string) => void
+ * @param {Function} onRemove     - () => void — se llamó a "quitar imagen"
  * @param {string}   label
+ *
+ * IMPORTANTE: el padre debe montar este componente con `key={record?._id || 'new'}`
+ * para que, al cambiar de producto/post editado, el preview se resetee solo
+ * (remount limpio) en vez de necesitar un efecto para sincronizar estado.
  */
-const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) => {
-  const [preview, setPreview]   = useState(value || '');
-  const [uploading, setUploading] = useState(false);
-  const [error, setError]       = useState('');
+const ImageUploader = ({ value, onFileSelect, onRemove, label = 'Imagen' }) => {
+  const [preview, setPreview] = useState(value || '');
+  const [error, setError]     = useState('');
   const [dragOver, setDragOver] = useState(false);
 
   const inputRef     = useRef(null);
   const objectUrlRef = useRef(null);
-
-  useEffect(() => {
-    setPreview(value || '');
-  }, [value]);
 
   useEffect(() => {
     return () => {
@@ -43,7 +51,7 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
     return null;
   };
 
-  const handleFile = useCallback(async (file) => {
+  const handleFile = useCallback((file) => {
     const validationError = validate(file);
     if (validationError) {
       setError(validationError);
@@ -51,26 +59,15 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
     }
     setError('');
 
-    // Preview local instantáneo mientras se sube
     if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
     const localUrl = URL.createObjectURL(file);
     objectUrlRef.current = localUrl;
     setPreview(localUrl);
 
-    setUploading(true);
-    try {
-      const data = await uploadImage(file, type);
-      setPreview(data.url);
-      onChange(data.url, data.publicId);
-    } catch (err) {
-      setError(
-        err?.response?.data?.message || err?.message || 'Error al subir la imagen.'
-      );
-      setPreview(value || '');
-    } finally {
-      setUploading(false);
-    }
-  }, [onChange, type, value]);
+    // No se sube nada acá — solo se avisa al padre qué File quedó
+    // seleccionado. La subida real ocurre en el submit del formulario.
+    onFileSelect(file, localUrl);
+  }, [onFileSelect]);
 
   const onInputChange = (e) => {
     const file = e.target.files?.[0];
@@ -90,7 +87,7 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
     objectUrlRef.current = null;
     setPreview('');
     setError('');
-    onChange('', '');
+    onRemove();
   };
 
   return (
@@ -98,7 +95,7 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
       <label className="text-sm font-medium text-[var(--text-h)]">{label}</label>
 
       <div
-        onClick={() => !uploading && inputRef.current?.click()}
+        onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -118,20 +115,17 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
               alt="Vista previa"
               loading="lazy"
               className="w-full h-40 object-cover"
-              style={{ opacity: uploading ? 0.5 : 1 }}
             />
-            {!uploading && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleRemove(); }}
-                className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
-                aria-label="Quitar imagen"
-              >
-                <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
-                  <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z" />
-                </svg>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleRemove(); }}
+              className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+              aria-label="Quitar imagen"
+            >
+              <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z" />
+              </svg>
+            </button>
           </>
         ) : (
           <div className="flex flex-col items-center gap-1.5 py-8 text-[var(--text)]">
@@ -140,15 +134,6 @@ const ImageUploader = ({ value, onChange, type = 'product', label = 'Imagen' }) 
             </svg>
             <p className="text-sm">Arrastrá una imagen o hacé clic para subirla</p>
             <p className="text-xs opacity-60">JPG, PNG, WEBP o GIF · máx. 5MB</p>
-          </div>
-        )}
-
-        {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-            </svg>
           </div>
         )}
       </div>
