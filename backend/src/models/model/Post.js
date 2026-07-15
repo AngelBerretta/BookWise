@@ -46,4 +46,6 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+postSchema.index({ createdAt: -1, _id: -1 });
+
 export default mongoose.model("Post", postSchema);
