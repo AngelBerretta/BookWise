@@ -36,7 +36,7 @@ const getPosts = catchAsync(async (req, res) => {
   const { docs, totalDocs, totalPages } = await postDAO.paginate(filters, {
     page:  pageNum,
     limit: limitNum,
-    sort:  { createdAt: -1 },
+    sort:  { createdAt: -1, _id: -1 },
   });
 
   const hasPrevPage = pageNum > 1;
