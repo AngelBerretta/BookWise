@@ -100,12 +100,15 @@ const AdminLayout = () => {
         </div>
 
         <nav className="flex-1 px-3 py-6 flex flex-col gap-1" aria-label="Navegación admin">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
-            <NavLink key={to} to={to} end={exact} className={navLinkCls}>
-              <Icon />
-              {label}
-            </NavLink>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink key={item.to} to={item.to} end={item.exact} className={navLinkCls}>
+                <Icon />
+                {item.label}
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="px-3 py-4 flex flex-col gap-1" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -173,12 +176,15 @@ const AdminLayout = () => {
             style={{ backgroundColor: 'var(--bw-primary, #041627)' }}
             aria-label="Navegación admin mobile"
           >
-            {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
-              <NavLink key={to} to={to} end={exact} className={navLinkCls}>
-                <Icon />
-                {label}
-              </NavLink>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink key={item.to} to={item.to} end={item.exact} className={navLinkCls}>
+                  <Icon />
+                  {item.label}
+                </NavLink>
+              );
+            })}
             <Link
               to="/"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"

@@ -1,32 +1,99 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import * as productService from '../../services/productService';
 import ProductForm from '../../components/product/ProductForm';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import Spinner from '../../components/ui/Spinner';
-import Toast from '../../components/ui/Toast';
+import { useToast } from '../../context/ToastContext';
 import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
 import Pagination from '../../components/ui/Pagination';
 import BulkActionBar from '../../components/ui/BulkActionBar';
 import TrashIcon from "../../components/ui/icons/TrashIcon";
+import useSlashFocus from '../../hooks/useSlashFocus';
+import { PRODUCT_CATEGORIES } from '../../utils/constants';
 
 const PAGE_SIZE = 10;
 const checkboxCls = 'w-4 h-4 rounded cursor-pointer accent-[var(--accent)]';
 
+const STOCK_OPTIONS = [
+  { value: 'out', label: 'Sin stock' },
+  { value: 'low', label: 'Stock bajo (≤5)' },
+];
+
+const COLUMNS_STATIC = ['Producto', 'Categoría'];
+const COLUMNS_END    = ['Publicación', 'Páginas', 'Acciones'];
+
+/* ─── Ícono de orden (flecha) ──────────────────────────────────────────────── */
+const SortArrow = ({ direction }) => (
+  <svg
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    className={`w-3 h-3 transition-transform duration-150 ${direction === 'desc' ? 'rotate-180' : ''}`}
+    style={{ opacity: direction ? 1 : 0.35 }}
+  >
+    <path fillRule="evenodd" d="M8 3.25a.75.75 0 0 1 .75.75v6.19l2.22-2.22a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 1 1 1.06-1.06L7.25 10.19V4a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
+  </svg>
+);
+
+/* ─── Header ordenable (Precio / Stock) ────────────────────────────────────── */
+const SortableHeader = ({ label, field, sort, onSort }) => {
+  const direction = sort === `${field}-asc` ? 'asc' : sort === `${field}-desc` ? 'desc' : null;
+  return (
+    <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text)] uppercase tracking-wide whitespace-nowrap">
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className="flex items-center gap-1 hover:text-[var(--text-h)] transition-colors"
+        aria-label={`Ordenar por ${label}`}
+      >
+        {label}
+        <SortArrow direction={direction} />
+      </button>
+    </th>
+  );
+};
+
+/* ─── Fila skeleton — mismo alto que una fila real ─────────────────────────── */
+const SkeletonRow = () => (
+  <tr className="animate-pulse">
+    <td className="px-4 py-3"><div className="w-4 h-4 rounded bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-16 rounded-lg bg-[var(--code-bg)] shrink-0" />
+        <div className="flex flex-col gap-2 w-full max-w-[180px]">
+          <div className="h-3.5 rounded bg-[var(--code-bg)] w-4/5" />
+          <div className="h-3 rounded bg-[var(--code-bg)] w-2/5" />
+        </div>
+      </div>
+    </td>
+    <td className="px-4 py-3"><div className="h-5 w-20 rounded-full bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3"><div className="h-3.5 w-14 rounded bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3"><div className="h-3.5 w-8 rounded bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3"><div className="h-3.5 w-16 rounded bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3"><div className="h-3.5 w-12 rounded bg-[var(--code-bg)]" /></td>
+    <td className="px-4 py-3"><div className="h-8 w-20 rounded-lg bg-[var(--code-bg)]" /></td>
+  </tr>
+);
+
 const AdminProducts = () => {
   const { setExtraCrumb } = useOutletContext();
+  const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
-  const [toast, setToast]             = useState(null);
   const [modalOpen, setModalOpen]     = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [deletingId, setDeletingId]   = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [search, setSearch]           = useState('');
+  const [category, setCategory]       = useState(searchParams.get('category') || '');
+  const [stock, setStock]             = useState(searchParams.get('stock') || '');
+  const [sort, setSort]               = useState('newest');
   const [page, setPage]               = useState(1);
   const [totalPages, setTotalPages]   = useState(1);
   const [totalDocs, setTotalDocs]     = useState(0);
@@ -35,6 +102,13 @@ const AdminProducts = () => {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkDeleting, setBulkDeleting]     = useState(false);
   const [formLoading, setFormLoading]       = useState(false);
+
+  const [bulkCategoryOpen, setBulkCategoryOpen]   = useState(false);
+  const [bulkCategoryValue, setBulkCategoryValue] = useState('');
+  const [bulkCategoryWorking, setBulkCategoryWorking] = useState(false);
+
+  const searchInputRef = useRef(null);
+  useSlashFocus(searchInputRef);
 
   useEffect(() => {
     if (!modalOpen) { setExtraCrumb(null); return; }
@@ -49,33 +123,45 @@ const AdminProducts = () => {
     try {
       const data = await productService.getProducts({
         search: search.trim() || undefined,
+        category: category || undefined,
+        stock: stock || undefined,
         page,
         limit: PAGE_SIZE,
-        sort: 'newest',
+        sort,
       });
       setProducts(Array.isArray(data) ? data : (data?.payload ?? []));
       setTotalPages(data?.totalPages ?? 1);
       setTotalDocs(data?.totalDocs ?? 0);
     } catch {
-      setToast({ type: 'error', message: 'No se pudieron cargar los productos.' });
+      showToast({ type: 'error', message: 'No se pudieron cargar los productos.' });
     } finally {
       setLoading(false);
     }
-  }, [search, page]);
+  }, [search, category, stock, page, sort, showToast]);
 
+  /* Vuelve a página 1 cuando cambia cualquier filtro/orden (no en el mount inicial) */
   const didMountRef = useRef(false);
   useEffect(() => {
     if (didMountRef.current) setPage(1);
     else didMountRef.current = true;
-  }, [search]);
+  }, [search, category, stock, sort]);
 
   useEffect(() => {
     const t = setTimeout(fetchProducts, search ? 400 : 0);
     return () => clearTimeout(t);
   }, [fetchProducts]);
 
+  /* Sincroniza filtros con la URL — permite deep-link desde el Dashboard */
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (category) next.set('category', category);
+    if (stock)    next.set('stock', stock);
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, stock]);
+
   /* La selección solo tiene sentido sobre la página/búsqueda actual */
-  useEffect(() => { setSelected(new Set()); }, [page, search]);
+  useEffect(() => { setSelected(new Set()); }, [page, search, category, stock, sort]);
 
   const openCreate = () => { setEditProduct(null); setModalOpen(true); };
   const openEdit   = (p)  => { setEditProduct(p);   setModalOpen(true); };
@@ -83,7 +169,7 @@ const AdminProducts = () => {
 
   const handleSuccess = () => {
     closeModal();
-    setToast({
+    showToast({
       type: 'success',
       message: editProduct ? 'Producto actualizado.' : 'Producto creado.',
     });
@@ -97,10 +183,10 @@ const AdminProducts = () => {
     setDeletingId(confirmTarget._id);
     try {
       await productService.deleteProduct(confirmTarget._id);
-      setToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
+      showToast({ type: 'success', message: `"${confirmTarget.title}" eliminado.` });
       fetchProducts();
     } catch (err) {
-      setToast({
+      showToast({
         type: 'error',
         message: err?.response?.data?.message || err?.message || 'No se pudo eliminar el producto.',
       });
@@ -129,14 +215,14 @@ const AdminProducts = () => {
     const count = selected.size;
     try {
       await productService.bulkDeleteProducts([...selected]);
-      setToast({
+      showToast({
         type: 'success',
         message: `${count} producto${count !== 1 ? 's' : ''} eliminado${count !== 1 ? 's' : ''}.`,
       });
       setSelected(new Set());
       fetchProducts();
     } catch (err) {
-      setToast({
+      showToast({
         type: 'error',
         message: err?.response?.data?.message || err?.message || 'No se pudieron eliminar los productos seleccionados.',
       });
@@ -146,6 +232,41 @@ const AdminProducts = () => {
     }
   };
 
+  const confirmBulkCategory = async () => {
+    if (!bulkCategoryValue) return;
+    setBulkCategoryWorking(true);
+    const count = selected.size;
+    try {
+      await productService.bulkUpdateCategory([...selected], bulkCategoryValue);
+      showToast({
+        type: 'success',
+        message: `${count} producto${count !== 1 ? 's' : ''} movido${count !== 1 ? 's' : ''} de categoría.`,
+      });
+      setSelected(new Set());
+      setBulkCategoryOpen(false);
+      setBulkCategoryValue('');
+      fetchProducts();
+    } catch (err) {
+      showToast({
+        type: 'error',
+        message: err?.response?.data?.message || err?.message || 'No se pudo cambiar la categoría de los productos seleccionados.',
+      });
+    } finally {
+      setBulkCategoryWorking(false);
+    }
+  };
+
+  const handleSort = (field) => {
+    setSort((prev) => {
+      if (prev === `${field}-asc`) return `${field}-desc`;
+      if (prev === `${field}-desc`) return 'newest';
+      return `${field}-asc`;
+    });
+  };
+
+  const clearFilters = () => { setCategory(''); setStock(''); setSearch(''); };
+  const hasActiveFilters = Boolean(category || stock || search);
+
   const fmt = (val) =>
     new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -153,14 +274,10 @@ const AdminProducts = () => {
       maximumFractionDigits: 0,
     }).format(val);
 
-  const COLUMNS = ['Producto', 'Categoría', 'Precio', 'Stock', 'Publicación', 'Páginas', 'Acciones'];
+  const showSkeleton = loading && products.length === 0;
 
   return (
     <>
-      {toast && (
-        <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />
-      )}
-
       {modalOpen && (
         <Modal
           title={editProduct ? 'Editar producto' : 'Nuevo producto'}
@@ -220,6 +337,41 @@ const AdminProducts = () => {
         />
       )}
 
+      {bulkCategoryOpen && (
+        <Modal
+          title="Cambiar categoría"
+          onClose={() => setBulkCategoryOpen(false)}
+          size="md"
+          footer={
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+              <Button variant="ghost" onClick={() => setBulkCategoryOpen(false)} disabled={bulkCategoryWorking} className="w-full sm:w-auto">
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={confirmBulkCategory}
+                loading={bulkCategoryWorking}
+                disabled={!bulkCategoryValue}
+                className="w-full sm:w-auto"
+              >
+                Mover {selected.size} producto{selected.size !== 1 ? 's' : ''}
+              </Button>
+            </div>
+          }
+        >
+          <p className="text-sm text-[var(--text)] mb-4">
+            Elegí la nueva categoría para los {selected.size} producto{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}.
+          </p>
+          <Select
+            label="Nueva categoría"
+            placeholder="Seleccioná una categoría"
+            options={PRODUCT_CATEGORIES}
+            value={bulkCategoryValue}
+            onChange={(e) => setBulkCategoryValue(e.target.value)}
+          />
+        </Modal>
+      )}
+
       <div className="container">
 
         <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
@@ -235,39 +387,60 @@ const AdminProducts = () => {
           </Button>
         </div>
 
-        <div className="mb-6 max-w-sm">
-          <Input
-            type="search"
-            placeholder="Buscar por título o descripción…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {loading && (
-          <div className="flex justify-center py-20">
-            <Spinner size="lg" className="text-[var(--accent)]" />
+        {/* Barra de filtros */}
+        <div className="mb-6 flex flex-wrap items-end gap-3">
+          <div className="w-full sm:w-64">
+            <Input
+              ref={searchInputRef}
+              type="search"
+              placeholder="Buscar por título o descripción… ( / )"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-        )}
+          <div className="w-full sm:w-48">
+            <Select
+              placeholder="Todas las categorías"
+              options={PRODUCT_CATEGORIES}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              aria-label="Filtrar por categoría"
+            />
+          </div>
+          <div className="w-full sm:w-44">
+            <Select
+              placeholder="Todo el stock"
+              options={STOCK_OPTIONS}
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              aria-label="Filtrar por stock"
+            />
+          </div>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Limpiar filtros
+            </Button>
+          )}
+        </div>
 
         {!loading && products.length === 0 && (
           <EmptyState
-            title={search ? 'Sin resultados' : 'No hay productos'}
+            title={hasActiveFilters ? 'Sin resultados' : 'No hay productos'}
             description={
-              search
-                ? `No encontramos productos para "${search}".`
+              hasActiveFilters
+                ? 'No encontramos productos que coincidan con los filtros aplicados.'
                 : 'Creá el primer producto del catálogo.'
             }
             action={
-              search
-                ? { label: 'Limpiar búsqueda', onClick: () => setSearch('') }
+              hasActiveFilters
+                ? { label: 'Limpiar filtros', onClick: clearFilters }
                 : { label: 'Crear producto', onClick: openCreate }
             }
           />
         )}
 
         {/* Tabla — desktop */}
-        {!loading && products.length > 0 && (
+        {(showSkeleton || products.length > 0) && (
           <div className="hidden md:block rounded-2xl border border-[var(--border)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -282,7 +455,17 @@ const AdminProducts = () => {
                         aria-label="Seleccionar todos los productos de esta página"
                       />
                     </th>
-                    {COLUMNS.map((h) => (
+                    {COLUMNS_STATIC.map((h) => (
+                      <th
+                        key={h}
+                        className="px-4 py-3 text-left text-xs font-semibold text-[var(--text)] uppercase tracking-wide whitespace-nowrap"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                    <SortableHeader label="Precio" field="price" sort={sort} onSort={handleSort} />
+                    <SortableHeader label="Stock" field="stock" sort={sort} onSort={handleSort} />
+                    {COLUMNS_END.map((h) => (
                       <th
                         key={h}
                         className="px-4 py-3 text-left text-xs font-semibold text-[var(--text)] uppercase tracking-wide whitespace-nowrap"
@@ -292,8 +475,13 @@ const AdminProducts = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--border)] bg-[var(--bg)]">
-                  {products.map((p) => (
+                <tbody
+                  className="divide-y divide-[var(--border)] bg-[var(--bg)]"
+                  style={{ opacity: !showSkeleton && loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
+                >
+                  {showSkeleton
+                    ? Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonRow key={i} />)
+                    : products.map((p) => (
                     <tr
                       key={p._id}
                       className={[
@@ -313,7 +501,7 @@ const AdminProducts = () => {
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-14 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-[var(--code-bg)] border border-[var(--border)]">
+                          <div className="w-12 h-16 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-[var(--code-bg)] border border-[var(--border)]">
                             {p.thumbnails?.[0] ? (
                               <img
                                 src={p.thumbnails[0]}
@@ -338,7 +526,7 @@ const AdminProducts = () => {
                       <td className="px-4 py-3 whitespace-nowrap"><Badge category={p.category} /></td>
                       <td className="px-4 py-3 whitespace-nowrap font-medium text-[var(--text-h)]">{fmt(p.price)}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`font-medium tabular-nums ${p.stock === 0 ? 'text-red-500' : 'text-[var(--text-h)]'}`}>
+                        <span className={`font-medium tabular-nums ${p.stock === 0 ? 'text-red-500' : p.stock <= 5 ? 'text-amber-500' : 'text-[var(--text-h)]'}`}>
                           {p.stock}
                         </span>
                       </td>
@@ -370,8 +558,11 @@ const AdminProducts = () => {
         )}
 
         {/* Cards — mobile */}
-        {!loading && products.length > 0 && (
-          <div className="md:hidden flex flex-col gap-3">
+        {!showSkeleton && products.length > 0 && (
+          <div
+            className="md:hidden flex flex-col gap-3"
+            style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
+          >
             <label className="flex items-center gap-2 text-sm text-[var(--text)] px-1">
               <input type="checkbox" className={checkboxCls} checked={allSelected} onChange={toggleSelectAll} />
               Seleccionar todos
@@ -422,7 +613,7 @@ const AdminProducts = () => {
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wide text-[var(--text)] opacity-60">Stock</p>
-                    <p className={`font-medium tabular-nums ${p.stock === 0 ? 'text-red-500' : 'text-[var(--text-h)]'}`}>{p.stock}</p>
+                    <p className={`font-medium tabular-nums ${p.stock === 0 ? 'text-red-500' : p.stock <= 5 ? 'text-amber-500' : 'text-[var(--text-h)]'}`}>{p.stock}</p>
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wide text-[var(--text)] opacity-60">Publicación</p>
@@ -456,6 +647,9 @@ const AdminProducts = () => {
       </div>
 
       <BulkActionBar count={selected.size} onClear={() => setSelected(new Set())}>
+        <Button variant="secondary" size="sm" onClick={() => setBulkCategoryOpen(true)}>
+          Cambiar categoría
+        </Button>
         <Button variant="danger" size="sm" onClick={() => setBulkDeleteOpen(true)}>
           Eliminar seleccionados
         </Button>

@@ -7,9 +7,10 @@ import {
   updateProduct,
   deleteProduct,
   bulkDeleteProducts,
+  bulkUpdateProducts,
 } from "../controllers/products.js";
 import { validate }                                   from "../middlewares/validate.middleware.js";
-import { createProductSchema, updateProductSchema, bulkIdsSchema } from "../models/schemas/index.js";
+import { createProductSchema, updateProductSchema, bulkIdsSchema, bulkCategorySchema } from "../models/schemas/index.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 import { demoGuard }      from "../middlewares/demoGuard.middleware.js";
@@ -34,6 +35,9 @@ router.post("/" ,authMiddleware, roleMiddleware(["admin"]), rateLimitDemoWrite, 
 router.put("/:pid", authMiddleware, roleMiddleware(["admin"]), rateLimitDemoWrite, demoContentFilter, validate(updateProductSchema), updateProduct);
 // DELETE /api/products/bulk — solo admin, bloqueado en modo demo
 router.delete("/bulk", authMiddleware, roleMiddleware(["admin"]), demoGuard, validate(bulkIdsSchema), bulkDeleteProducts);
+
+// PATCH /api/products/bulk/category — solo admin
+router.patch("/bulk/category", authMiddleware, roleMiddleware(["admin"]), validate(bulkCategorySchema), bulkUpdateProducts);
 
 // DELETE /api/products/:pid — solo admin, bloqueado en modo demo
 router.delete("/:pid", authMiddleware, roleMiddleware(["admin"]), demoGuard, deleteProduct);

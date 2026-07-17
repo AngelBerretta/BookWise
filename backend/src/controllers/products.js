@@ -6,6 +6,9 @@ import { deleteImage }  from "../services/cloudinary.service.js";
 
 // ── GET /api/products ─────────────────────────────────────────────────────────
 
+// Umbral de "stock bajo" — a partir de acá un producto se considera bajo de stock
+const LOW_STOCK_THRESHOLD = 5;
+
 const getProducts = catchAsync(async (req, res) => {
   const {
     limit = 10,
@@ -15,6 +18,7 @@ const getProducts = catchAsync(async (req, res) => {
     search,   // 🆕 búsqueda por texto (title, description)           // "asc" | "desc" — por precio
     minPrice,
     maxPrice,
+    stock,    // 🆕 "out" (sin stock) | "low" (stock bajo, incluye sin stock)
   } = req.query;
 
   const limitNum = Math.max(1, parseInt(limit, 10)  || 10);
@@ -48,11 +52,20 @@ const getProducts = catchAsync(async (req, res) => {
     if (max !== null && !isNaN(max)) filters.price.$lte = max;
   } 
 
+  // 🆕 Filtro por stock — "out" = sin stock, "low" = stock bajo (incluye sin stock)
+  if (stock === "out") {
+    filters.stock = 0;
+  } else if (stock === "low") {
+    filters.stock = { $lte: LOW_STOCK_THRESHOLD };
+  }
+
   // ── Ordenamiento ───────────────────────────────────────────────────────────
   const sortObj = {};
    switch (sort) {
    case "price-asc":  sortObj.price = 1;  break;
    case "price-desc": sortObj.price = -1; break;
+   case "stock-asc":  sortObj.stock = 1;  break;
+   case "stock-desc": sortObj.stock = -1; break;
    case "title-asc":  sortObj.title = 1;  break;
    case "newest":
    default:
@@ -75,6 +88,7 @@ const getProducts = catchAsync(async (req, res) => {
     if (search) params.set("search", search); // 🆕 preservar search en links
     if (min !== null)  params.set("minPrice", min);
     if (max !== null)  params.set("maxPrice", max);
+    if (stock) params.set("stock", stock); // 🆕 preservar filtro de stock en links
     return `/api/products?${params.toString()}`;
   };
 
@@ -192,4 +206,19 @@ const bulkDeleteProducts = catchAsync(async (req, res) => {
 });
 
 
-export { getProducts, getMaxPrice, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts };
+ // ── PATCH /api/products/bulk/category ─────────────────────────────────────────
+
+const bulkUpdateProducts = catchAsync(async (req, res) => {
+  const { ids, category } = req.body;
+  const modifiedCount = await productDAO.updateMany(ids, { category });
+
+  const io = req.app.get("io");
+  if (io) io.emit("product:bulkUpdated", { ids, category });
+
+  return res.status(200).json({
+    message: `${modifiedCount} producto${modifiedCount !== 1 ? "s" : ""} actualizado${modifiedCount !== 1 ? "s" : ""}`,
+    modifiedCount,
+  });
+});
+
+export { getProducts, getMaxPrice, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, bulkUpdateProducts };

@@ -10,6 +10,7 @@ const useBlog = () => {
   const [error, setError]     = useState(null);
 
   const [search, setSearchRaw]      = useState('');
+  const [published, setPublished]   = useState(undefined); // undefined = todos, true/false = filtro
   const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalDocs, setTotalDocs]   = useState(0);
@@ -42,31 +43,32 @@ const useBlog = () => {
     }
   }, []);
 
-  /* Cambiar la búsqueda vuelve a página 1 */
+  /* Cambiar la búsqueda o el filtro de publicado vuelve a página 1 */
   useEffect(() => {
     if (!didMountRef.current) { didMountRef.current = true; return; }
     setPage(1);
-  }, [search]);
+  }, [search, published]);
 
-  /* Fetch automático — mount, cambio de página o búsqueda (con debounce) */
+  /* Fetch automático — mount, cambio de página, búsqueda o filtro (con debounce) */
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchPosts({
         search: search.trim() || undefined,
+        published,
         page,
         limit: PAGE_SIZE,
       });
     }, search ? 400 : 0);
     return () => clearTimeout(debounceRef.current);
-  }, [search, page, fetchPosts]);
+  }, [search, published, page, fetchPosts]);
 
   const setSearch = useCallback((value) => setSearchRaw(value), []);
 
   /* Vuelve a pedir la página actual — usar tras crear/editar/eliminar */
   const refetch = useCallback(() => {
-    fetchPosts({ search: search.trim() || undefined, page, limit: PAGE_SIZE });
-  }, [fetchPosts, search, page]);
+    fetchPosts({ search: search.trim() || undefined, published, page, limit: PAGE_SIZE });
+  }, [fetchPosts, search, published, page]);
 
   /* ── GET por slug ── */
   const fetchPostBySlug = useCallback(async (slug) => {
@@ -134,6 +136,7 @@ const useBlog = () => {
   return {
     posts, post, loading, error,
     search, setSearch,
+    published, setPublished,
     page, setPage, totalPages, totalDocs,
     fetchPosts, refetch, fetchPostBySlug,
     createPost, updatePost, deletePost,
