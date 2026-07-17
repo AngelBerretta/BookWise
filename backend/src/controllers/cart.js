@@ -45,6 +45,11 @@ const getCart = catchAsync(async (req, res) => {
 
 const addProduct = catchAsync(async (req, res) => {
   const { cid, pid } = req.params;
+  const { quantity = 1 } = req.body;
+
+  if (typeof quantity !== "number" || quantity < 1) {
+    throw new ApiError(400, "quantity debe ser un número mayor a 0");
+  }
 
   const cart = await cartDAO.getById(cid);
   if (!cart) throw new ApiError(404, "Carrito no encontrado");
@@ -57,10 +62,17 @@ const addProduct = catchAsync(async (req, res) => {
     (item) => String(item.product) === String(pid)
   );
 
+  const currentQty = idx !== -1 ? products[idx].quantity : 0;
+  const newQty     = currentQty + quantity;
+
+  if (newQty > product.stock) {
+    throw new ApiError(400, `Stock insuficiente. Disponible: ${product.stock}`);
+  }
+
   if (idx !== -1) {
-    products[idx].quantity += 1;
+    products[idx].quantity += quantity;
   } else {
-    products.push({ product: pid, quantity: 1 });
+    products.push({ product: pid, quantity });
   }
 
   const updated   = await cartDAO.update(cid, { products });
@@ -120,6 +132,11 @@ const updateProductQuantity = catchAsync(async (req, res) => {
     (item) => String(item.product) === String(pid)
   );
   if (idx === -1) throw new ApiError(404, "Producto no está en el carrito");
+
+  const product = await productDAO.getById(pid);
+  if (product && quantity > product.stock) {
+    throw new ApiError(400, `Stock insuficiente. Disponible: ${product.stock}`);
+  }
 
   products[idx].quantity = quantity;
 
