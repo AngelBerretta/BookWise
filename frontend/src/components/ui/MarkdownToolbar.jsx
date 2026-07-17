@@ -56,18 +56,21 @@ const MarkdownToolbar = ({ textareaRef, onInsert }) => {
 
   return (
     <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 rounded-t-lg border border-b-0 border-[var(--border)] bg-[var(--bg-subtle)]">
-      {ACTIONS.map(({ icon: Icon, label, apply }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={() => handleClick({ apply })}
-          title={label}
-          aria-label={label}
-          className="flex items-center justify-center w-7 h-7 rounded text-[var(--text)] hover:bg-[var(--code-bg)] hover:text-[var(--text-h)] transition-colors"
-        >
-          <Icon size={15} />
-        </button>
-      ))}
+      {ACTIONS.map((action) => {
+        const Icon = action.icon;
+        return (
+          <button
+            key={action.label}
+            type="button"
+            onClick={() => handleClick(action)}
+            title={action.label}
+            aria-label={action.label}
+            className="flex items-center justify-center w-7 h-7 rounded text-[var(--text)] hover:bg-[var(--code-bg)] hover:text-[var(--text-h)] transition-colors"
+          >
+            <Icon size={15} />
+          </button>
+        );
+      })}
     </div>
   );
 };

@@ -10,7 +10,9 @@
  * @param {string}  className    - Clases adicionales para el wrapper
  * @param {object}  rest         - Props adicionales (register spread, onChange, value, etc.)
  */
-const Input = ({
+import { forwardRef } from 'react';
+
+const Input = forwardRef(({
   label,
   error,
   type        = 'text',
@@ -18,7 +20,7 @@ const Input = ({
   id,
   className   = '',
   ...rest
-}) => {
+}, ref) => {
   const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-') ?? 'input';
 
   const baseInput = [
@@ -44,6 +46,7 @@ const Input = ({
       )}
 
       <input
+        ref={ref}
         id={inputId}
         type={type}
         placeholder={placeholder}
@@ -76,6 +79,8 @@ const Input = ({
       )}
     </div>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;

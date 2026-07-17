@@ -176,6 +176,20 @@ const bulkPublishSchema = Joi.object({
   }),
 });
 
+const bulkCategorySchema = Joi.object({
+  ids: Joi.array().items(Joi.string().required()).min(1).required().messages({
+    "array.min": "Debés seleccionar al menos un elemento",
+    "any.required": "Los ids son requeridos",
+  }),
+  category: Joi.string()
+    .valid(...CATEGORIES)
+    .required()
+    .messages({
+      "any.only": `La categoría debe ser una de: ${CATEGORIES.join(", ")}`,
+      "any.required": "La categoría es requerida",
+    }),
+});
+
 
 // ── Cart ──────────────────────────────────────────────────────────────────────
 
@@ -273,4 +287,5 @@ export {
   updatePostSchema,
   bulkIdsSchema,
   bulkPublishSchema,
+  bulkCategorySchema,
 };

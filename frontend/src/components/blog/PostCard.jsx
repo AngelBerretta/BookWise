@@ -49,6 +49,10 @@ const PostCard = ({ post }) => {
           <span className="w-1 h-1 rounded-full bg-[var(--border)] inline-block" />
         )}
         {formattedDate && <time dateTime={createdAt}>{formattedDate}</time>}
+        {(tags?.[0] || formattedDate) && (
+         <span className="w-1 h-1 rounded-full bg-[var(--border)] inline-block" />
+        )}
+        <span>{authorName}</span>
       </div>
 
       {/* Título */}
