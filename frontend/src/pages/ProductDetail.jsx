@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/ui/Spinner';
-import Toast from '../components/ui/Toast';
+import { useToast } from '../context/ToastContext';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
@@ -20,17 +20,15 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { isSaved, toggleWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const [product, setProduct]   = useState(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [adding, setAdding]     = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [toast, setToast]       = useState(null);
-  const [saved, setSaved]       = useState(false);
   const [savingWish, setSavingWish] = useState(false);
   const [related, setRelated] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(false);
 
   /* ── Fetch ── */
   useEffect(() => {
@@ -57,26 +55,26 @@ const ProductDetail = () => {
   /* ── Fetch relacionados — depende del producto ya cargado ── */
   useEffect(() => {
     if (!product?.category) return;
-    setLoadingRelated(true);
     getProducts({ category: product.category, limit: 5 })
       .then((d) => {
         const arr = Array.isArray(d) ? d : (d.payload ?? []);
         setRelated(arr.filter((p) => p._id !== product._id).slice(0, 4));
       })
-      .catch(() => setRelated([]))
-      .finally(() => setLoadingRelated(false));
+      .catch(() => setRelated([]));
   }, [product?._id, product?.category]);  
 
-    const handleToggleWishlist = async () => {
+const handleToggleWishlist = async () => {
     if (!isAuthenticated) {
-      setToast({ type: 'warning', message: 'Iniciá sesión para guardar productos.' });
+      showToast({ type: 'warning', message: 'Iniciá sesión para guardar productos.' });
       return;
     }
     setSavingWish(true);
     try {
       await toggleWishlist(product._id);
-    } catch {
-      setToast({ type: 'error', message: 'No pudimos actualizar tus guardados.' });
+    } catch (err) {
+      const msg = err?.response?.data?.message
+        || 'No pudimos actualizar tus guardados.';
+      showToast({ type: 'error', message: msg });
     } finally {
       setSavingWish(false);
     }
@@ -85,15 +83,16 @@ const ProductDetail = () => {
   /* ── Add to cart ── */
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      setToast({ type: 'warning', message: 'Iniciá sesión para agregar al carrito.' });
+      showToast({ type: 'warning', message: 'Iniciá sesión para agregar al carrito.' });
       return;
     }
     setAdding(true);
     try {
       await addToCart(product._id, quantity);
-      setToast({ type: 'success', message: `"${product.title}" agregado al carrito.` });
-    } catch {
-      setToast({ type: 'error', message: 'No pudimos agregar el producto. Intentá de nuevo.' });
+      showToast({ type: 'success', message: `"${product.title}" agregado al carrito.` });
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'No pudimos agregar el producto. Intentá de nuevo.';
+      showToast({ type: 'error', message: msg });
     } finally {
       setAdding(false);
     }
@@ -128,17 +127,9 @@ const ProductDetail = () => {
   const outOfStock = stock === 0;
   const maxQty     = Math.min(stock, 10);
   const thumbnail  = thumbnails?.[0];
+  const saved      = isSaved(product._id);
 
   return (
-    <>
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <div className="antialiased min-h-screen flex flex-col font-body"
            style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
 
@@ -364,14 +355,14 @@ const ProductDetail = () => {
                       className="px-4 py-4 rounded-lg transition-colors duration-300 shrink-0"
                       style={{
                         border: '1px solid rgba(196,198,205,0.5)',
-                        color: isSaved(product._id) ? 'var(--accent)' : 'var(--text)',
+                        color: saved ? 'var(--accent)' : 'var(--text)',
                       }}
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-container)'}
                       onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-                      aria-label={isSaved(product._id) ? 'Quitar de guardados' : 'Guardar'}
+                      aria-label={saved ? 'Quitar de guardados' : 'Guardar'}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                        {savingWish ? 'hourglass_empty' : (isSaved(product._id) ? 'bookmark' : 'bookmark_border')}
+                        {savingWish ? 'hourglass_empty' : (saved ? 'bookmark' : 'bookmark_border')}
                       </span>
                     </button>
 
@@ -451,7 +442,6 @@ const ProductDetail = () => {
 
         </main>
       </div>
-    </>
   );
 };
 
