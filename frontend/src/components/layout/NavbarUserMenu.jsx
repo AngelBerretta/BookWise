@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext';
-import { CartIcon, AdminIcon, LogoutIcon } from '../ui/icons/NavIcons';
+import { AdminIcon, LogoutIcon } from '../ui/icons/NavIcons';
+import CartMenu from '../cart/CartMenu';
 
 /** Menú de usuario — se renderiza solo en desktop (ver Navbar.jsx) */
 const NavbarUserMenu = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const { itemCount } = useCart();
 
   if (!isAuthenticated) {
     return (
@@ -40,21 +39,7 @@ const NavbarUserMenu = () => {
         </Link>
       )}
 
-      <Link
-        to="/cart"
-        aria-label={`Carrito — ${itemCount} ${itemCount === 1 ? 'ítem' : 'ítems'}`}
-        className="relative flex items-center justify-center w-9 h-9 rounded-lg text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--accent-bg)] transition-colors duration-150"
-      >
-        <CartIcon />
-        {itemCount > 0 && (
-          <span
-            aria-hidden="true"
-            className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[var(--accent)] rounded-full leading-none"
-          >
-            {itemCount > 99 ? '99+' : itemCount}
-          </span>
-        )}
-      </Link>
+      <CartMenu />
 
       <div className="w-px h-5 bg-[var(--border)] mx-1" aria-hidden="true" />
 
