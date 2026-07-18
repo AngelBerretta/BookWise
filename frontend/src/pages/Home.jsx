@@ -4,6 +4,7 @@ import { getProducts }         from '../services/productService';
 import { getPosts }            from '../services/blogService';
 import { useAuth }             from '../context/AuthContext';
 import ProductCard             from '../components/product/ProductCard';
+import ProductSkeleton         from '../components/product/ProductSkeleton';
 import PostCard                from '../components/blog/PostCard';
 import Button                  from '../components/ui/Button';
 import Spinner                 from '../components/ui/Spinner';
@@ -139,8 +140,8 @@ const Home = () => {
         </div>
 
         {loadingP ? (
-          <div className="flex justify-center py-16">
-            <Spinner size="lg" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)}
           </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">

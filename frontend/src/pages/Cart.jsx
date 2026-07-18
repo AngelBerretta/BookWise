@@ -4,9 +4,9 @@ import useCart from '../hooks/useCart';
 import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
 import CartEmpty from '../components/cart/CartEmpty';
+import CartItemSkeleton from '../components/cart/CartItemSkeleton';
 import Button from '../components/ui/Button';
-import Spinner from '../components/ui/Spinner';
-import Toast from '../components/ui/Toast';
+import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 /**
@@ -16,9 +16,9 @@ import ConfirmDialog from '../components/ui/ConfirmDialog';
  */
 const Cart = () => {
   const { products, loading, itemCount, total, clearCart } = useCart();
+  const { showToast } = useToast();
 
   const [clearing, setClearing]     = useState(false);
-  const [toast, setToast]           = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   /* ── Vaciar carrito ── */
@@ -26,9 +26,9 @@ const Cart = () => {
     setClearing(true);
     try {
       await clearCart();
-      setToast({ type: 'success', message: 'Carrito vaciado correctamente.' });
+      showToast({ type: 'success', message: 'Carrito vaciado correctamente.' });
     } catch {
-      setToast({ type: 'error', message: 'No pudimos vaciar el carrito. Intentá de nuevo.' });
+      showToast({ type: 'error', message: 'No pudimos vaciar el carrito. Intentá de nuevo.' });
     } finally {
       setClearing(false);
       setConfirmOpen(false);
@@ -38,8 +38,20 @@ const Cart = () => {
   /* ── Loading inicial ── */
   if (loading && !products.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <Spinner size="lg" className="text-[var(--accent)]" />
+      <div className="min-h-screen bg-[var(--bg)]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <h1 className="h1-admin mb-8">Mi carrito</h1>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-6">
+              {Array.from({ length: 3 }).map((_, i) => <CartItemSkeleton key={i} />)}
+            </section>
+            <aside
+              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 h-64 animate-pulse"
+              style={{ backgroundColor: 'var(--bg-subtle)' }}
+              aria-hidden="true"
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -58,14 +70,6 @@ const Cart = () => {
 
   return (
     <>
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       {confirmOpen && (
         <ConfirmDialog
           title="Vaciar carrito"

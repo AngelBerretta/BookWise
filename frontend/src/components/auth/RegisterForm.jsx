@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import useForm from '../../hooks/useForm';
-import Toast from '../ui/Toast';
+import { useToast } from '../../context/ToastContext';
 
 /**
  * Formulario de registro — estilo BookWise editorial.
@@ -9,6 +9,7 @@ import Toast from '../ui/Toast';
  */
 const RegisterForm = ({ onSuccess }) => {
   const { register } = useAuth();
+  const { showToast } = useToast();
 
   const [fields, setFields] = useState({
     username: '',
@@ -19,7 +20,6 @@ const RegisterForm = ({ onSuccess }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword]         = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [toast, setToast] = useState(null);
 
   /* ── Validación local ── */
   const validate = () => {
@@ -51,13 +51,21 @@ const RegisterForm = ({ onSuccess }) => {
   const { handleSubmit, loading, error } = useForm(
     useCallback(
       async (data) => {
-        const { confirmPassword, ...payload } = data;
+        const { confirmPassword: _confirmPassword, ...payload } = data;
         await register(payload);
         onSuccess?.();
       },
       [register, onSuccess]
     )
   );
+
+  const prevErrorRef = useRef(null);
+  useEffect(() => {
+    if (error && error !== prevErrorRef.current) {
+      showToast({ type: 'error', message: error });
+    }
+    prevErrorRef.current = error;
+  }, [error, showToast]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -77,14 +85,8 @@ const RegisterForm = ({ onSuccess }) => {
     handleSubmit(fields);
   };
 
-  const showToast = error && !toast;
-
   return (
     <>
-      {showToast && (
-        <Toast type="error" message={error} onClose={() => setToast(null)} />
-      )}
-
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[clamp(0.45rem,1.6dvh,0.85rem)]">
 
         {/* ── Username ── */}

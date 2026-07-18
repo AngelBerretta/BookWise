@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import Button from '../ui/Button';
-import Toast from '../ui/Toast';
+import { useToast } from '../../context/ToastContext';
+import { formatPrice } from '../../utils/formatPrice';
 
 /**
  * Panel lateral con el resumen del pedido.
@@ -12,30 +12,17 @@ import Toast from '../ui/Toast';
  * }} props
  */
 const CartSummary = ({ products, total, itemCount }) => {
-  const [toast, setToast] = useState(null);
-
-  const fmt = (val) =>
-    new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      maximumFractionDigits: 0,
-    }).format(val);
+  const { showToast } = useToast();
 
   const handleCheckout = () => {
-    setToast({ type: 'info', message: '🚀 El checkout todavía está en desarrollo — por ahora podés seguir agregando libros.' });
+    showToast({
+      type: 'info',
+      message: '🚀 El checkout todavía está en desarrollo — por ahora podés seguir agregando libros.',
+      duration: 4000,
+    });
   };
 
   return (
-    <>
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-          duration={4000}
-        />
-      )}
-
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 flex flex-col gap-5 sticky top-24">
 
         <h2 className="text-lg font-semibold text-[var(--text-h)]">
@@ -56,7 +43,7 @@ const CartSummary = ({ products, total, itemCount }) => {
                   <span className="text-[var(--text)] opacity-60 ml-1">×{quantity}</span>
                 </span>
                 <span className="font-medium text-[var(--text-h)] shrink-0 tabular-nums">
-                  {fmt(subtotal)}
+                  {formatPrice(subtotal, false)}
                 </span>
               </li>
             );
@@ -70,7 +57,7 @@ const CartSummary = ({ products, total, itemCount }) => {
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex justify-between text-[var(--text)]">
             <span>Subtotal ({itemCount} {itemCount === 1 ? 'artículo' : 'artículos'})</span>
-            <span className="tabular-nums">{fmt(total)}</span>
+            <span className="tabular-nums">{formatPrice(total, false)}</span>
           </div>
           <div className="flex justify-between text-[var(--text)]">
             <span>Envío</span>
@@ -82,19 +69,29 @@ const CartSummary = ({ products, total, itemCount }) => {
         <div className="flex justify-between items-center border-t border-[var(--border)] pt-4">
           <span className="font-semibold text-[var(--text-h)]">Total</span>
           <span className="text-xl font-bold text-[var(--text-h)] tabular-nums">
-            {fmt(total)}
+            {formatPrice(total, false)}
           </span>
         </div>
 
         {/* Botón checkout */}
         <div className="flex flex-col gap-2">
           <Button
-            variant="primary"
+            variant="secondary"
             size="lg"
             className="w-full"
             onClick={handleCheckout}
           >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '18px' }}
+              aria-hidden="true"
+            >
+              schedule
+            </span>
             Finalizar compra
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              Beta
+            </span>
           </Button>
           <p className="text-xs text-center text-[var(--text)] opacity-60">
             El pago está en desarrollo — todavía no procesamos compras reales.
@@ -102,7 +99,6 @@ const CartSummary = ({ products, total, itemCount }) => {
         </div>
 
       </div>
-    </>
   );
 };
 

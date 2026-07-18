@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import useForm from '../../hooks/useForm';
-import Toast from '../ui/Toast';
+import { useToast } from '../../context/ToastContext';
 
 /**
  * Formulario de inicio de sesión — estilo BookWise editorial.
@@ -9,12 +9,11 @@ import Toast from '../ui/Toast';
  */
 const LoginForm = ({ onSuccess }) => {
   const { login } = useAuth();
+  const { showToast } = useToast();
 
   const [fields, setFields]           = useState({ email: '', password: '' });
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast]             = useState(null);
-  const [infoToast, setInfoToast]     = useState(false);
 
   /* ── Validación local ── */
   const validate = () => {
@@ -43,6 +42,15 @@ const LoginForm = ({ onSuccess }) => {
     )
   );
 
+  // Dispara el toast de error solo cuando `error` cambia (evita duplicados en re-renders)
+  const prevErrorRef = useRef(null);
+  useEffect(() => {
+    if (error && error !== prevErrorRef.current) {
+      showToast({ type: 'error', message: error });
+    }
+    prevErrorRef.current = error;
+  }, [error, showToast]);  
+
   const onChange = (e) => {
     const { name, value } = e.target;
     setFields((prev) => ({ ...prev, [name]: value }));
@@ -61,21 +69,9 @@ const LoginForm = ({ onSuccess }) => {
     handleSubmit(fields);
   };
 
-  const showToast = error && !toast;
 
   return (
     <>
-      {showToast && (
-        <Toast type="error" message={error} onClose={() => setToast(null)} />
-      )}
-      {infoToast && (
-        <Toast
-          type="info"
-          message="La recuperación de contraseña estará disponible próximamente. Mientras tanto, probá el acceso demo para explorar la plataforma."
-          onClose={() => setInfoToast(false)}
-        />
-      )}
-
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[clamp(0.6rem,2dvh,1rem)]">
 
         {/* ── Email ── */}
@@ -128,7 +124,10 @@ const LoginForm = ({ onSuccess }) => {
             </label>
             <button
               type="button"
-              onClick={() => setInfoToast(true)}
+              onClick={() => showToast({
+                type: 'info',
+                message: 'La recuperación de contraseña estará disponible próximamente. Mientras tanto, probá el acceso demo para explorar la plataforma.',
+              })}
               className="font-label text-xs font-medium transition-opacity hover:opacity-70"
               style={{ color: 'var(--bw-primary)' }}
             >
