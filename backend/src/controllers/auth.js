@@ -5,7 +5,7 @@ import crypto  from "node:crypto";           // ← prefijo node: recomendado en
 import config                    from "../../config.js";
 import { userDAO }               from "../models/DAOs/index.js";
 import { toUserDTO }             from "../models/DTOs/index.js";
-// import { sendVerificationEmail } from "../services/email.service.js";
+import { sendVerificationEmail } from "../services/email.service.js";
 import catchAsync                from "../utils/catchAsync.js";
 import ApiError                  from "../utils/ApiError.js";
 
@@ -34,7 +34,7 @@ const register = catchAsync(async (req, res) => {
 
   // El email no bloquea el registro si falla
   try {
-    // await sendVerificationEmail(email, username, verificationToken);
+    await sendVerificationEmail(email, username, verificationToken);
   } catch (emailErr) {
     console.error("[register] Error al enviar email:", emailErr.message);
   }
