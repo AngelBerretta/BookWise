@@ -5,6 +5,7 @@ import NavbarUserMenu from './NavbarUserMenu';
 import MobileMenu     from './MobileMenu';
 import { useCart }    from '../../context/CartContext';
 import { CartIcon }   from '../ui/icons/NavIcons';
+import CartBadge      from '../ui/CartBadge';
 
 const BookWiseLogo = () => (
   <Link to="/" className="group shrink-0" aria-label="BookWise — Inicio">
@@ -26,14 +27,7 @@ const MobileCartButton = () => {
       className="relative flex items-center justify-center w-9 h-9 rounded-lg text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--accent-bg)] transition-colors"
     >
       <CartIcon />
-      {itemCount > 0 && (
-        <span
-          aria-hidden="true"
-          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[var(--accent)] rounded-full leading-none"
-        >
-          {itemCount > 99 ? '99+' : itemCount}
-        </span>
-      )}
+      <CartBadge count={itemCount} />
     </Link>
   );
 };

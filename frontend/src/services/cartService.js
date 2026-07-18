@@ -6,62 +6,38 @@ import api from './api';
 
 // POST /api/carts — crear carrito
 export const createCart = async () => {
-  try {
     const response = await api.post('/carts');
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // GET /api/carts/:cid — obtener carrito
 export const getCart = async (cartId) => {
-  try {
     const response = await api.get(`/carts/${cartId}`);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // POST /api/carts/:cid/products/:pid — agregar producto
 export const addProduct = async (cartId, productId, quantity = 1) => {
-  try {
     const response = await api.post(`/carts/${cartId}/products/${productId}`, { quantity });
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // PUT /api/carts/:cid/products/:pid — actualizar cantidad
 export const updateItem = async (cartId, productId, quantity) => {
-  try {
     const response = await api.put(`/carts/${cartId}/products/${productId}`, { quantity });
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // DELETE /api/carts/:cid/products/:pid — eliminar producto
 export const removeCart = async (cartId, productId) => {
-  try {
     const response = await api.delete(`/carts/${cartId}/products/${productId}`);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // DELETE /api/carts/:cid — vaciar carrito
 export const clearCart = async (cartId) => {
-  try {
     const response = await api.delete(`/carts/${cartId}`);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // ── Helpers (no tocan la API) ──

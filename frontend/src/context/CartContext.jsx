@@ -108,6 +108,7 @@ export const CartProvider = ({ children }) => {
 
   const value = {
     cart,
+    products,
     loading,
     itemCount,
     total,
