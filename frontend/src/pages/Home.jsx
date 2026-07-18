@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link }                from 'react-router-dom';
 import { getProducts }         from '../services/productService';
 import { getPosts }            from '../services/blogService';
-import { useAuth }             from '../context/AuthContext';
+import useAuth                 from '../hooks/useAuth';
 import ProductCard             from '../components/product/ProductCard';
 import ProductSkeleton         from '../components/product/ProductSkeleton';
 import PostCard                from '../components/blog/PostCard';

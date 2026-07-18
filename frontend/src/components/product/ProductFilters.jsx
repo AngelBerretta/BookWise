@@ -1,5 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
+
+/**
+ * Mantiene un buffer de texto ("draft") sincronizado con un valor externo,
+ * salvo mientras el usuario está tipeando en él (evita pisar lo que está
+ * escribiendo). Ajusta el estado durante el render en vez de usar un
+ * efecto con setState síncrono.
+ */
+const useSyncedDraft = (externalValue, editing) => {
+  const [draft, setDraft] = useState(() => String(externalValue));
+  const [prevValue, setPrevValue] = useState(externalValue);
+  const [prevEditing, setPrevEditing] = useState(editing);
+
+  if (externalValue !== prevValue || editing !== prevEditing) {
+    setPrevValue(externalValue);
+    setPrevEditing(editing);
+    if (!editing) setDraft(String(externalValue));
+  }
+
+  return [draft, setDraft];
+};
 
 const ProductFilters = ({
   filters,
@@ -176,15 +196,13 @@ const DualRangeSlider = ({ min, max, value, onChange }) => {
 ───────────────────────────────────────────── */
 const PriceNumberInputs = ({ min, max, value, onChange }) => {
   const [lo, hi] = value;
-  const [draftLo, setDraftLo] = useState(String(lo));
-  const [draftHi, setDraftHi] = useState(String(hi));
   const [editingLo, setEditingLo] = useState(false);
   const [editingHi, setEditingHi] = useState(false);
 
   // Sincroniza el buffer con el valor real SOLO si el usuario no está
   // tipeando ahí en ese momento (evita pisar lo que está escribiendo).
-  useEffect(() => { if (!editingLo) setDraftLo(String(lo)); }, [lo, editingLo]);
-  useEffect(() => { if (!editingHi) setDraftHi(String(hi)); }, [hi, editingHi]);
+  const [draftLo, setDraftLo] = useSyncedDraft(lo, editingLo);
+  const [draftHi, setDraftHi] = useSyncedDraft(hi, editingHi);
 
   const commitLo = () => {
     setEditingLo(false);

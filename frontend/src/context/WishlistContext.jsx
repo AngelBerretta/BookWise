@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import * as wishlistService from '../services/wishlistService';
-import { useAuth } from './AuthContext';
+import useAuth from '../hooks/useAuth';
 
 const WishlistContext = createContext(null);
 
@@ -23,13 +23,36 @@ export const WishlistProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  // Reset inmediato al des-autenticarse. Se ajusta durante el render (no en
+  // un efecto) para evitar el setState síncrono al inicio del efecto.
+  const [prevIsAuthenticated, setPrevIsAuthenticated] = useState(isAuthenticated);
+  if (isAuthenticated !== prevIsAuthenticated) {
+    setPrevIsAuthenticated(isAuthenticated);
+    if (!isAuthenticated) setWishlist([]);
+  }
+
+  // Carga automática al autenticarse. La lógica se define acá adentro
+  // (en vez de llamar a fetchWishlist) para que el efecto sea autocontenido:
+  // fetchWishlist queda disponible como API pública para refetch manual.
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchWishlist();
-    } else {
-      setWishlist([]);
-    }
-  }, [isAuthenticated, user?._id, fetchWishlist]);
+    if (!isAuthenticated) return;
+
+    let ignore = false;
+    const loadWishlist = async () => {
+      setLoading(true);
+      try {
+        const data = await wishlistService.getWishlist();
+        if (!ignore) setWishlist(data.wishlist ?? []);
+      } catch {
+        if (!ignore) setWishlist([]);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+    loadWishlist();
+
+    return () => { ignore = true; };
+  }, [isAuthenticated, user?._id]);
 
   const isSaved = useCallback(
     (productId) => wishlist.some((p) => p._id === productId),
@@ -62,14 +85,6 @@ export const WishlistProvider = ({ children }) => {
       {children}
     </WishlistContext.Provider>
   );
-};
-
-export const useWishlist = () => {
-  const context = useContext(WishlistContext);
-  if (!context) {
-    throw new Error('useWishlist debe usarse dentro de <WishlistProvider>');
-  }
-  return context;
 };
 
 export default WishlistContext;

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
-import { useWishlist } from '../../context/WishlistContext';
-import { useToast } from '../../context/ToastContext';
+import useCart from '../../hooks/useCart';
+import useAuth from '../../hooks/useAuth';
+import useWishlist from '../../hooks/useWishlist';
+import useToast from '../../hooks/useToast';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import { formatPrice } from '../../utils/formatPrice';

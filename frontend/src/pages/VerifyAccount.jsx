@@ -1,26 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { verifyAccount } from '../services/authService';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
 
-/**
- * Página de verificación de cuenta.
- * Lee el token de la URL (?token=...) y llama a authService.verifyAccount.
- * Muestra estado de: cargando / éxito / error.
- */
 const VerifyAccount = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
-  const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error' | 'missing'
+  const [status, setStatus] = useState(() => (token ? 'loading' : 'missing'));
   const [message, setMessage] = useState('');
+  const calledRef = useRef(false);
 
   useEffect(() => {
-    if (!token) {
-      setStatus('missing');
-      return;
-    }
+    if (!token || calledRef.current) return;
+    calledRef.current = true;
 
     const verify = async () => {
       try {

@@ -1,8 +1,10 @@
-import { useCart as useCartContext } from '../context/CartContext';
+import { useContext } from 'react';
+import CartContext from '../context/CartContext';
 
 /**
  * Hook de carrito para uso en componentes.
- * Re-exporta CartContext con una interfaz limpia y nombres explícitos.
+ * Consume CartContext directamente y expone una interfaz limpia y
+ * nombres explícitos.
  *
  * @returns {{
  *   cart: Object|null,
@@ -18,6 +20,11 @@ import { useCart as useCartContext } from '../context/CartContext';
  * }}
  */
 const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart debe usarse dentro de <CartProvider>');
+  }
+
   const {
     cart,
     loading,
@@ -28,7 +35,7 @@ const useCart = () => {
     updateQuantity,
     removeItem,
     clearCart,
-  } = useCartContext();
+  } = context;
 
   // products es el array de items dentro del carrito
   const products = cart?.products ?? [];

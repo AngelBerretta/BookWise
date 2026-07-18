@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../hooks/useAuth';
 import Breadcrumbs from './Breadcrumbs';
 
 /* ─── Íconos ─────────────────────────────────────────────── */
@@ -72,11 +72,15 @@ const AdminLayout = () => {
   const [extraCrumb, setExtraCrumb] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Al cambiar de sección admin, limpiamos cualquier crumb dinámico stale
-  useEffect(() => {
+  // Al cambiar de sección admin, limpiamos cualquier crumb dinámico stale.
+  // Ajustamos el estado durante el render (en vez de en un efecto) siguiendo
+  // el patrón recomendado por React para resetear estado ante un cambio.
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname);
     setExtraCrumb(null);
     setMobileNavOpen(false);
-  }, [location.pathname]);
+  }
 
   return (
     <div className="min-h-screen flex bg-[var(--bg)]">

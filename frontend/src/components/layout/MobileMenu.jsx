@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../hooks/useAuth';
 import { AdminIcon, LogoutIcon } from '../ui/icons/NavIcons';
-import { LINKS } from './NavbarLinks';
+import { NAV_LINKS } from '../../utils/constants';
 
 const MobileMenu = ({ open, onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -61,7 +61,7 @@ const MobileMenu = ({ open, onClose }) => {
         <div className="px-4 py-4 flex flex-col gap-1">
 
           <nav className="flex flex-col gap-1" aria-label="Menú principal">
-            {LINKS.map(({ to, label, exact }) => (
+            {NAV_LINKS.map(({ to, label, exact }) => (
               <NavLink key={to} to={to} end={exact} className={mobileLink} onClick={onClose}>
                 {label}
               </NavLink>

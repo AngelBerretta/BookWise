@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import ToastCard from '../components/ui/ToastCard';
 
@@ -47,14 +47,6 @@ export const ToastProvider = ({ children }) => {
       )}
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast debe usarse dentro de <ToastProvider>');
-  }
-  return context;
 };
 
 export default ToastContext;

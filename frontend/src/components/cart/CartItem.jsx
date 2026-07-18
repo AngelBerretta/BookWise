@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useCart from '../../hooks/useCart';
 import Button from '../ui/Button';
-import { useToast } from '../../context/ToastContext';
+import useToast from '../../hooks/useToast';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**

@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import * as cartService from '../services/cartService';
-import { useAuth } from './AuthContext';
+import useAuth from '../hooks/useAuth';
 
 const CartContext = createContext(null);
 
@@ -15,7 +15,10 @@ export const CartProvider = ({ children }) => {
   const itemCount  = cartService.getCartItemCount(products);
   const total      = cartService.calculateCartTotal(products);
 
-  // Carga o crea el carrito cuando el usuario se autentica
+  // Carga o crea el carrito cuando el usuario se autentica.
+  // Nota: la dependencia es `user` (objeto completo) y no `user?._id`
+  // porque el análisis de memoización no puede acotar de forma segura
+  // una dependencia a una propiedad accedida con optional chaining.
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated || !user?._id) return;
     setLoading(true);
@@ -51,16 +54,66 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, user?._id]);
+  }, [isAuthenticated, user]);
 
-  useEffect(() => {
-    if (isAuthenticated && user?._id) {
-      fetchCart();
-    } else {
+  // Reset inmediato al des-autenticarse. Se ajusta durante el render (no en
+  // un efecto) para evitar el setState síncrono al inicio del efecto.
+  const authKey = isAuthenticated ? (user?._id ?? null) : null;
+  const [prevAuthKey, setPrevAuthKey] = useState(authKey);
+  if (authKey !== prevAuthKey) {
+    setPrevAuthKey(authKey);
+    if (!authKey) {
       setCart(null);
       setCartId(null);
     }
-  }, [isAuthenticated, user?._id, fetchCart]);
+  }
+
+  // Carga automática al autenticarse. La lógica se define acá adentro
+  // (en vez de llamar a fetchCart) para que el efecto sea autocontenido:
+  // fetchCart queda disponible como API pública para refetch manual.
+  useEffect(() => {
+    const userId = user?._id;
+    if (!isAuthenticated || !userId) return;
+
+    let ignore = false;
+    const loadCart = async () => {
+      setLoading(true);
+      try {
+        const savedCartId = localStorage.getItem(`cartId_${userId}`);
+
+        if (savedCartId) {
+          try {
+            const data = await cartService.getCart(savedCartId);
+            if (!ignore) {
+              setCart(data.cart ?? data.payload ?? data);
+              setCartId(savedCartId);
+            }
+            return;
+          } catch (err) {
+            if (err?.response?.status === 404) {
+              localStorage.removeItem(`cartId_${userId}`);
+            }
+          }
+        }
+
+        const newCart = await cartService.createCart();
+        const id = newCart?.cart?._id || newCart?._id;
+        if (id && !ignore) {
+          localStorage.setItem(`cartId_${userId}`, id);
+          setCartId(id);
+          setCart(newCart.cart ?? newCart);
+        }
+      } catch (err) {
+        console.error('Error al cargar/crear carrito:', err);
+        if (!ignore) setCart(null);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+    loadCart();
+
+    return () => { ignore = true; };
+  }, [isAuthenticated, user]);
 
   const addToCart = useCallback(async (productId, quantity = 1) => {
     if (!cartId) return;
@@ -124,14 +177,6 @@ export const CartProvider = ({ children }) => {
       {children}
     </CartContext.Provider>
   );
-};
-
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart debe usarse dentro de <CartProvider>');
-  }
-  return context;
 };
 
 export default CartContext;

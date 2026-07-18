@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import * as blogService from '../../services/blogService';
 import { uploadImage } from '../../services/uploadService';
 import Input            from '../ui/Input';
@@ -19,7 +19,18 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
     published: false,
   };
 
-  const [fields, setFields]           = useState(emptyFields);
+  // Inicialización perezosa a partir del post recibido por props.
+  // PostForm se remonta (vía `key`) cada vez que AdminBlog abre el modal
+  // para un post distinto, así que no hace falta un efecto para
+  // "sincronizar" fields con post: el estado ya nace correcto.
+  const [fields, setFields] = useState(() => (post ? {
+    title:     post.title     ?? '',
+    content:   post.content   ?? '',
+    thumbnail: post.thumbnail ?? '',
+    thumbnailPublicId: post.thumbnailPublicId ?? '',
+    tags:      Array.isArray(post.tags) ? post.tags.join(', ') : '',
+    published: post.published ?? false,
+  } : emptyFields));
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
@@ -29,24 +40,6 @@ const PostForm = ({ post, onSuccess, onCancel }) => {
   const [imageFile, setImageFile]         = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState('');
   const [imageRemoved, setImageRemoved]   = useState(false);
-
-  useEffect(() => {
-    if (post) {
-      setFields({
-        title:     post.title     ?? '',
-        content:   post.content   ?? '',
-        thumbnail: post.thumbnail ?? '',
-        thumbnailPublicId: post.thumbnailPublicId ?? '',
-        tags:      Array.isArray(post.tags) ? post.tags.join(', ') : '',
-        published: post.published ?? false,
-      });
-    }
-    // Cambió el post (o se pasó a modo "crear") → descartar cualquier
-    // selección de imagen pendiente que quedara del post anterior.
-    setImageFile(null);
-    setImagePreviewUrl('');
-    setImageRemoved(false);
-  }, [post]);
 
   const validate = () => {
     const e = {};

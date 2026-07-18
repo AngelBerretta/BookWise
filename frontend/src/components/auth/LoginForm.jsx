@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../hooks/useAuth';
 import useForm from '../../hooks/useForm';
-import { useToast } from '../../context/ToastContext';
+import useToast from '../../hooks/useToast';
 
 /**
  * Formulario de inicio de sesión — estilo BookWise editorial.
