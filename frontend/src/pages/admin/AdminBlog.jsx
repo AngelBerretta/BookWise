@@ -6,7 +6,7 @@ import PostForm                from '../../components/blog/PostForm';
 import Modal                   from '../../components/ui/Modal';
 import ConfirmDialog           from '../../components/ui/ConfirmDialog';
 import Button                  from '../../components/ui/Button';
-import { useToast }            from '../../context/ToastContext';
+import useToast                from '../../hooks/useToast';
 import EmptyState              from '../../components/ui/EmptyState';
 import Input                   from '../../components/ui/Input';
 import Pagination              from '../../components/ui/Pagination';
@@ -75,7 +75,15 @@ const AdminBlog = () => {
     return () => setExtraCrumb(null);
   }, [modalOpen, editPost, setExtraCrumb]);
 
-  useEffect(() => { setSelected(new Set()); }, [page, search, published]);
+  // La selección solo tiene sentido sobre la página/búsqueda actual.
+  // Se limpia ajustando el estado durante el render (en vez de un efecto)
+  // cuando cambia alguno de los filtros, siguiendo el patrón recomendado
+  // por React para "resetear estado cuando cambian otros valores".
+  const [selectionFilters, setSelectionFilters] = useState({ page, search, published });
+  if (selectionFilters.page !== page || selectionFilters.search !== search || selectionFilters.published !== published) {
+    setSelectionFilters({ page, search, published });
+    setSelected(new Set());
+  }
 
   const openCreate = () => { setEditPost(null); setModalOpen(true); };
   const openEdit   = (p)  => { setEditPost(p);  setModalOpen(true); };
@@ -168,7 +176,7 @@ const AdminBlog = () => {
     <>
       {modalOpen && (
         <Modal title={editPost ? 'Editar post' : 'Nuevo post'} onClose={closeModal} size="xl">
-          <PostForm post={editPost} onSuccess={handleSuccess} onCancel={closeModal} />
+          <PostForm key={editPost?._id ?? 'new'} post={editPost} onSuccess={handleSuccess} onCancel={closeModal} />
         </Modal>
       )}
 

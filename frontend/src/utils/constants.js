@@ -1,5 +1,11 @@
 // Constantes globales de la aplicación
 
+export const NAV_LINKS = [
+  { to: '/',         label: 'Inicio',    exact: true },
+  { to: '/products', label: 'Productos' },
+  { to: '/blog',     label: 'Blog' },
+];
+
 export const PRODUCT_CATEGORIES = [
   { value: 'ficcion', label: 'Ficción' },
   { value: 'no-ficcion', label: 'No Ficción' },

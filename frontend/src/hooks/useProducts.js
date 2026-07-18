@@ -28,6 +28,7 @@ const useProducts = () => {
   const [sortBy, setSortBy]      = useState('newest');
 
   const [priceRange, setPriceRangeRaw] = useState([0, 0]);
+  const [priceLow, priceHigh]          = priceRange;
   const [maxPrice, setMaxPrice]        = useState(0);
   const [priceReady, setPriceReady]    = useState(false);
 
@@ -84,7 +85,7 @@ const useProducts = () => {
   useEffect(() => {
     if (!didMountRef.current) { didMountRef.current = true; return; }
     setPage(1);
-  }, [filters.category, filters.search, sortBy, priceRange[0], priceRange[1]]);
+  }, [filters.category, filters.search, sortBy, priceLow, priceHigh]);
 
   /* Mantiene ?category= en la URL en sync con el filtro activo
      (replace, no push: no queremos ensuciar el historial en cada click) */
@@ -107,7 +108,7 @@ const useProducts = () => {
         category: filters.category,
         search:   filters.search,
         sort:     sortBy,
-        ...(maxPrice > 0 ? { minPrice: priceRange[0], maxPrice: priceRange[1] } : {}),
+        ...(maxPrice > 0 ? { minPrice: priceLow, maxPrice: priceHigh } : {}),
         limit:    PAGE_SIZE,
         page,
       });
@@ -116,7 +117,7 @@ const useProducts = () => {
     return () => clearTimeout(debounceRef.current);
   }, [
     filters.category, filters.search, sortBy,
-    priceRange[0], priceRange[1], page,
+    priceLow, priceHigh, page,
     priceReady, maxPrice, fetchProducts,
   ]);
 
@@ -131,11 +132,11 @@ const useProducts = () => {
       category: filters.category,
       search:   filters.search,
       sort:     sortBy,
-      ...(maxPrice > 0 ? { minPrice: priceRange[0], maxPrice: priceRange[1] } : {}),
+      ...(maxPrice > 0 ? { minPrice: priceLow, maxPrice: priceHigh } : {}),
       limit:    PAGE_SIZE,
       page,
     });
-  }, [fetchProducts, filters, sortBy, priceRange, maxPrice, page]);
+  }, [fetchProducts, filters, sortBy, priceLow, priceHigh, maxPrice, page]);
 
   return {
     products,

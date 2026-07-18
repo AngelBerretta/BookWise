@@ -1,10 +1,5 @@
 import { NavLink } from 'react-router-dom';
-
-export const LINKS = [
-  { to: '/',         label: 'Inicio',    exact: true },
-  { to: '/products', label: 'Productos' },
-  { to: '/blog',     label: 'Blog' },
-];
+import { NAV_LINKS } from '../../utils/constants';
 
 const linkBase = [
   'relative text-sm font-medium transition-colors duration-150',
@@ -19,7 +14,7 @@ const NavbarLinks = () => {
 
   return (
     <nav className="flex items-center gap-7" aria-label="Navegación principal">
-      {LINKS.map(({ to, label, exact }) => (
+      {NAV_LINKS.map(({ to, label, exact }) => (
         <NavLink key={to} to={to} end={exact} className={desktopLink}>
           {({ isActive }) => (
             <>

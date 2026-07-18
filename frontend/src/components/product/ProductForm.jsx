@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
 import * as productService from '../../services/productService';
 import { uploadImage } from '../../services/uploadService';
@@ -33,7 +33,24 @@ const ProductForm = ({
 }) => {
   const isEditing = !!product;
 
-  const [fields, setFields]           = useState({ ...EMPTY_FIELDS });
+  // Inicialización perezosa a partir del product recibido por props.
+  // ProductForm se remonta (vía `key`) cada vez que AdminProducts abre el
+  // modal para un producto distinto, así que no hace falta un efecto para
+  // "sincronizar" fields con product: el estado ya nace correcto.
+  const [fields, setFields] = useState(() => (product ? {
+    title:           product.title           ?? '',
+    author:          product.author          ?? '',
+    price:           product.price           ?? '',
+    category:        product.category        ?? '',
+    description:     product.description     ?? '',
+    stock:           product.stock           ?? '',
+    url:             product.url             ?? '',
+    thumbnail:       product.thumbnails?.[0] ?? '',
+    thumbnailPublicId: product.thumbnailPublicId ?? '',
+    code:            product.code            ?? '',
+    pages:           product.pages           ?? '',
+    publicationDate: product.publicationDate ?? '',
+  } : { ...EMPTY_FIELDS }));
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoadingState]    = useState(false);
   const [error, setError]             = useState(null);
@@ -47,31 +64,6 @@ const ProductForm = ({
     setLoadingState(val);
     onLoadingChange?.(val);
   };
-
-  useEffect(() => {
-    if (product) {
-      setFields({
-        title:           product.title           ?? '',
-        author:          product.author          ?? '',
-        price:           product.price           ?? '',
-        category:        product.category        ?? '',
-        description:     product.description     ?? '',
-        stock:           product.stock           ?? '',
-        url:             product.url             ?? '',
-        thumbnail:       product.thumbnails?.[0] ?? '',
-        thumbnailPublicId: product.thumbnailPublicId ?? '',
-        code:            product.code            ?? '',
-        pages:           product.pages           ?? '',   
-        publicationDate: product.publicationDate ?? '',   
-      });
-    } else {
-      setFields({ ...EMPTY_FIELDS });
-    }
-    // Cambió el producto (o se pasó a modo "crear") → descartar cualquier
-    // selección de imagen pendiente que quedara del producto anterior.
-    setImageFile(null);
-    setImageRemoved(false);
-  }, [product]);
 
   /* ── Validación ── */
   const validate = () => {

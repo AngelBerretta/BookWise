@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import NavbarLinks    from './NavbarLinks';
 import NavbarUserMenu from './NavbarUserMenu';
 import MobileMenu     from './MobileMenu';
-import { useCart }    from '../../context/CartContext';
+import useCart        from '../../hooks/useCart';
 import { CartIcon }   from '../ui/icons/NavIcons';
 import CartBadge      from '../ui/CartBadge';
 

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductById, getProducts } from '../services/productService';
-import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
-import { useAuth } from '../context/AuthContext';
+import useCart from '../hooks/useCart';
+import useWishlist from '../hooks/useWishlist';
+import useAuth from '../hooks/useAuth';
 import Spinner from '../components/ui/Spinner';
-import { useToast } from '../context/ToastContext';
+import useToast from '../hooks/useToast';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';

@@ -6,7 +6,7 @@ import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import { useToast } from '../../context/ToastContext';
+import useToast from '../../hooks/useToast';
 import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
@@ -149,7 +149,7 @@ const AdminProducts = () => {
   useEffect(() => {
     const t = setTimeout(fetchProducts, search ? 400 : 0);
     return () => clearTimeout(t);
-  }, [fetchProducts]);
+  }, [fetchProducts, search]);
 
   /* Sincroniza filtros con la URL — permite deep-link desde el Dashboard */
   useEffect(() => {
@@ -160,8 +160,21 @@ const AdminProducts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, stock]);
 
-  /* La selección solo tiene sentido sobre la página/búsqueda actual */
-  useEffect(() => { setSelected(new Set()); }, [page, search, category, stock, sort]);
+  /* La selección solo tiene sentido sobre la página/búsqueda actual.
+     Se limpia ajustando el estado durante el render (en vez de un efecto)
+     cuando cambia alguno de los filtros, siguiendo el patrón recomendado
+     por React para "resetear estado cuando cambian otros valores". */
+  const [selectionFilters, setSelectionFilters] = useState({ page, search, category, stock, sort });
+  if (
+    selectionFilters.page !== page ||
+    selectionFilters.search !== search ||
+    selectionFilters.category !== category ||
+    selectionFilters.stock !== stock ||
+    selectionFilters.sort !== sort
+  ) {
+    setSelectionFilters({ page, search, category, stock, sort });
+    setSelected(new Set());
+  }
 
   const openCreate = () => { setEditProduct(null); setModalOpen(true); };
   const openEdit   = (p)  => { setEditProduct(p);   setModalOpen(true); };
@@ -307,6 +320,7 @@ const AdminProducts = () => {
           }
         >
           <ProductForm
+            key={editProduct?._id ?? 'new'}
             product={editProduct}
             onSuccess={handleSuccess}
             onCancel={closeModal}

@@ -6,7 +6,7 @@ import CartSummary from '../components/cart/CartSummary';
 import CartEmpty from '../components/cart/CartEmpty';
 import CartItemSkeleton from '../components/cart/CartItemSkeleton';
 import Button from '../components/ui/Button';
-import { useToast } from '../context/ToastContext';
+import useToast from '../hooks/useToast';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 /**
