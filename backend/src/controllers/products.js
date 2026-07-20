@@ -124,7 +124,15 @@ const createProduct = catchAsync(async (req, res) => {
   const existing = await productDAO.findOne({ code: req.body.code });
   if (existing) throw new ApiError(409, "Ya existe un producto con ese código");
 
-  const product = await productDAO.create(req.body);
+  // Quién lo crea queda registrado — el reseed automático usa este dato
+  // para saber si el producto lo generó un visitante con la cuenta demo.
+  const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+
+  const product = await productDAO.create({
+    ...req.body,
+    createdBy:    actor,
+    lastEditedBy: actor,
+  });
 
   // Emitir evento WebSocket a todos los clientes conectados
   const io = req.app.get("io");
@@ -142,7 +150,11 @@ const updateProduct = catchAsync(async (req, res) => {
   const existing = await productDAO.getById(req.params.pid);
   if (!existing) throw new ApiError(404, "Producto no encontrado");
 
-  const updated = await productDAO.update(req.params.pid, req.body);
+  // Quién edita queda registrado (no se toca createdBy, solo la última edición).
+  const updated = await productDAO.update(req.params.pid, {
+    ...req.body,
+    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
+  });
   if (!updated) throw new ApiError(404, "Producto no encontrado");
 
   // Si se reemplazó o quitó la imagen, borrar la anterior de Cloudinary
@@ -210,7 +222,8 @@ const bulkDeleteProducts = catchAsync(async (req, res) => {
 
 const bulkUpdateProducts = catchAsync(async (req, res) => {
   const { ids, category } = req.body;
-  const modifiedCount = await productDAO.updateMany(ids, { category });
+  const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+  const modifiedCount = await productDAO.updateMany(ids, { category, lastEditedBy: actor });
 
   const io = req.app.get("io");
   if (io) io.emit("product:bulkUpdated", { ids, category });

@@ -63,19 +63,85 @@ const seed = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Conectado a MongoDB');
 
-    /* ── Reset completo del catálogo ── */
-    const deleted = await Product.deleteMany({});
-    console.log(`🗑  ${deleted.deletedCount} productos anteriores eliminados`);
+    const baselineCodes = products.map((p) => p.code);
+    const baselineByCode = new Map(products.map((p) => [p.code, p]));
 
-    /* ── Inserción ── */
-    const inserted = await Product.insertMany(products, { ordered: false });
-    console.log(`\n📚 ${inserted.length} productos insertados:\n`);
+    // Arma el objeto "canónico" completo de un producto del catálogo base,
+    // con defaults explícitos para los campos que el literal no siempre trae
+    // (pages, publicationDate, thumbnailPublicId). Necesario porque un simple
+    // Object.assign(doc, baseline) NO resetea claves ausentes en `baseline`
+    // — dejaría colgado cualquier valor que la cuenta demo haya seteado ahí.
+    const toBaselineDoc = (entry) => ({
+      title:             entry.title,
+      description:       entry.description,
+      code:              entry.code,
+      price:             entry.price,
+      status:            entry.status,
+      stock:             entry.stock,
+      category:          entry.category,
+      thumbnails:        entry.thumbnails ?? [],
+      thumbnailPublicId: '',
+      url:               entry.url ?? '',
+      author:            entry.author ?? '',
+      pages:             entry.pages ?? null,
+      publicationDate:   entry.publicationDate ?? null,
+    });
 
-    inserted.forEach(p =>
-      console.log(`   ✔ [${p.code.padEnd(10)}] ${p.title}`)
-    );
+    /* ── 1. Borrar productos inventados por la cuenta demo ──────────────────
+       Un producto "inventado" es uno cuyo código no pertenece al catálogo
+       base — solo puede haberlo creado un admin (real o demo) a mano.
+       Si lo creó o lo tocó por última vez la cuenta demo, es basura de un
+       visitante probando el panel: se borra. Si lo tocó el admin real, se
+       conserva sin importar qué sea. */
+    const demoExtras = await Product.find({
+      code: { $nin: baselineCodes },
+      'lastEditedBy.isDemo': true,
+    }).select('_id thumbnailPublicId');
 
-    console.log('\n🎉 Seed de productos completado con éxito\n');
+    if (demoExtras.length) {
+      const { deleteImage } = await import('../services/cloudinary.service.js');
+      await Promise.all(
+        demoExtras
+          .filter((p) => p.thumbnailPublicId)
+          .map((p) => deleteImage(p.thumbnailPublicId).catch(() => {}))
+      );
+      await Product.deleteMany({ _id: { $in: demoExtras.map((p) => p._id) } });
+    }
+    console.log(`🗑  ${demoExtras.length} producto(s) creados por la cuenta demo eliminados`);
+
+    /* ── 2. Restaurar productos del catálogo base "vandalizados" por demo ───
+       Si un producto SÍ pertenece al catálogo base pero la cuenta demo fue
+       la última en editarlo, se resetean sus campos a la versión original.
+       Si la última edición fue del admin real (o nunca se editó), no se
+       toca — ahí es donde viven tus imágenes subidas a mano. */
+    const vandalized = await Product.find({
+      code: { $in: baselineCodes },
+      'lastEditedBy.isDemo': true,
+    });
+
+    for (const doc of vandalized) {
+      const baseline = toBaselineDoc(baselineByCode.get(doc.code));
+      Object.assign(doc, baseline, {
+        createdBy:    { userId: null, isDemo: false },
+        lastEditedBy: { userId: null, isDemo: false },
+      });
+      await doc.save({ validateBeforeSave: true });
+    }
+    console.log(`♻️  ${vandalized.length} producto(s) del catálogo restaurados (editados por la cuenta demo)`);
+
+    /* ── 3. Insertar del catálogo base lo que todavía no existe ─────────────
+       Solo pasa la primera vez (DB vacía) o si se agregó un libro nuevo al
+       array de arriba. Si el admin real borró un producto del catálogo a
+       propósito, NO se reinserta acá — se respeta esa decisión. */
+    const existingCodes = new Set(await Product.distinct('code'));
+    const missing = products.filter((p) => !existingCodes.has(p.code));
+
+    if (missing.length) {
+      await Product.insertMany(missing, { ordered: false });
+    }
+    console.log(`📚 ${missing.length} producto(s) del catálogo base insertados por primera vez`);
+
+    console.log('\n🎉 Reseed selectivo completado con éxito\n');
 
   } catch (err) {
     if (err.code === 11000) {

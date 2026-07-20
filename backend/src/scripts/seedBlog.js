@@ -54,22 +54,76 @@ const seed = async () => {
       console.log(`👤 Admin ya existía → ${ADMIN_EMAIL} (reutilizado como autor)`);
     }
 
-    /* ── Reset completo del blog ── */
-    const deleted = await Post.deleteMany({});
-    console.log(`🗑  ${deleted.deletedCount} posts anteriores eliminados`);
+    const baselineSlugs = posts.map((p) => p.slug);
+    const baselineBySlug = new Map(posts.map((p) => [p.slug, p]));
 
-    /* ── Inserción ── */
-    const postsWithAuthor = posts.map(p => ({ ...p, author: admin._id }));
-    const inserted = await Post.insertMany(postsWithAuthor, { ordered: false });
+    // Arma el objeto "canónico" completo de un post del blog base — con
+    // defaults explícitos, igual que toBaselineDoc en seedProducts.js.
+    const toBaselinePost = (entry) => ({
+      title:             entry.title,
+      content:           entry.content,
+      slug:              entry.slug,
+      tags:              entry.tags ?? [],
+      thumbnail:         entry.thumbnail ?? '',
+      thumbnailPublicId: '',
+      published:         entry.published ?? false,
+      author:            admin._id,
+    });
 
-    const publishedCount = inserted.filter(p => p.published).length;
-    console.log(`\n📝 ${inserted.length} posts insertados (${publishedCount} publicados, ${inserted.length - publishedCount} borradores):\n`);
+    /* ── 1. Borrar posts inventados por la cuenta demo ───────────────────────
+       Un post "inventado" es uno cuyo slug no pertenece al blog base — solo
+       puede haberlo creado un admin (real o demo) a mano. Si lo tocó por
+       última vez la cuenta demo, es basura de un visitante probando el
+       panel: se borra. Si lo tocó el admin real, se conserva. */
+    const demoExtras = await Post.find({
+      slug: { $nin: baselineSlugs },
+      'lastEditedBy.isDemo': true,
+    }).select('_id thumbnailPublicId');
 
-    inserted.forEach(p =>
-      console.log(`   ✔ [${p.published ? 'PUB' : 'DRAFT'}] ${p.title}`)
-    );
+    if (demoExtras.length) {
+      const { deleteImage } = await import('../services/cloudinary.service.js');
+      await Promise.all(
+        demoExtras
+          .filter((p) => p.thumbnailPublicId)
+          .map((p) => deleteImage(p.thumbnailPublicId).catch(() => {}))
+      );
+      await Post.deleteMany({ _id: { $in: demoExtras.map((p) => p._id) } });
+    }
+    console.log(`🗑  ${demoExtras.length} post(s) creados por la cuenta demo eliminados`);
 
-    console.log('\n🎉 Seed de blog completado con éxito\n');
+    /* ── 2. Restaurar posts del blog base "vandalizados" por demo ───────────
+       Si un post SÍ pertenece al blog base pero la cuenta demo fue la
+       última en editarlo, se resetean sus campos a la versión original.
+       Si la última edición fue del admin real (o nunca se editó), no se
+       toca — ahí es donde vive lo que vos escribís de verdad. */
+    const vandalized = await Post.find({
+      slug: { $in: baselineSlugs },
+      'lastEditedBy.isDemo': true,
+    });
+
+    for (const doc of vandalized) {
+      const baseline = toBaselinePost(baselineBySlug.get(doc.slug));
+      Object.assign(doc, baseline, {
+        lastEditedBy: { userId: null, isDemo: false },
+      });
+      await doc.save({ validateBeforeSave: true });
+    }
+    console.log(`♻️  ${vandalized.length} post(s) del blog restaurados (editados por la cuenta demo)`);
+
+    /* ── 3. Insertar del blog base lo que todavía no existe ─────────────────
+       Solo pasa la primera vez (DB vacía) o si se agregó un post nuevo al
+       array de arriba. Si el admin real borró un post del blog base a
+       propósito, NO se reinserta acá — se respeta esa decisión. */
+    const existingSlugs = new Set(await Post.distinct('slug'));
+    const missing = posts.filter((p) => !existingSlugs.has(p.slug));
+
+    if (missing.length) {
+      const missingWithAuthor = missing.map((p) => ({ ...p, author: admin._id }));
+      await Post.insertMany(missingWithAuthor, { ordered: false });
+    }
+    console.log(`📝 ${missing.length} post(s) del blog base insertados por primera vez`);
+
+    console.log('\n🎉 Reseed selectivo del blog completado con éxito\n');
 
   } catch (err) {
     if (err.code === 11000) {

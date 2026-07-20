@@ -36,8 +36,8 @@ router.put("/:pid", authMiddleware, roleMiddleware(["admin"]), rateLimitDemoWrit
 // DELETE /api/products/bulk — solo admin, bloqueado en modo demo
 router.delete("/bulk", authMiddleware, roleMiddleware(["admin"]), demoGuard, validate(bulkIdsSchema), bulkDeleteProducts);
 
-// PATCH /api/products/bulk/category — solo admin
-router.patch("/bulk/category", authMiddleware, roleMiddleware(["admin"]), validate(bulkCategorySchema), bulkUpdateProducts);
+// PATCH /api/products/bulk/category — solo admin, bloqueado en modo demo
+router.patch("/bulk/category", authMiddleware, roleMiddleware(["admin"]), demoGuard, validate(bulkCategorySchema), bulkUpdateProducts);
 
 // DELETE /api/products/:pid — solo admin, bloqueado en modo demo
 router.delete("/:pid", authMiddleware, roleMiddleware(["admin"]), demoGuard, deleteProduct);
