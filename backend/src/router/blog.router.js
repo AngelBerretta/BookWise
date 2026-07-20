@@ -79,11 +79,12 @@ router.delete(
   bulkDeletePosts
 );
 
-// PATCH /api/blog/bulk/publish
+// PATCH /api/blog/bulk/publish — bloqueado en modo demo
 router.patch(
   "/bulk/publish",
   authMiddleware,
   roleMiddleware(["admin"]),
+  demoGuard,
   validate(bulkPublishSchema),
   bulkUpdatePosts
 );

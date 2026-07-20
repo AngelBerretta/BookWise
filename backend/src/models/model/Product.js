@@ -82,6 +82,17 @@ const productSchema = new mongoose.Schema(
       trim: true,
       default: null,   // ej: "Feb 2015" | "2023" | "Marzo 2021"
     },
+    // ── Trazabilidad de quién tocó el producto por última vez ──
+    // Se usa en el reseed automático para limpiar solo lo que ensucia la
+    // cuenta admin-demo, sin tocar nada gestionado por un admin real.
+    createdBy: {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+      isDemo: { type: Boolean, default: false },
+    },
+    lastEditedBy: {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+      isDemo: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );

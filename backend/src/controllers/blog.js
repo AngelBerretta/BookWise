@@ -70,7 +70,11 @@ const createPost = catchAsync(async (req, res) => {
   const existing = await postDAO.findOne({ slug: req.body.slug });
   if (existing) throw new ApiError(409, "Ya existe un post con ese slug");
 
-  const post = await postDAO.create({ ...req.body, author: req.user._id });
+  const post = await postDAO.create({
+    ...req.body,
+    author: req.user._id,
+    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
+  });
   return res.status(201).json(toPostDTO(post));
 });
 
@@ -87,7 +91,10 @@ const updatePost = catchAsync(async (req, res) => {
     }
   }
 
-  const updated = await postDAO.update(req.params.id, req.body);
+  const updated = await postDAO.update(req.params.id, {
+    ...req.body,
+    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
+  });
   if (!updated) throw new ApiError(404, "Post no encontrado");
 
   const oldPublicId = currentPost.thumbnailPublicId;
@@ -133,7 +140,8 @@ const deletePost = catchAsync(async (req, res) => {
 
  const bulkUpdatePosts = catchAsync(async (req, res) => {
    const { ids, published } = req.body;
-   const modifiedCount = await postDAO.updateMany(ids, { published });
+   const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+   const modifiedCount = await postDAO.updateMany(ids, { published, lastEditedBy: actor });
    return res.status(200).json({
      message: `${modifiedCount} post${modifiedCount !== 1 ? "s" : ""} actualizado${modifiedCount !== 1 ? "s" : ""}`,
      modifiedCount,

@@ -42,6 +42,14 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    // ── Trazabilidad de quién tocó el post por última vez ──
+    // Igual que en Product: el reseed automático usa este dato para
+    // limpiar solo lo que ensucia la cuenta admin-demo.
+    lastEditedBy: {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+      isDemo: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );
