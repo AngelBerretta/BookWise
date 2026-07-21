@@ -75,7 +75,8 @@ const ProductCard = ({ product }) => {
             <div
               className="relative rounded-lg p-4 sm:p-6 flex justify-center items-center
                          aspect-[3/4] overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-subtle)' }}
+              // style={{ backgroundColor: 'var(--bg-subtle)' }}
+              style={{ backgroundColor: 'var(--bg-container)' }}
             >
               {thumbnail && !imgError ? (
                 <img

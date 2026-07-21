@@ -15,7 +15,7 @@ const Button = ({
     'inline-flex items-center justify-center gap-2',
     'font-medium tracking-wide border',
     'transition-all duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-offset-2',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:opacity-40 disabled:cursor-not-allowed',
     'select-none whitespace-nowrap',
     'cursor-pointer',
