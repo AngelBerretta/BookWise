@@ -120,14 +120,21 @@ const seed = async () => {
     });
 
     for (const doc of vandalized) {
-      const baseline = toBaselineDoc(baselineByCode.get(doc.code));
-      Object.assign(doc, baseline, {
-        createdBy:    { userId: null, isDemo: false },
-        lastEditedBy: { userId: null, isDemo: false },
+      // Si el admin real ya había guardado una versión de este producto,
+      // volvemos ahí (no al catálogo base) — así no se pierde su
+      // personalización (ej. la miniatura que subió) por culpa de un
+      // visitante editando con la cuenta demo después.
+      const restoreTo = doc.lastRealSnapshot
+        ? { ...doc.lastRealSnapshot }
+        : toBaselineDoc(baselineByCode.get(doc.code));
+
+      Object.assign(doc, restoreTo, {
+        lastEditedBy:     { userId: null, isDemo: false },
+        lastRealSnapshot: restoreTo,
       });
       await doc.save({ validateBeforeSave: true });
     }
-    console.log(`♻️  ${vandalized.length} producto(s) del catálogo restaurados (editados por la cuenta demo)`);
+    console.log(`♻️  ${vandalized.length} producto(s) restaurados a su última versión real (no al catálogo base, si el admin ya lo había personalizado)`);
 
     /* ── 3. Insertar del catálogo base lo que todavía no existe ─────────────
        Solo pasa la primera vez (DB vacía) o si se agregó un libro nuevo al
@@ -137,7 +144,11 @@ const seed = async () => {
     const missing = products.filter((p) => !existingCodes.has(p.code));
 
     if (missing.length) {
-      await Product.insertMany(missing, { ordered: false });
+      const missingWithSnapshot = missing.map((p) => ({
+        ...p,
+        lastRealSnapshot: toBaselineDoc(p),
+      }));
+      await Product.insertMany(missingWithSnapshot, { ordered: false });
     }
     console.log(`📚 ${missing.length} producto(s) del catálogo base insertados por primera vez`);
 

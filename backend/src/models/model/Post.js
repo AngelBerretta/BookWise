@@ -50,6 +50,13 @@ const postSchema = new mongoose.Schema(
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
       isDemo: { type: Boolean, default: false },
     },
+    // Última versión guardada por un admin REAL de los campos editables.
+    // Ver Product.js — mismo propósito: el reseed restaura acá en vez de
+    // al blog base cuando la cuenta demo edita un post ya personalizado.
+    lastRealSnapshot: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
   },
   { timestamps: true }
 );

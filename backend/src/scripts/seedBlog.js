@@ -102,13 +102,20 @@ const seed = async () => {
     });
 
     for (const doc of vandalized) {
-      const baseline = toBaselinePost(baselineBySlug.get(doc.slug));
-      Object.assign(doc, baseline, {
-        lastEditedBy: { userId: null, isDemo: false },
+      // Si el admin real ya había guardado una versión de este post,
+      // volvemos ahí (no al blog base) — así no se pierde lo que escribiste
+      // de verdad por culpa de un visitante editando con la cuenta demo después.
+      const restoreTo = doc.lastRealSnapshot
+        ? { ...doc.lastRealSnapshot }
+        : toBaselinePost(baselineBySlug.get(doc.slug));
+
+      Object.assign(doc, restoreTo, {
+        lastEditedBy:     { userId: null, isDemo: false },
+        lastRealSnapshot: restoreTo,
       });
       await doc.save({ validateBeforeSave: true });
     }
-    console.log(`♻️  ${vandalized.length} post(s) del blog restaurados (editados por la cuenta demo)`);
+    console.log(`♻️  ${vandalized.length} post(s) restaurados a su última versión real (no al blog base, si el admin ya lo había personalizado)`);
 
     /* ── 3. Insertar del blog base lo que todavía no existe ─────────────────
        Solo pasa la primera vez (DB vacía) o si se agregó un post nuevo al
@@ -118,7 +125,11 @@ const seed = async () => {
     const missing = posts.filter((p) => !existingSlugs.has(p.slug));
 
     if (missing.length) {
-      const missingWithAuthor = missing.map((p) => ({ ...p, author: admin._id }));
+      const missingWithAuthor = missing.map((p) => ({
+        ...p,
+        author: admin._id,
+        lastRealSnapshot: toBaselinePost(p),
+      }));
       await Post.insertMany(missingWithAuthor, { ordered: false });
     }
     console.log(`📝 ${missing.length} post(s) del blog base insertados por primera vez`);

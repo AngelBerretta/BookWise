@@ -93,6 +93,15 @@ const productSchema = new mongoose.Schema(
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
       isDemo: { type: Boolean, default: false },
     },
+    // Última versión guardada por un admin REAL (no demo) de los campos
+    // editables. El reseed la usa para restaurar acá cuando la cuenta demo
+    // ensucia un producto — en vez de resetear al catálogo base y perder
+    // la personalización real (ej: la miniatura que subiste vos).
+    // null = todavía nunca lo tocó un admin real (recién nace del seed).
+    lastRealSnapshot: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
   },
   { timestamps: true }
 );
