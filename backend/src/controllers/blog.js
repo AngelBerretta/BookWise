@@ -4,6 +4,17 @@ import catchAsync    from "../utils/catchAsync.js";   // ← limpio, sin .defaul
 import ApiError      from "../utils/ApiError.js";
 import { deleteImage } from "../services/cloudinary.service.js";
 
+// ── Trazabilidad admin real vs. demo ──────────────────────────────────────────
+// Igual que en products.js: campos editables que se guardan en
+// `lastRealSnapshot` cada vez que un admin REAL (no demo) crea/edita un post.
+const SNAPSHOT_FIELDS = ["title", "content", "slug", "tags", "thumbnail", "thumbnailPublicId", "published"];
+
+const extractSnapshot = (src) =>
+  SNAPSHOT_FIELDS.reduce((acc, field) => {
+    acc[field] = src[field] !== undefined ? src[field] : null;
+    return acc;
+  }, {});
+
 // ── GET /api/blog ─────────────────────────────────────────────────────────────
 
 const getPosts = catchAsync(async (req, res) => {
@@ -70,11 +81,17 @@ const createPost = catchAsync(async (req, res) => {
   const existing = await postDAO.findOne({ slug: req.body.slug });
   if (existing) throw new ApiError(409, "Ya existe un post con ese slug");
 
-  const post = await postDAO.create({
+  const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+  const payload = {
     ...req.body,
     author: req.user._id,
-    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
-  });
+    lastEditedBy: actor,
+  };
+  if (!actor.isDemo) {
+    payload.lastRealSnapshot = extractSnapshot(req.body);
+  }
+
+  const post = await postDAO.create(payload);
   return res.status(201).json(toPostDTO(post));
 });
 
@@ -91,10 +108,15 @@ const updatePost = catchAsync(async (req, res) => {
     }
   }
 
-  const updated = await postDAO.update(req.params.id, {
-    ...req.body,
-    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
-  });
+  const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+  const payload = { ...req.body, lastEditedBy: actor };
+
+  if (!actor.isDemo) {
+    const merged = { ...currentPost.toObject(), ...req.body };
+    payload.lastRealSnapshot = extractSnapshot(merged);
+  }
+
+  const updated = await postDAO.update(req.params.id, payload);
   if (!updated) throw new ApiError(404, "Post no encontrado");
 
   const oldPublicId = currentPost.thumbnailPublicId;

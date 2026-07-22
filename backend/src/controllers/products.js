@@ -4,6 +4,21 @@ import catchAsync       from "../utils/catchAsync.js";
 import ApiError         from "../utils/ApiError.js";
 import { deleteImage }  from "../services/cloudinary.service.js";
 
+// ── Trazabilidad admin real vs. demo ──────────────────────────────────────────
+// Campos editables que se guardan en `lastRealSnapshot` cada vez que un admin
+// REAL (no demo) crea/edita un producto. El reseed automático usa esta foto
+// para restaurar acá en vez de resetear al catálogo base (ver seedProducts.js).
+const SNAPSHOT_FIELDS = [
+  "title", "description", "code", "price", "status", "stock", "category",
+  "thumbnails", "thumbnailPublicId", "url", "author", "pages", "publicationDate",
+];
+
+const extractSnapshot = (src) =>
+  SNAPSHOT_FIELDS.reduce((acc, field) => {
+    acc[field] = src[field] !== undefined ? src[field] : null;
+    return acc;
+  }, {});
+
 // ── GET /api/products ─────────────────────────────────────────────────────────
 
 // Umbral de "stock bajo" — a partir de acá un producto se considera bajo de stock
@@ -128,11 +143,17 @@ const createProduct = catchAsync(async (req, res) => {
   // para saber si el producto lo generó un visitante con la cuenta demo.
   const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
 
-  const product = await productDAO.create({
+  const payload = {
     ...req.body,
     createdBy:    actor,
     lastEditedBy: actor,
-  });
+  };
+  // Si lo crea el admin real, esta es la primera "foto" de su estado real.
+  if (!actor.isDemo) {
+    payload.lastRealSnapshot = extractSnapshot(req.body);
+  }
+
+  const product = await productDAO.create(payload);
 
   // Emitir evento WebSocket a todos los clientes conectados
   const io = req.app.get("io");
@@ -151,10 +172,18 @@ const updateProduct = catchAsync(async (req, res) => {
   if (!existing) throw new ApiError(404, "Producto no encontrado");
 
   // Quién edita queda registrado (no se toca createdBy, solo la última edición).
-  const updated = await productDAO.update(req.params.pid, {
-    ...req.body,
-    lastEditedBy: { userId: req.user._id, isDemo: req.user.isDemo ?? false },
-  });
+  const actor = { userId: req.user._id, isDemo: req.user.isDemo ?? false };
+  const payload = { ...req.body, lastEditedBy: actor };
+
+  // Si edita el admin real, guardamos una foto del estado resultante
+  // (existing + este cambio) para que el reseed pueda volver acá si la
+  // cuenta demo lo edita después, en vez de resetear al catálogo base.
+  if (!actor.isDemo) {
+    const merged = { ...existing.toObject(), ...req.body };
+    payload.lastRealSnapshot = extractSnapshot(merged);
+  }
+
+  const updated = await productDAO.update(req.params.pid, payload);
   if (!updated) throw new ApiError(404, "Producto no encontrado");
 
   // Si se reemplazó o quitó la imagen, borrar la anterior de Cloudinary
