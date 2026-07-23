@@ -12,6 +12,7 @@ import VerifyAccount from '../pages/VerifyAccount';
 import Products      from '../pages/Products';
 import ProductDetail from '../pages/ProductDetail';
 import Cart          from '../pages/Cart';
+import Wishlist      from '../pages/Wishlist';
 import Blog          from '../pages/Blog';
 import BlogPost      from '../pages/BlogPost';
 import Dashboard     from '../pages/admin/Dashboard';
@@ -33,6 +34,7 @@ const AppRouter = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
           </Route>
         </Route>
 

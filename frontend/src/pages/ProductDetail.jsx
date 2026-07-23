@@ -70,7 +70,11 @@ const handleToggleWishlist = async () => {
     }
     setSavingWish(true);
     try {
-      await toggleWishlist(product._id);
+      const result = await toggleWishlist(product._id, product.title); // 🆕 Pasamos el título
+      // 🆕 Mostrar toast solo si se agregó
+      if (result?.added) {
+        showToast({ type: 'success', message: `"${product.title}" agregado a favoritos` });
+      }
     } catch (err) {
       const msg = err?.response?.data?.message
         || 'No pudimos actualizar tus guardados.';
@@ -352,17 +356,28 @@ const handleToggleWishlist = async () => {
                     <button
                       onClick={handleToggleWishlist}
                       disabled={savingWish}
-                      className="px-4 py-4 rounded-lg transition-colors duration-300 shrink-0"
+                      className="px-4 py-4 rounded-lg transition-all duration-300 shrink-0"
                       style={{
-                        border: '1px solid rgba(196,198,205,0.5)',
-                        color: saved ? 'var(--accent)' : 'var(--text)',
+                        border: saved ? '1px solid var(--accent)' : '1px solid rgba(196,198,205,0.5)',
+                        backgroundColor: saved ? 'var(--accent)' : 'transparent',
+                        color: saved ? '#ffffff' : 'var(--text)',
                       }}
-                      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-container)'}
-                      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      onMouseEnter={e => {
+                        if (!saved) e.currentTarget.style.backgroundColor = 'var(--bg-container)';
+                      }}
+                      onMouseLeave={e => {
+                        if (!saved) e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       aria-label={saved ? 'Quitar de guardados' : 'Guardar'}
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                        {savingWish ? 'hourglass_empty' : (saved ? 'bookmark' : 'bookmark_border')}
+                      <span 
+                        className="material-symbols-outlined" 
+                        style={{ 
+                          fontSize: '20px',
+                          fontVariationSettings: saved ? "'FILL' 1" : "'FILL' 0",
+                        }}
+                      >
+                        {savingWish ? 'hourglass_empty' : 'bookmark'}
                       </span>
                     </button>
 

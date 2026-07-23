@@ -56,7 +56,11 @@ const ProductCard = ({ product }) => {
     }
     setTogglingWishlist(true);
     try {
-      await toggleWishlist(_id);
+      const result = await toggleWishlist(_id, title); // 🆕 Pasamos el título
+      // 🆕 Mostrar toast solo si se agregó (no si se quitó)
+      if (result?.added) {
+        showToast({ type: 'success', message: `"${title}" agregado a favoritos` });
+      }
     } catch (err) {
       const msg = err?.response?.data?.message
         || 'No pudimos actualizar tus favoritos. Intentá de nuevo.';
@@ -113,14 +117,22 @@ const ProductCard = ({ product }) => {
             aria-label={saved ? 'Quitar de favoritos' : 'Agregar a favoritos'}
             aria-pressed={saved}
             className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 rounded-full
-                       transition-all duration-200 disabled:opacity-50"
+                      transition-all duration-200 disabled:opacity-50"
             style={{
-              backgroundColor: 'rgba(251,249,244,0.90)',
-              color: saved ? 'var(--accent)' : 'var(--text)',
+              backgroundColor: saved ? 'var(--accent)' : 'rgba(251,249,244,0.90)',
+              color: saved ? '#ffffff' : 'var(--text)',
+              boxShadow: saved ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
+              transform: saved ? 'scale(1.05)' : 'scale(1)',
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-              {togglingWishlist ? 'hourglass_empty' : (saved ? 'bookmark' : 'bookmark_border')}
+            <span 
+              className="material-symbols-outlined transition-all duration-200" 
+              style={{ 
+                fontSize: saved ? '20px' : '18px',
+                fontVariationSettings: saved ? "'FILL' 1" : "'FILL' 0",
+              }}
+            >
+              {togglingWishlist ? 'hourglass_empty' : 'bookmark'}
             </span>
           </button>
         </div>

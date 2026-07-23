@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-import { AdminIcon, LogoutIcon } from '../ui/icons/NavIcons';
+import useWishlist from '../../hooks/useWishlist';
+import { AdminIcon, LogoutIcon, WishlistIcon } from '../ui/icons/NavIcons';
 import { NAV_LINKS } from '../../utils/constants';
 
 const MobileMenu = ({ open, onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { wishlist } = useWishlist();
   const panelRef = useRef(null);
 
   // Cerrar con Escape
@@ -105,6 +107,20 @@ const MobileMenu = ({ open, onClose }) => {
                   )}
                 </div>
               </div>
+
+              <Link
+                to="/wishlist"
+                onClick={onClose}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl text-base font-medium text-[var(--text)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-h)] transition-colors"
+              >
+                <WishlistIcon />
+                Favoritos
+                {wishlist.length > 0 && (
+                  <span className="ml-auto text-xs font-semibold text-[var(--accent)]">
+                    {wishlist.length}
+                  </span>
+                )}
+              </Link>
 
               {user?.role === 'admin' && (
                 <Link

@@ -23,7 +23,7 @@ const useProducts = () => {
 
   const [filters, setFiltersRaw] = useState({
     category: searchParams.get('category') ?? '',
-    search: '',
+    search: searchParams.get('search') ?? '',
   });
   const [sortBy, setSortBy]      = useState('newest');
 
@@ -87,16 +87,18 @@ const useProducts = () => {
     setPage(1);
   }, [filters.category, filters.search, sortBy, priceLow, priceHigh]);
 
-  /* Mantiene ?category= en la URL en sync con el filtro activo
+  /* Mantiene ?category= y ?search= en la URL en sync con los filtros activos
      (replace, no push: no queremos ensuciar el historial en cada click) */
   useEffect(() => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       if (filters.category) next.set('category', filters.category);
       else next.delete('category');
+      if (filters.search) next.set('search', filters.search);
+      else next.delete('search');
       return next;
     }, { replace: true });
-  }, [filters.category, setSearchParams]);
+  }, [filters.category, filters.search, setSearchParams]);
 
   /* Fetch real — debounced. Depende también de `page` para paginar. */
   useEffect(() => {
