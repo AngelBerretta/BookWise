@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import useCart from '../../hooks/useCart';
+import useWishlist from '../../hooks/useWishlist';
 import Button from '../ui/Button';
 import { formatPrice } from '../../utils/formatPrice';
-import { CartIcon } from '../ui/icons/NavIcons';
+import { WishlistIcon } from '../ui/icons/NavIcons';
 import CountBadge from '../ui/CountBadge';
 
 /**
- * Ícono + badge + dropdown de resumen del carrito.
- * Solo para desktop — en mobile el ícono lleva directo a /cart (ver Navbar.jsx).
+ * Ícono + badge + dropdown de resumen de la wishlist.
+ * Solo para desktop — en mobile vive dentro del drawer (ver MobileMenu.jsx).
  */
-const CartMenu = () => {
-  const { products, itemCount, total } = useCart();
+const WishlistMenu = () => {
+  const { wishlist } = useWishlist();
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
 
@@ -31,36 +31,35 @@ const CartMenu = () => {
   }, [open]);
 
   const close = () => setOpen(false);
-  const visibleItems = products.slice(0, 4);
-  const remaining = products.length - visibleItems.length;
+  const visibleItems = wishlist.slice(0, 4);
+  const remaining = wishlist.length - visibleItems.length;
 
   return (
     <div className="relative" ref={rootRef}>
-      {/* Trigger — mismo look que tenía antes en NavbarUserMenu */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label={`Carrito — ${itemCount} ${itemCount === 1 ? 'ítem' : 'ítems'}`}
+        aria-label={`Favoritos — ${wishlist.length} ${wishlist.length === 1 ? 'ítem' : 'ítems'}`}
         aria-expanded={open}
         aria-haspopup="dialog"
         className="relative flex items-center justify-center w-9 h-9 rounded-lg text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--accent-bg)] transition-colors duration-150"
       >
-        <CartIcon />
-        <CountBadge count={itemCount} />
+        <WishlistIcon />
+        <CountBadge count={wishlist.length} />
       </button>
 
       {open && (
         <div
           role="dialog"
-          aria-label="Resumen del carrito"
+          aria-label="Resumen de favoritos"
           className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-2xl border border-[var(--border)] bg-[var(--bg)] shadow-[var(--shadow-lg)] z-50 overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
             <h3 className="text-sm font-semibold text-[var(--text-h)]">
-              Mi carrito {itemCount > 0 && `(${itemCount})`}
+              Favoritos {wishlist.length > 0 && `(${wishlist.length})`}
             </h3>
             <Link
-              to="/cart"
+              to="/wishlist"
               onClick={close}
               className="text-xs font-medium text-[var(--accent)] hover:opacity-70 transition-opacity"
             >
@@ -69,18 +68,16 @@ const CartMenu = () => {
           </div>
 
           {/* Vacío */}
-          {products.length === 0 ? (
+          {wishlist.length === 0 ? (
             <div className="px-4 py-10 flex flex-col items-center text-center gap-2">
-              <span className="material-symbols-outlined text-3xl" style={{ color: 'var(--text-muted)' }}>
-                shopping_bag
-              </span>
-              <p className="text-sm text-[var(--text)]">Tu carrito está vacío</p>
+              <WishlistIcon />
+              <p className="text-sm text-[var(--text)]">Todavía no guardaste nada</p>
             </div>
           ) : (
             <>
               {/* Lista de items (máx. 4) */}
               <ul className="max-h-80 overflow-y-auto divide-y divide-[var(--border-subtle)]">
-                {visibleItems.map(({ product, quantity }) => {
+                {visibleItems.map((product) => {
                   const thumbnail = product?.thumbnails?.[0] || product?.url;
                   return (
                     <li key={product?._id} className="flex gap-3 px-4 py-3">
@@ -110,7 +107,7 @@ const CartMenu = () => {
                           {product?.title}
                         </Link>
                         <span className="text-xs text-[var(--text)] opacity-70">
-                          {quantity} × {formatPrice(product?.price, false)}
+                          {formatPrice(product?.price, false)}
                         </span>
                       </div>
                     </li>
@@ -125,15 +122,9 @@ const CartMenu = () => {
                     +{remaining} {remaining === 1 ? 'producto más' : 'productos más'}
                   </p>
                 )}
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-[var(--text)]">Total</span>
-                  <span className="text-base font-bold text-[var(--text-h)] tabular-nums">
-                    {formatPrice(total, false)}
-                  </span>
-                </div>
-                <Link to="/cart" onClick={close}>
+                <Link to="/wishlist" onClick={close}>
                   <Button variant="primary" size="md" className="w-full">
-                    Ver carrito
+                    Ver favoritos
                   </Button>
                 </Link>
               </div>
@@ -145,4 +136,4 @@ const CartMenu = () => {
   );
 };
 
-export default CartMenu;
+export default WishlistMenu;

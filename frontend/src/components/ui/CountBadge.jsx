@@ -1,9 +1,8 @@
 /**
- * Numerito flotante sobre el ícono de carrito.
- * Único punto de verdad para su estilo — usado en CartMenu (desktop)
- * y en el botón rápido de carrito en mobile (Navbar.jsx).
+ * Numerito flotante sobre un ícono (carrito, wishlist, etc).
+ * Único punto de verdad para su estilo.
  */
-const CartBadge = ({ count }) => {
+const CountBadge = ({ count }) => {
   if (!count || count <= 0) return null;
 
   return (
@@ -16,4 +15,4 @@ const CartBadge = ({ count }) => {
   );
 };
 
-export default CartBadge;
+export default CountBadge;

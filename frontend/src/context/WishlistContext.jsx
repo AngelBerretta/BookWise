@@ -23,17 +23,12 @@ export const WishlistProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
-  // Reset inmediato al des-autenticarse. Se ajusta durante el render (no en
-  // un efecto) para evitar el setState síncrono al inicio del efecto.
   const [prevIsAuthenticated, setPrevIsAuthenticated] = useState(isAuthenticated);
   if (isAuthenticated !== prevIsAuthenticated) {
     setPrevIsAuthenticated(isAuthenticated);
     if (!isAuthenticated) setWishlist([]);
   }
 
-  // Carga automática al autenticarse. La lógica se define acá adentro
-  // (en vez de llamar a fetchWishlist) para que el efecto sea autocontenido:
-  // fetchWishlist queda disponible como API pública para refetch manual.
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -59,7 +54,8 @@ export const WishlistProvider = ({ children }) => {
     [wishlist]
   );
 
-  const toggleWishlist = useCallback(async (productId) => {
+  // 🆕 Ahora recibe un segundo parámetro opcional: productTitle
+  const toggleWishlist = useCallback(async (productId, productTitle = '') => {
     const alreadySaved = wishlist.some((p) => p._id === productId);
     setLoading(true);
     try {
@@ -67,6 +63,11 @@ export const WishlistProvider = ({ children }) => {
         ? await wishlistService.removeFromWishlist(productId)
         : await wishlistService.addToWishlist(productId);
       setWishlist(data.wishlist ?? []);
+      
+      // 🆕 Devolvemos si se agregó o quitó para que el componente decida si mostrar toast
+      return { added: !alreadySaved, title: productTitle };
+    } catch (error) {
+      throw error; // El error lo maneja el componente que llama
     } finally {
       setLoading(false);
     }

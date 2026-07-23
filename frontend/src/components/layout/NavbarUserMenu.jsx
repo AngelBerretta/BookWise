@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { AdminIcon, LogoutIcon } from '../ui/icons/NavIcons';
 import CartMenu from '../cart/CartMenu';
+import WishlistMenu from '../wishlist/WishlistMenu';
 
 /** Menú de usuario — se renderiza solo en desktop (ver Navbar.jsx) */
 const NavbarUserMenu = () => {
@@ -39,6 +40,7 @@ const NavbarUserMenu = () => {
         </Link>
       )}
 
+      <WishlistMenu />
       <CartMenu />
 
       <div className="w-px h-5 bg-[var(--border)] mx-1" aria-hidden="true" />

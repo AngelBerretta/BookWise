@@ -7,6 +7,21 @@ export const CartIcon = () => (
   </svg>
 );
 
+export const SearchIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
+    strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+export const WishlistIcon = ({ filled = false }) => (
+  <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75"
+    strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1Z" />
+  </svg>
+);
+
 export const AdminIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
     strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
