@@ -68,7 +68,9 @@ const CartSummary = ({ products, total, itemCount }) => {
         {/* Total final */}
         <div className="flex justify-between items-center border-t border-[var(--border)] pt-4">
           <span className="font-semibold text-[var(--text-h)]">Total</span>
-          <span className="text-xl font-bold text-[var(--text-h)] tabular-nums">
+          <span className="text-xl font-bold text-[var(--text-h)] tabular-nums"
+            aria-live="polite"
+          >
             {formatPrice(total, false)}
           </span>
         </div>
@@ -76,7 +78,7 @@ const CartSummary = ({ products, total, itemCount }) => {
         {/* Botón checkout */}
         <div className="flex flex-col gap-2">
           <Button
-            variant="secondary"
+            variant="primary"
             size="lg"
             className="w-full"
             onClick={handleCheckout}

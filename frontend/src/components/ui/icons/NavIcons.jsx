@@ -1,6 +1,6 @@
-export const CartIcon = () => (
+export const CartIcon = ({ className = 'w-5 h-5' }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
-    strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+    strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
     <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
     <line x1="3" y1="6" x2="21" y2="6" />
     <path d="M16 10a4 4 0 0 1-8 0" />
@@ -15,9 +15,9 @@ export const SearchIcon = () => (
   </svg>
 );
 
-export const WishlistIcon = ({ filled = false }) => (
+export const WishlistIcon = ({ filled = false, className = 'w-5 h-5' }) => (
   <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75"
-    strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+    strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
     <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1Z" />
   </svg>
 );
