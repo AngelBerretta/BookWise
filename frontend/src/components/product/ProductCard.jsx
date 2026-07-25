@@ -7,6 +7,7 @@ import useToast from '../../hooks/useToast';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import { formatPrice } from '../../utils/formatPrice';
+import { CartIcon } from '../ui/icons/NavIcons';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart(); // 👈 ya no dependemos de `loading` global
@@ -39,6 +40,7 @@ const ProductCard = ({ product }) => {
       await addToCart(_id, 1);
       showToast({ type: 'success', message: `"${title}" agregado al carrito.` });
     } catch (err) {
+      if (err?.status === 401) return;
       const msg = err?.response?.data?.message
         || 'No pudimos agregar el producto. Intentá de nuevo.';
       showToast({ type: 'error', message: msg });
@@ -62,6 +64,7 @@ const ProductCard = ({ product }) => {
         showToast({ type: 'success', message: `"${title}" agregado a favoritos` });
       }
     } catch (err) {
+      if (err?.status === 401) return;
       const msg = err?.response?.data?.message
         || 'No pudimos actualizar tus favoritos. Intentá de nuevo.';
       showToast({ type: 'error', message: msg });
@@ -177,9 +180,7 @@ const ProductCard = ({ product }) => {
               onClick={handleAddToCart}
             >
               {!adding && (
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">
-                  {outOfStock ? 'remove_shopping_cart' : 'add_shopping_cart'}
-                </span>
+                <CartIcon className="w-3.5 h-3.5" />
               )}
               <span className="hidden sm:inline">
                 {outOfStock ? 'Sin stock' : 'Agregar'}

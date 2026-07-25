@@ -40,7 +40,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="h1-admin mb-8">Mi carrito</h1>
+          <h1 className="h1-editorial mb-8">Mi carrito</h1>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-6">
               {Array.from({ length: 3 }).map((_, i) => <CartItemSkeleton key={i} />)}
@@ -61,7 +61,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="h1-admin mb-2">Mi carrito</h1>
+          <h1 className="h1-editorial mb-2">Mi carrito</h1>
           <CartEmpty />
         </div>
       </div>
@@ -98,7 +98,7 @@ const Cart = () => {
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <div>
-              <h1 className="h1-admin">Mi carrito</h1>
+              <h1 className="h1-editorial">Mi carrito</h1>
               <p className="mt-1 text-sm text-[var(--text)]">
                 {itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}
               </p>

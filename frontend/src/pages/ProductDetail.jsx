@@ -9,6 +9,7 @@ import useToast from '../hooks/useToast';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import { CartIcon } from '../components/ui/icons/NavIcons';
 import ProductCard from '../components/product/ProductCard';
 import { formatPrice } from '../utils/formatPrice';
 import { PRODUCT_CATEGORIES } from '../utils/constants';
@@ -391,9 +392,7 @@ const handleToggleWishlist = async () => {
                         className="flex-1 justify-center min-w-[200px]"
                       >
                         {!adding && (
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                            shopping_bag
-                          </span>
+                          <CartIcon className="w-5 h-5" />
                         )}
                         {adding ? 'Agregando…' : 'Agregar al carrito'}
                       </Button>

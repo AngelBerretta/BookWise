@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useCart from '../../hooks/useCart';
+import useWishlist from '../../hooks/useWishlist';
+import { WishlistIcon } from '../ui/icons/NavIcons';
 import Button from '../ui/Button';
 import useToast from '../../hooks/useToast';
 import { formatPrice } from '../../utils/formatPrice';
+
 
 /**
  * Fila de un ítem dentro del carrito.
@@ -14,10 +17,13 @@ import { formatPrice } from '../../utils/formatPrice';
  */
 const CartItem = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
+  const { toggleWishlist, isSaved } = useWishlist();
   const { showToast } = useToast();
 
-  const [updatingQty, setUpdatingQty] = useState(false);
-  const [removing, setRemoving]       = useState(false);
+  const [updatingQty, setUpdatingQty]       = useState(false);
+  const [removing, setRemoving]             = useState(false);
+  const [savingForLater, setSavingForLater] = useState(false);
+  const [isLeaving, setIsLeaving]           = useState(false);
 
   const { product, quantity } = item;
   const { _id, title, author, price, thumbnails, url, stock } = product ?? {};
@@ -26,8 +32,6 @@ const CartItem = ({ item }) => {
 
   const maxQty = Math.min(stock ?? 99, 10);
 
-  // Distingue si el límite lo pone el stock real o el tope de 10 por compra —
-  // determina el tono del mensaje (urgencia vs. política de la tienda).
   const stockLimited = (stock ?? 99) < 10;
   const atMaxQty     = quantity >= maxQty;
 
@@ -46,23 +50,59 @@ const CartItem = ({ item }) => {
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     setRemoving(true);
+    setIsLeaving(true);
+  };
+
+  const handleSaveForLater = async () => {
+    setSavingForLater(true);
+    try {
+      const alreadySaved = isSaved(_id);
+      if (!alreadySaved) {
+        await toggleWishlist(_id, title);
+      }
+      showToast({
+        type: 'success',
+        message: alreadySaved
+          ? `"${title}" ya estaba en tu wishlist. Lo sacamos del carrito.`
+          : `Guardamos "${title}" para después. Lo encontrás en tu wishlist.`,
+      });
+      setIsLeaving(true);
+    } catch (err) {
+      const msg = err?.response?.data?.message
+        || 'No pudimos guardar el producto para después. Intentá de nuevo.';
+      showToast({ type: 'error', message: msg });
+      setSavingForLater(false);
+    }
+  };
+
+  // Se dispara al terminar la transición CSS de salida (fade + collapse).
+  // Tanto "Eliminar" como "Guardar para después" terminan acá: la wishlist
+  // ya se actualizó (si correspondía) antes de animar, este paso solo
+  // saca el ítem del carrito una vez que el usuario vio el feedback visual.
+  const handleExitEnd = async (e) => {
+    if (e.target !== e.currentTarget || !isLeaving) return;
     try {
       await removeItem(_id);
     } catch (err) {
       const msg = err?.response?.data?.message
-        || 'No pudimos eliminar el producto. Intentá de nuevo.';  
-      showToast({ type: 'error', message: msg }); 
+        || 'No pudimos eliminar el producto. Intentá de nuevo.';
+      showToast({ type: 'error', message: msg });
+      setIsLeaving(false);
     } finally {
       setRemoving(false);
+      setSavingForLater(false);
     }
   };
 
-  const isDisabled = updatingQty || removing;
+  const isDisabled = updatingQty || removing || savingForLater;
 
   return (
-      <article className="flex gap-4 py-5 border-b border-[var(--border)] last:border-b-0">
+      <article
+        className={`cart-item-exit flex gap-4 py-5 border-b border-[var(--border)] last:border-b-0 ${isLeaving ? 'is-leaving' : ''}`}
+        onTransitionEnd={handleExitEnd}
+      >
 
         {/* Imagen */}
         <Link
@@ -112,7 +152,7 @@ const CartItem = ({ item }) => {
             </span>
           </div>
 
-          {/* Selector cantidad + botón eliminar + subtotal */}
+          {/* Selector cantidad + acciones + subtotal */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-3 flex-wrap">
 
@@ -139,11 +179,26 @@ const CartItem = ({ item }) => {
                 </button>
               </div>
 
+              {/* Guardar para después */}
+              <Button
+                variant="ghost"
+                size="sm"
+                loading={savingForLater}
+                disabled={isDisabled}
+                onClick={handleSaveForLater}
+                className="px-2"
+                aria-label="Guardar para después"
+              >
+                 <WishlistIcon filled={isSaved(_id)} className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Guardar para después</span>
+              </Button>
+
               {/* Eliminar */}
               <Button
                 variant="ghost"
                 size="sm"
                 loading={removing}
+                disabled={isDisabled}
                 onClick={handleRemove}
                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-2"
                 aria-label="Eliminar del carrito"

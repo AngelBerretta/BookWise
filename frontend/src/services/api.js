@@ -90,11 +90,19 @@ api.interceptors.response.use(
       const { status, data } = error.response;
 
       switch (status) {
-        case 401:
-          // El backend rechazó el token → limpiar sesión
+        case 401: {
+          // El backend rechazó el token → limpiar sesión.
+          // Se excluye /auth/login: un 401 ahí es "credenciales incorrectas",
+          // no "sesión expirada" — ese caso ya lo maneja LoginForm con su
+          // propio mensaje, y no debe disparar el evento global.
+          const isLoginAttempt = config?.url?.startsWith('/auth/login');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          if (!isLoginAttempt) {
+            window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+          }
           break;
+        }
 
         case 403:
           console.error('No tienes permisos para realizar esta acción');
