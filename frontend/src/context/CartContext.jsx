@@ -8,24 +8,25 @@ export const CartProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
 
   const [cart, setCart]       = useState(null);
-  const [cartId, setCartId]   = useState(null);  // Guardar el ID del carrito
+  const [cartId, setCartId]   = useState(null);
   const [loading, setLoading] = useState(false);
 
   const products   = cart?.products ?? [];
   const itemCount  = cartService.getCartItemCount(products);
   const total      = cartService.calculateCartTotal(products);
 
-  // Carga o crea el carrito cuando el usuario se autentica.
-  // Nota: la dependencia es `user` (objeto completo) y no `user?._id`
-  // porque el análisis de memoización no puede acotar de forma segura
-  // una dependencia a una propiedad accedida con optional chaining.
+  // Helper: un cartId guardado deja de ser válido si el carrito ya no existe
+  // (404) o si ya no pertenece al usuario actual (403 — ej: sesión anterior
+  // de otra persona en el mismo navegador). En ambos casos hay que
+  // descartarlo y crear uno nuevo.
+  const isStaleCartId = (err) => err?.status === 404 || err?.status === 403;
+
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated || !user?._id) return;
     setLoading(true);
     try {
-      // Buscar si ya existe un carrito guardado en localStorage
       const savedCartId = localStorage.getItem(`cartId_${user._id}`);
-      
+
       if (savedCartId) {
         try {
           const data = await cartService.getCart(savedCartId);
@@ -33,14 +34,12 @@ export const CartProvider = ({ children }) => {
           setCartId(savedCartId);
           return;
         } catch (err) {
-          // Si el carrito guardado no existe, crear uno nuevo
-          if (err?.response?.status === 404) {
+          if (isStaleCartId(err)) {
             localStorage.removeItem(`cartId_${user._id}`);
           }
         }
       }
 
-      // Crear carrito nuevo
       const newCart = await cartService.createCart();
       const id = newCart?.cart?._id || newCart?._id;
       if (id) {
@@ -56,8 +55,6 @@ export const CartProvider = ({ children }) => {
     }
   }, [isAuthenticated, user]);
 
-  // Reset inmediato al des-autenticarse. Se ajusta durante el render (no en
-  // un efecto) para evitar el setState síncrono al inicio del efecto.
   const authKey = isAuthenticated ? (user?._id ?? null) : null;
   const [prevAuthKey, setPrevAuthKey] = useState(authKey);
   if (authKey !== prevAuthKey) {
@@ -68,9 +65,6 @@ export const CartProvider = ({ children }) => {
     }
   }
 
-  // Carga automática al autenticarse. La lógica se define acá adentro
-  // (en vez de llamar a fetchCart) para que el efecto sea autocontenido:
-  // fetchCart queda disponible como API pública para refetch manual.
   useEffect(() => {
     const userId = user?._id;
     if (!isAuthenticated || !userId) return;
@@ -90,7 +84,7 @@ export const CartProvider = ({ children }) => {
             }
             return;
           } catch (err) {
-            if (err?.response?.status === 404) {
+            if (isStaleCartId(err)) {
               localStorage.removeItem(`cartId_${userId}`);
             }
           }
