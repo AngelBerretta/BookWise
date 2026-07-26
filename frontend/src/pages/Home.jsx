@@ -9,7 +9,7 @@ import ProductCard             from '../components/product/ProductCard';
 import ProductSkeleton         from '../components/product/ProductSkeleton';
 import PostCard                from '../components/blog/PostCard';
 import Button                  from '../components/ui/Button';
-import Spinner                 from '../components/ui/Spinner';
+import PostCardSkeleton        from '../components/blog/PostCardSkeleton';
 import Input                   from '../components/ui/Input';
 import { PRODUCT_CATEGORIES, CATEGORY_COLORS } from '../utils/constants';
 import heroImage                from '../assets/hero.png';
@@ -329,17 +329,17 @@ const Home = () => {
           </div>
 
           {loadingB ? (
-            <div className="flex justify-center py-16">
-              <Spinner size="lg" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)}
             </div>
           ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {posts.map((post) => <PostCard key={post._id} post={post} />)}
             </div>
           ) : errorB ? (
-           <p className="text-center text-[var(--text)] py-12">
-             No pudimos cargar los artículos. Probá recargar la página.
-           </p>
+          <p className="text-center text-[var(--text)] py-12">
+            No pudimos cargar los artículos. Probá recargar la página.
+          </p>
           ) : (
             <p className="text-center text-[var(--text)] py-12">
               Todavía no hay artículos publicados.
