@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { getProducts } from '../../services/productService';
 import { getPosts } from '../../services/blogService';
 import useAuth from '../../hooks/useAuth';
-import Spinner from '../../components/ui/Spinner';
 
 /* ─── Íconos ────────────────────────────────────────────────────────────────── */
 const BookIcon = () => (
@@ -73,7 +72,6 @@ const StatCard = ({ label, value, sublabel, icon, href, colorClass, delay }) => 
                hover:border-[var(--accent-border)] hover:shadow-lg transition-all duration-300"
     style={{ animationDelay: delay }}
   >
-    {/* Glow de fondo al hover */}
     <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${colorClass.glow}`} />
 
     <div className="relative flex items-start justify-between gap-3">
@@ -95,6 +93,25 @@ const StatCard = ({ label, value, sublabel, icon, href, colorClass, delay }) => 
       Gestionar <ArrowIcon />
     </div>
   </Link>
+);
+
+/* ─── Stat Card Skeleton ────────────────────────────────────────────────────── */
+const StatCardSkeleton = ({ delay }) => (
+  <div
+    className="stat-card rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 animate-pulse"
+    style={{ animationDelay: delay }}
+    aria-hidden="true"
+  >
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 flex-1">
+        <div className="h-2.5 w-20 rounded" style={{ backgroundColor: 'var(--bg-container)' }} />
+        <div className="h-9 w-16 rounded" style={{ backgroundColor: 'var(--bg-container)' }} />
+        <div className="h-3 w-32 rounded" style={{ backgroundColor: 'var(--bg-container)' }} />
+      </div>
+      <div className="w-10 h-10 rounded-xl shrink-0" style={{ backgroundColor: 'var(--bg-container)' }} />
+    </div>
+    <div className="h-3 w-20 rounded mt-4" style={{ backgroundColor: 'var(--bg-container)' }} />
+  </div>
 );
 
 /* ─── Quick Link ────────────────────────────────────────────────────────────── */
@@ -166,6 +183,20 @@ const RecentProductRow = ({ product }) => {
   );
 };
 
+/* ─── Recent Product Row Skeleton ───────────────────────────────────────────── */
+const RecentProductRowSkeleton = () => (
+  <div className="flex items-center gap-3 px-3 py-2.5 -mx-3 animate-pulse" aria-hidden="true">
+    <div
+      className="w-9 h-12 rounded-lg shrink-0"
+      style={{ backgroundColor: 'var(--bg-container)' }}
+    />
+    <div className="min-w-0 flex-1 flex flex-col gap-2">
+      <div className="h-3.5 w-2/3 rounded" style={{ backgroundColor: 'var(--bg-container)' }} />
+      <div className="h-3 w-1/3 rounded" style={{ backgroundColor: 'var(--bg-container)' }} />
+    </div>
+  </div>
+);
+
 /* ─── Dashboard ─────────────────────────────────────────────────────────────── */
 const Dashboard = () => {
   const { user } = useAuth();
@@ -180,13 +211,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // limit: 1 → solo interesa el metadato totalDocs, no la lista
         const [productsData, postsData, publishedData, outOfStockData, lowStockData] = await Promise.allSettled([
           getProducts({ limit: 1 }),
           getPosts({ limit: 1 }),
           getPosts({ limit: 1, published: true }),
           getProducts({ limit: 1, stock: 'out' }),
-          getProducts({ limit: 1, stock: 'low' }), // incluye "sin stock"
+          getProducts({ limit: 1, stock: 'low' }),
         ]);
 
         const products = productsData.status === 'fulfilled'
@@ -287,7 +317,6 @@ const Dashboard = () => {
     },
   ];
 
-  /* Hora de saludo */
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
 
@@ -327,7 +356,6 @@ const Dashboard = () => {
                 </p>
               </div>
 
-              {/* Pill de fecha */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
                                bg-[var(--bg-subtle)] border border-[var(--border)]
                                text-xs font-medium text-[var(--text)] shrink-0">
@@ -339,8 +367,10 @@ const Dashboard = () => {
 
           {/* ── Stats ────────────────────────────────────────────────────── */}
           {loading ? (
-            <div className="flex justify-center py-16">
-              <Spinner size="lg" className="text-[var(--accent)]" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <StatCardSkeleton key={i} delay={`${i * 60}ms`} />
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
@@ -351,7 +381,7 @@ const Dashboard = () => {
           )}
 
           {/* ── Últimos productos agregados ─────────────────────────────────── */}
-          {!loadingRecent && recentProducts.length > 0 && (
+          {(loadingRecent || recentProducts.length > 0) && (
             <>
               <div className="fade-up flex items-center gap-3 mb-3" style={{ animationDelay: '170ms' }}>
                 <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text)]">
@@ -369,9 +399,9 @@ const Dashboard = () => {
                 className="fade-up rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-3 py-1 mb-10 divide-y divide-[var(--border)]"
                 style={{ animationDelay: '190ms' }}
               >
-                {recentProducts.map((p) => (
-                  <RecentProductRow key={p._id} product={p} />
-                ))}
+                {loadingRecent
+                  ? Array.from({ length: 3 }).map((_, i) => <RecentProductRowSkeleton key={i} />)
+                  : recentProducts.map((p) => <RecentProductRow key={p._id} product={p} />)}
               </div>
             </>
           )}
