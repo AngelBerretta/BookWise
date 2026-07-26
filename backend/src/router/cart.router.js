@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 import {
   createCart,
   getCart,
@@ -10,6 +11,8 @@ import {
 } from "../controllers/cart.js";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // POST   /api/carts                          — crear carrito
 router.post("/", createCart);

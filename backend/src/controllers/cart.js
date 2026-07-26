@@ -21,11 +21,24 @@ const populateCart = async (cart) => {
   return CartModel.findById(cart._id).populate("products.product").lean();
 };
 
+// ── Helper: ownership ──────────────────────────────────────────────────────
+// Verifica que el carrito pertenezca al usuario autenticado (o que sea admin).
+// Carritos "legacy" sin `user` asignado (creados antes de exigir auth acá)
+// se dejan pasar para no romper datos existentes — se recomienda re-sembrar
+// los datos demo tras este cambio para que todos los carritos tengan owner.
+const assertOwnership = (cart, req) => {
+  if (!cart.user) return; // carrito legacy sin owner — compatibilidad hacia atrás
+  if (req.user?.role === "admin") return;
+  if (String(cart.user) !== String(req.user?._id)) {
+    throw new ApiError(403, "No tenés permiso para acceder a este carrito");
+  }
+};
+
 // ── POST /api/carts ───────────────────────────────────────────────────────────
 // Crear carrito con ID autogenerado
 
 const createCart = catchAsync(async (req, res) => {
-  const cart = await cartDAO.create({ user: req.user?._id || null, products: [] });
+  const cart = await cartDAO.create({ user: req.user._id, products: [] });
   return res.status(201).json(toCartDTO(cart));
 });
 
