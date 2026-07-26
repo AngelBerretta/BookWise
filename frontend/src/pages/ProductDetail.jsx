@@ -4,7 +4,7 @@ import { getProductById, getProducts } from '../services/productService';
 import useCart from '../hooks/useCart';
 import useWishlist from '../hooks/useWishlist';
 import useAuth from '../hooks/useAuth';
-import Spinner from '../components/ui/Spinner';
+import ProductDetailSkeleton from '../components/product/ProductDetailSkeleton';
 import useToast from '../hooks/useToast';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
@@ -107,12 +107,7 @@ const handleToggleWishlist = async () => {
 
   /* ── Estados UI ── */
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center"
-           style={{ backgroundColor: 'var(--bg)' }}>
-        <Spinner size="lg" />
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
