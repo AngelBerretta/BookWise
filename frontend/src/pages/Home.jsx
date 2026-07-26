@@ -11,24 +11,25 @@ import PostCard                from '../components/blog/PostCard';
 import Button                  from '../components/ui/Button';
 import PostCardSkeleton        from '../components/blog/PostCardSkeleton';
 import Input                   from '../components/ui/Input';
-import { PRODUCT_CATEGORIES, CATEGORY_COLORS } from '../utils/constants';
+import { PRODUCT_CATEGORIES } from '../utils/constants';
 import heroImage                from '../assets/hero.png';
 
-/* Ícono por categoría — reutiliza Material Symbols, ya cargado globalmente.
-   Comparte paleta de colores con CATEGORY_COLORS para que la cuadrícula
-   de categorías y los badges del catálogo se vean consistentes. */
-const CATEGORY_ICONS = {
-  'ficcion':             'auto_stories',
-  'no-ficcion':          'fact_check',
-  'ciencia-tecnologia':  'science',
-  'desarrollo-personal': 'self_improvement',
-  'infantil-juvenil':    'child_care',
-  'poesia':              'menu_book',
-  'ebooks':              'tablet_mac',
-};
-const DEFAULT_ICON = 'category';
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const FEATURED_PRODUCTS_LIMIT = 4;
+const FEATURED_POSTS_LIMIT    = 3;
+
+/* Ícono de flecha reutilizable para la fila de categoría (mobile y desktop) */
+const CategoryArrow = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    className={`w-3.5 h-3.5 shrink-0 text-[var(--text-muted)] opacity-0 -translate-x-1
+               group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ${className}`}
+    aria-hidden="true"
+  >
+    <path fillRule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+  </svg>
+);
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -40,12 +41,11 @@ const Home = () => {
   const [loadingB, setLoadingB]     = useState(true);
   const [errorP, setErrorP]         = useState(false);
   const [errorB, setErrorB]         = useState(false);
-  const [totalBooks, setTotalBooks] = useState(null); // total real del catálogo, para Estadísticas
+  const [totalBooks, setTotalBooks] = useState(null);
 
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribing, setSubscribing]         = useState(false);
 
-  // Refs de scroll-reveal por sección (fade-in + slide-up al entrar en viewport)
   const [categoriesRef, categoriesVisible] = useScrollReveal();
   const [productsRef, productsVisible]     = useScrollReveal();
   const [blogRef, blogVisible]             = useScrollReveal();
@@ -54,7 +54,7 @@ const Home = () => {
   const [newsletterRef, newsletterVisible] = useScrollReveal();
 
   useEffect(() => {
-    getProducts({ limit: 4 })
+    getProducts({ limit: FEATURED_PRODUCTS_LIMIT })
       .then((d) => {
         setProducts(Array.isArray(d) ? d : (d.payload ?? []));
         setTotalBooks(Array.isArray(d) ? null : (d.totalDocs ?? null));
@@ -64,18 +64,15 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    getPosts({ limit: 3 })
+    getPosts({ limit: FEATURED_POSTS_LIMIT })
       .then((d) => {
         const arr = Array.isArray(d) ? d : (d.payload ?? []);
-        setPosts(arr.slice(0, 3)); // el backend ya filtra published=true para no-admins
+        setPosts(arr.slice(0, FEATURED_POSTS_LIMIT));
       })
       .catch(() => setErrorB(true))
       .finally(() => setLoadingB(false));
   }, []);
 
-  // Newsletter — todavía no hay endpoint de suscripción en el backend,
-  // así que confirmamos en el cliente (mismo criterio que el toast que
-  // reemplazó el enlace roto de "olvidaste tu contraseña" en Login).
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     const email = newsletterEmail.trim();
@@ -103,7 +100,6 @@ const Home = () => {
       label: 'Categorías para explorar',
     },
     {
-      // Cifra ilustrativa: todavía no existe un endpoint público de conteo de usuarios.
       value: '+200',
       label: 'Lectores en la comunidad',
     },
@@ -138,33 +134,35 @@ const Home = () => {
                 Ficción, ensayo, ciencia y más. Encontrá tu próximo libro favorito en BookWise, la librería digital del lector exigente.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <Link to="/products">
-                  <Button variant="primary" size="lg">
-                    Ver catálogo
-                  </Button>
-                </Link>
-                {!isAuthenticated && (
-                  <Link to="/register">
-                    <Button variant="secondary" size="lg">
-                      Crear cuenta gratis
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/products">
+                    <Button variant="primary" size="lg">
+                      Ver catálogo
                     </Button>
                   </Link>
-                )}
-              </div>
+                  {!isAuthenticated && (
+                    <Link to="/register">
+                      <Button variant="secondary" size="lg">
+                        Crear cuenta gratis
+                      </Button>
+                    </Link>
+                  )}
+                </div>
 
-              <a
-                href="#novedades"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-h)] w-fit hover:opacity-60 transition-opacity"
-              >
-                Ver novedades
-                <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
-                  <path fillRule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                </svg>
-              </a>
+                <a
+                  href="#novedades"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-h)] w-fit hover:opacity-60 transition-opacity"
+                >
+                  Ver novedades
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                    <path fillRule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                  </svg>
+                </a>
+              </div>
             </div>
 
-            {/* Imagen hero — puramente decorativa, sin Link ni hover */}
+            {/* Imagen hero */}
             <div className="lg:col-span-7 order-1 lg:order-2 relative">
               <div
                 className="absolute inset-0 rounded-xl -z-10"
@@ -214,32 +212,45 @@ const Home = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 border-t border-l border-[var(--border-subtle)]">
           {PRODUCT_CATEGORIES.map((cat, i) => {
-            const colorClasses = CATEGORY_COLORS[cat.value] ?? 'bg-[var(--accent-bg)] text-[var(--accent)]';
-            const icon = CATEGORY_ICONS[cat.value] ?? DEFAULT_ICON;
-
+            const number = String(i + 1).padStart(2, '0');
             return (
               <Link
                 key={cat.value}
                 to={`/products?category=${cat.value}`}
-                className={`group reveal ${categoriesVisible ? 'is-visible' : ''}`}
+                className={`group relative border-r border-b border-[var(--border-subtle)]
+                            transition-colors duration-300 hover:bg-[var(--bg-subtle)]
+                            reveal ${categoriesVisible ? 'is-visible' : ''}`}
                 style={{ transitionDelay: categoriesVisible ? `${i * 60}ms` : '0ms' }}
               >
-                <div
-                  className="flex flex-col items-center text-center gap-3 h-full p-5 rounded-xl
-                             transition-colors duration-200 hover:bg-[var(--bg-container)]"
-                >
+                {/* Mobile — fila tipo índice: número · label · flecha, ancho completo */}
+                <div className="flex sm:hidden items-center gap-4 px-5 py-4">
                   <span
-                    className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0
-                               transition-transform duration-300 group-hover:scale-110 ${colorClasses}`}
+                    className="text-[var(--border)] group-hover:text-[var(--accent)] transition-colors duration-300 shrink-0"
+                    style={{ fontFamily: 'var(--heading)', fontWeight: 400, fontSize: '1.5rem' }}
                   >
-                    <span className="material-symbols-outlined text-[28px]" aria-hidden="true">
-                      {icon}
-                    </span>
+                    {number}
                   </span>
-                  <span className="text-sm font-medium text-[var(--text-h)] leading-snug">
+                  <span className="flex-1 text-sm font-medium text-[var(--text-h)]">
                     {cat.label}
+                  </span>
+                  <CategoryArrow />
+                </div>
+
+                {/* Tablet/desktop — celda tipo tarjeta, número arriba, label abajo */}
+                <div className="hidden sm:flex flex-col justify-between gap-10 md:gap-14 p-6 md:p-7 h-full">
+                  <span
+                    className="text-[var(--border)] group-hover:text-[var(--accent)] transition-colors duration-300"
+                    style={{ fontFamily: 'var(--heading)', fontWeight: 400, fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}
+                  >
+                    {number}
+                  </span>
+                  <span className="flex items-end justify-between gap-2">
+                    <span className="text-[0.95rem] font-medium text-[var(--text-h)] leading-snug">
+                      {cat.label}
+                    </span>
+                    <CategoryArrow />
                   </span>
                 </div>
               </Link>
@@ -249,7 +260,7 @@ const Home = () => {
       </section>
 
       {/* ── Divisor ── */}
-      <div className="border-t border-[var(--border-subtle)]" />
+      <div className="border-t border-[var(--border-subtle)]" role="presentation" aria-hidden="true" />
 
       {/* ── Productos destacados ── */}
       <section
@@ -281,7 +292,7 @@ const Home = () => {
 
           {loadingP ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              {Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)}
+              {Array.from({ length: FEATURED_PRODUCTS_LIMIT }).map((_, i) => <ProductSkeleton key={i} />)}
             </div>
           ) : products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
@@ -300,7 +311,7 @@ const Home = () => {
       </section>
 
       {/* ── Divisor ── */}
-      <div className="border-t border-[var(--border-subtle)]" />
+      <div className="border-t border-[var(--border-subtle)]" role="presentation" aria-hidden="true" />
 
       {/* ── Blog ── */}
       <section
@@ -330,7 +341,7 @@ const Home = () => {
 
           {loadingB ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)}
+              {Array.from({ length: FEATURED_POSTS_LIMIT }).map((_, i) => <PostCardSkeleton key={i} />)}
             </div>
           ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -349,8 +360,6 @@ const Home = () => {
       </section>
 
       {/* ── Estadísticas ── */}
-      {/* Movida justo antes del CTA final: el social proof pesa más
-          cerca del momento de conversión que flotando a mitad del embudo. */}
       <section
         ref={statsRef}
         className={`py-14 sm:py-16 reveal ${statsVisible ? 'is-visible' : ''}`}
