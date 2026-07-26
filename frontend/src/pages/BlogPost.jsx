@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import useBlog from '../hooks/useBlog';
 import PostDetail from '../components/blog/PostDetail';
-import Spinner from '../components/ui/Spinner';
+import PostDetailSkeleton from '../components/blog/PostDetailSkeleton';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 
@@ -19,17 +19,8 @@ const BlogPost = () => {
     if (slug) fetchPostBySlug(slug);
   }, [slug, fetchPostBySlug]);
 
-  /* ── Loading ── */
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <Spinner size="lg" className="text-[var(--accent)]" />
-      </div>
-    );
-  }
-
   /* ── Error / no encontrado ── */
-  if (error || !post) {
+  if (!loading && (error || !post)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <EmptyState
@@ -69,13 +60,17 @@ const BlogPost = () => {
             <Link to="/" className="hover:text-[var(--text-h)] transition-colors">Inicio</Link>
             <span>/</span>
             <Link to="/blog" className="hover:text-[var(--text-h)] transition-colors">Blog</Link>
-            <span>/</span>
-            <span className="text-[var(--text-h)] line-clamp-1">{post.title}</span>
+            {!loading && post && (
+              <>
+                <span>/</span>
+                <span className="text-[var(--text-h)] line-clamp-1">{post.title}</span>
+              </>
+            )}
           </nav>
         </div>
 
-        {/* Contenido del post */}
-        <PostDetail post={post} />
+        {/* Contenido del post — skeleton mientras carga */}
+        {loading ? <PostDetailSkeleton /> : <PostDetail post={post} />}
 
         {/* Footer del post */}
         <div className="mt-12 pt-8 border-t border-[var(--border)] flex justify-center">

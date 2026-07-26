@@ -1,7 +1,8 @@
 import { Link }      from 'react-router-dom';
 import useBlog       from '../hooks/useBlog';
 import PostCard      from '../components/blog/PostCard';
-import Spinner       from '../components/ui/Spinner';
+import PostCardSkeleton     from '../components/blog/PostCardSkeleton';
+import FeaturedPostSkeleton from '../components/blog/FeaturedPostSkeleton';
 import EmptyState    from '../components/ui/EmptyState';
 import Pagination    from '../components/ui/Pagination';
 import { stripMarkdown } from '../utils/markdown';
@@ -14,6 +15,11 @@ const Blog = () => {
 
   /* Primer post destacado, el resto en grid */
   const [featured, ...rest] = posts;
+
+  /* Se muestra destacado solo en la primera página sin búsqueda activa —
+     esto ya lo sabemos antes de que responda el fetch, por eso también
+     puede decidirse durante el estado de loading (para el skeleton). */
+  const showFeatured = !search && page === 1;
 
   return (
     <div className="bg-[var(--bg)] min-h-screen">
@@ -56,11 +62,20 @@ const Blog = () => {
 
       <div className="container py-14">
 
-        {/* Loading */}
+        {/* Carga inicial → skeletons (mismo patrón que ProductGrid) */}
         {loading && posts.length === 0 && (
-          <div className="flex justify-center py-20">
-            <Spinner size="lg" />
-          </div>
+          <>
+            {showFeatured && (
+              <div className="mb-16">
+                <FeaturedPostSkeleton />
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <PostCardSkeleton key={i} />
+              ))}
+            </div>
+          </>
         )}
 
         {/* Error */}
@@ -86,7 +101,7 @@ const Blog = () => {
         )}
 
         {/* Post destacado */}
-        {posts.length > 0 && !search && page === 1 && featured && (
+        {posts.length > 0 && showFeatured && featured && (
           <div
             className="mb-16"
             style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
@@ -101,7 +116,7 @@ const Blog = () => {
             style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
           >
-            
+
             {(search || page > 1 ? posts : rest).map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
@@ -155,8 +170,7 @@ const FeaturedPost = ({ post }) => {
       {/* Contenido */}
       <div className="lg:col-span-5 p-8 lg:p-12 flex flex-col gap-5">
         <span
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase w-fit"
-          style={{ background: 'var(--secondary-bg)', color: 'var(--secondary-text)' }}
+          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase w-fit"          style={{ background: 'var(--secondary-bg)', color: 'var(--secondary-text)' }}
         >
           Artículo destacado
         </span>
