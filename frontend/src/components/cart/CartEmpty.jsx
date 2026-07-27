@@ -7,7 +7,7 @@ import { CartIcon } from '../ui/icons/NavIcons';
  */
 const CartEmpty = () => {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 px-6 gap-6">
+    <div className="flex flex-col items-center justify-center text-center py-[clamp(1.5rem,8dvh,5rem)] px-6 gap-6">
 
       {/* Ícono carrito vacío */}
       <div className="flex items-center justify-center w-28 h-28 rounded-full bg-[var(--code-bg)]">

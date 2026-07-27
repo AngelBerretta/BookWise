@@ -5,6 +5,7 @@ import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
 import CartEmpty from '../components/cart/CartEmpty';
 import CartItemSkeleton from '../components/cart/CartItemSkeleton';
+import MobileCheckoutBar from '../components/cart/MobileCheckoutBar';
 import Button from '../components/ui/Button';
 import useToast from '../hooks/useToast';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -38,8 +39,8 @@ const Cart = () => {
   /* ── Loading inicial ── */
   if (loading && !products.length) {
     return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex flex-col bg-[var(--bg)]">
+         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(7rem_+_env(safe-area-inset-bottom))] lg:pb-10">
           <h1 className="h1-editorial mb-8">Mi carrito</h1>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-6">
@@ -59,8 +60,11 @@ const Cart = () => {
   /* ── Carrito vacío ── */
   if (!products.length) {
     return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div
+        className="flex flex-col justify-start sm:justify-center bg-[var(--bg)]"
+        style={{ minHeight: 'calc(100dvh - var(--navbar-h))' }}
+      >
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-[clamp(1.5rem,8dvh,4rem)] pb-10 w-full">
           <h1 className="h1-editorial mb-2">Mi carrito</h1>
           <CartEmpty />
         </div>
@@ -81,8 +85,8 @@ const Cart = () => {
         />
       )}
 
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex flex-col bg-[var(--bg)]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(6rem_+_env(safe-area-inset-bottom))] lg:pb-10">
 
           {/* Seguir comprando */}
           <Link
@@ -127,7 +131,7 @@ const Cart = () => {
 
             {/* Lista de ítems */}
             <section
-              className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-6"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 sm:px-6"
               aria-label="Productos en el carrito"
             >
               {/* Cabecera de columnas — solo desktop */}
@@ -147,7 +151,7 @@ const Cart = () => {
             </section>
 
             {/* Panel resumen */}
-            <aside aria-label="Resumen del pedido">
+            <aside aria-label="Resumen del pedido" className="hidden lg:block">
               <CartSummary
                 products={products}
                 total={total}
@@ -158,6 +162,11 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      <MobileCheckoutBar
+        total={total}
+        itemCount={itemCount}
+        disabled={clearing}
+      />
     </>
   );
 };
