@@ -4,6 +4,7 @@ import useCart from '../hooks/useCart';
 import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
 import CartEmpty from '../components/cart/CartEmpty';
+import CrossSell from '../components/cart/CrossSell';
 import CartItemSkeleton from '../components/cart/CartItemSkeleton';
 import MobileCheckoutBar from '../components/cart/MobileCheckoutBar';
 import Button from '../components/ui/Button';
@@ -164,6 +165,10 @@ const Cart = () => {
             </aside>
 
           </div>
+
+          {/* También te puede interesar — sugerencias según la categoría
+              más frecuente del carrito */}
+          <CrossSell />
         </div>
       </div>
       <MobileCheckoutBar
