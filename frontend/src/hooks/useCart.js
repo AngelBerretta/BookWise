@@ -17,6 +17,7 @@ import CartContext from '../context/CartContext';
  *   removeItem: Function,
  *   clearCart: Function,
  *   fetchCart: Function,
+ *   isQuantityPending: Function,
  * }}
  */
 const useCart = () => {
@@ -35,6 +36,7 @@ const useCart = () => {
     updateQuantity,
     removeItem,
     clearCart,
+    isQuantityPending,
   } = context;
 
   // products es el array de items dentro del carrito
@@ -51,6 +53,7 @@ const useCart = () => {
     updateQuantity,
     removeItem,
     clearCart,
+    isQuantityPending,
   };
 };
 
