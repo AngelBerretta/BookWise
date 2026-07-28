@@ -66,3 +66,30 @@ export const getCartItemCount = (products) => {
   if (!products || !Array.isArray(products)) return 0;
   return products.reduce((count, item) => count + (item.quantity || 0), 0);
 };
+
+// 🆕 Categoría más frecuente del carrito — usada por el cross-sell
+// ("También te puede interesar"). Se pondera por CANTIDAD, no por
+// cantidad de líneas distintas: 3 unidades de un libro de "poesia" pesan
+// más que 1 unidad de "ensayo", porque reflejan mejor el interés real de
+// compra. Ante un empate gana la categoría que aparece primero en el
+// carrito (orden determinístico).
+export const getMostFrequentCategory = (products) => {
+  if (!products || !Array.isArray(products) || products.length === 0) return null;
+
+  const counts = new Map();
+  for (const item of products) {
+    const category = item.product?.category;
+    if (!category) continue;
+    counts.set(category, (counts.get(category) || 0) + (item.quantity || 1));
+  }
+
+  let topCategory = null;
+  let topCount = 0;
+  for (const [category, count] of counts) {
+    if (count > topCount) {
+      topCategory = category;
+      topCount = count;
+    }
+  }
+  return topCategory;
+};

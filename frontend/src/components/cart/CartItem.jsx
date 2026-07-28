@@ -16,11 +16,10 @@ import { formatPrice } from '../../utils/formatPrice';
  *   item.quantity → cantidad actual en el carrito
  */
 const CartItem = ({ item }) => {
-  const { updateQuantity, removeItem } = useCart();
+  const { updateQuantity, removeItem, isQuantityPending } = useCart();
   const { toggleWishlist, isSaved } = useWishlist();
   const { showToast } = useToast();
 
-  const [updatingQty, setUpdatingQty]       = useState(false);
   const [removing, setRemoving]             = useState(false);
   const [savingForLater, setSavingForLater] = useState(false);
   const [isLeaving, setIsLeaving]           = useState(false);
@@ -35,19 +34,24 @@ const CartItem = ({ item }) => {
   const stockLimited = (stock ?? 99) < 10;
   const atMaxQty     = quantity >= maxQty;
 
+  // Optimistic UI: el número que se ve ya es la cantidad "deseada" — se
+  // actualiza al instante en cada click, sin esperar al server. Esto solo
+  // indica que hay una request en curso (debounce pendiente o en vuelo)
+  // para mostrar un feedback visual sutil, NO bloquea los botones.
+  const quantityPending = isQuantityPending(_id);
+
   /* ── Handlers ── */
-  const handleQuantity = async (newQty) => {
+  const handleQuantity = (newQty) => {
     if (newQty < 1 || newQty > maxQty) return;
-    setUpdatingQty(true);
-    try {
-      await updateQuantity(_id, newQty);
-    } catch (err) {
-      const msg = err?.response?.data?.message
+    // No usamos await para no bloquear la UI: el cambio ya se ve
+    // reflejado al instante (ver CartContext). Si la request termina
+    // fallando, CartContext hace el rollback y esta promesa se rechaza
+    // acá, donde avisamos con un toast.
+    updateQuantity(_id, newQty).catch((err) => {
+      const msg = err?.message
         || 'No pudimos actualizar la cantidad. Intentá de nuevo.';
       showToast({ type: 'error', message: msg });
-    } finally {
-      setUpdatingQty(false);
-    }
+    });
   };
 
   const handleRemove = () => {
@@ -70,7 +74,7 @@ const CartItem = ({ item }) => {
       });
       setIsLeaving(true);
     } catch (err) {
-      const msg = err?.response?.data?.message
+      const msg = err?.message
         || 'No pudimos guardar el producto para después. Intentá de nuevo.';
       showToast({ type: 'error', message: msg });
       setSavingForLater(false);
@@ -86,7 +90,7 @@ const CartItem = ({ item }) => {
     try {
       await removeItem(_id);
     } catch (err) {
-      const msg = err?.response?.data?.message
+      const msg = err?.message
         || 'No pudimos eliminar el producto. Intentá de nuevo.';
       showToast({ type: 'error', message: msg });
       setIsLeaving(false);
@@ -96,7 +100,16 @@ const CartItem = ({ item }) => {
     }
   };
 
-  const isDisabled = updatingQty || removing || savingForLater;
+  // Los botones +/− NO se deshabilitan por `quantityPending`: ese es
+  // justamente el punto del optimistic UI, dejar seguir clickeando.
+  // Sí se deshabilitan si el ítem se está yendo (remove / guardar para
+  // después), para no cambiar la cantidad de algo que ya está saliendo
+  // del carrito.
+  const qtyControlsDisabled = removing || savingForLater;
+  // Eliminar / guardar para después sí esperan a que no haya una
+  // actualización de cantidad en curso, para evitar que una request de
+  // cantidad "vieja" le pegue a un ítem que ya no está.
+  const isDisabled = qtyControlsDisabled || quantityPending;
 
   return (
       <article
@@ -156,28 +169,39 @@ const CartItem = ({ item }) => {
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-3 flex-wrap">
 
-              {/* Selector +/− */}
-              <div className={`flex items-center rounded-lg border border-[var(--border)] overflow-hidden transition-opacity ${isDisabled ? 'opacity-50' : ''}`}>
+              {/* Selector +/− — optimista: el número cambia al instante en
+                  cada click, no espera al server. El puntito solo indica
+                  que esa cantidad todavía se está guardando. */}
+              <div className={`flex items-center rounded-lg border border-[var(--border)] overflow-hidden transition-opacity ${qtyControlsDisabled ? 'opacity-50' : ''}`}>
                 <button
                   onClick={() => handleQuantity(quantity - 1)}
-                  disabled={isDisabled || quantity <= 1}
+                  disabled={qtyControlsDisabled || quantity <= 1}
                   className="px-2.5 py-1.5 text-[var(--text)] hover:bg-[var(--code-bg)] disabled:cursor-not-allowed transition-colors text-base leading-none"
                   aria-label="Reducir cantidad"
                 >
                   −
                 </button>
-                <span className="px-3 py-1.5 text-sm font-semibold text-[var(--text-h)] border-x border-[var(--border)] min-w-[2.5rem] text-center tabular-nums">
-                  {updatingQty ? '…' : quantity}
+                <span className="relative px-3 py-1.5 text-sm font-semibold text-[var(--text-h)] border-x border-[var(--border)] min-w-[2.5rem] text-center tabular-nums">
+                  {quantity}
+                  {quantityPending && (
+                    <span
+                      className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"
+                      aria-hidden="true"
+                    />
+                  )}
                 </span>
                 <button
                   onClick={() => handleQuantity(quantity + 1)}
-                  disabled={isDisabled || quantity >= maxQty}
+                  disabled={qtyControlsDisabled || quantity >= maxQty}
                   className="px-2.5 py-1.5 text-[var(--text)] hover:bg-[var(--code-bg)] disabled:cursor-not-allowed transition-colors text-base leading-none"
                   aria-label="Aumentar cantidad"
                 >
                   +
                 </button>
               </div>
+              <span className="sr-only" role="status">
+                {quantityPending ? `Actualizando cantidad a ${quantity}` : ''}
+              </span>
 
               {/* Guardar para después */}
               <Button
