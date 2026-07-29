@@ -13,7 +13,11 @@ import { formatPrice } from '../../utils/formatPrice';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-const stripePromise = PUBLISHABLE_KEY ? loadStripe(PUBLISHABLE_KEY) : null;
+const stripePromise = PUBLISHABLE_KEY
+  ? loadStripe(PUBLISHABLE_KEY, {
+      developerTools: { assistant: { enabled: false } },
+    })
+  : null;
 
 // Stripe Elements corre dentro de un iframe y no puede leer nuestras
 // variables CSS (--accent, --bg, etc.) — le pasamos los mismos colores
