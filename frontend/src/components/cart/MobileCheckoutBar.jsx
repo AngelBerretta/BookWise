@@ -1,5 +1,5 @@
+import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
-import useToast from '../../hooks/useToast';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**
@@ -13,14 +13,10 @@ import { formatPrice } from '../../utils/formatPrice';
  * }} props
  */
 const MobileCheckoutBar = ({ total, itemCount, disabled = false }) => {
-  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
-    showToast({
-      type: 'info',
-      message: '🚀 El checkout todavía está en desarrollo — por ahora podés seguir agregando libros.',
-      duration: 4000,
-    });
+    navigate('/checkout/shipping');
   };
 
   return (

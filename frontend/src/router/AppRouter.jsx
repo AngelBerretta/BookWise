@@ -12,6 +12,9 @@ import VerifyAccount from '../pages/VerifyAccount';
 import Products      from '../pages/Products';
 import ProductDetail from '../pages/ProductDetail';
 import Cart          from '../pages/Cart';
+import ShippingStep     from '../pages/checkout/Shipping';
+import PaymentStep      from '../pages/checkout/Payment';
+import ConfirmationStep from '../pages/checkout/Confirmation';
 import Wishlist      from '../pages/Wishlist';
 import Blog          from '../pages/Blog';
 import BlogPost      from '../pages/BlogPost';
@@ -34,6 +37,9 @@ const AppRouter = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout/shipping" element={<ShippingStep />} />
+            <Route path="/checkout/payment" element={<PaymentStep />} />
+            <Route path="/checkout/confirmation" element={<ConfirmationStep />} />
             <Route path="/wishlist" element={<Wishlist />} />
           </Route>
         </Route>

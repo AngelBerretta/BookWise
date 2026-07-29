@@ -77,6 +77,14 @@ const corsOptions = {
 // ── Middlewares globales ──────────────────────────────────────────────────────
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // preflight
+
+// El webhook de Stripe necesita el body CRUDO (sin parsear) para poder
+// verificar la firma con stripe.webhooks.constructEvent — por eso va antes
+// de express.json() y solo para esta ruta puntual. body-parser marca
+// internamente `req._body = true` al parsear, así que express.json() de más
+// abajo detecta que ya está parseado y no lo vuelve a tocar para esta ruta.
+app.use("/api/orders/webhook", express.raw({ type: "application/json" }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
