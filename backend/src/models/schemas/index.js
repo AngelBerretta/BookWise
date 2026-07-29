@@ -268,6 +268,50 @@ const updatePostSchema = Joi.object({
     "object.min": "Debés enviar al menos un campo para actualizar",
   });
 
+// ── Orders / Checkout ─────────────────────────────────────────────────────────
+
+const shippingAddressSchema = Joi.object({
+  fullName: Joi.string().min(3).max(100).required().messages({
+    "string.min": "El nombre completo debe tener al menos 3 caracteres",
+    "string.max": "El nombre completo no puede superar los 100 caracteres",
+    "any.required": "El nombre completo es requerido",
+  }),
+  email: Joi.string().email().required().messages({
+    "string.email": "El email no es válido",
+    "any.required": "El email es requerido",
+  }),
+  phone: Joi.string().min(6).max(30).required().messages({
+    "string.min": "El teléfono no es válido",
+    "any.required": "El teléfono es requerido",
+  }),
+  address: Joi.string().min(5).max(200).required().messages({
+    "string.min": "La dirección no puede estar vacía",
+    "any.required": "La dirección es requerida",
+  }),
+  city: Joi.string().min(2).max(100).required().messages({
+    "any.required": "La ciudad es requerida",
+  }),
+  province: Joi.string().min(2).max(100).required().messages({
+    "any.required": "La provincia es requerida",
+  }),
+  postalCode: Joi.string().min(3).max(15).required().messages({
+    "any.required": "El código postal es requerido",
+  }),
+  country: Joi.string().min(2).max(100).required().messages({
+    "any.required": "El país es requerido",
+  }),
+  notes: Joi.string().max(500).optional().allow(""),
+});
+
+const createOrderSchema = Joi.object({
+  cartId: Joi.string().required().messages({
+    "any.required": "El id del carrito es requerido",
+  }),
+  shippingAddress: shippingAddressSchema.required().messages({
+    "any.required": "La dirección de envío es requerida",
+  }),
+});
+
 // ── Exports ───────────────────────────────────────────────────────────────────
 
 export {
@@ -282,6 +326,8 @@ export {
   // Cart
   addToCartSchema,
   updateCartItemSchema,
+  // Orders
+  createOrderSchema,
   // Blog
   createPostSchema,
   updatePostSchema,

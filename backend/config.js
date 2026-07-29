@@ -44,6 +44,17 @@ const config = {
     url: process.env.CLIENT_URL || "http://localhost:5173",
   },
 
+  // ── Stripe (checkout en modo test) ────────────────────────────────────────
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || "",
+    // La genera `stripe listen --forward-to localhost:8080/api/orders/webhook`
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
+    // Moneda del checkout — debe estar habilitada en tu cuenta de Stripe.
+    // Por default usa la misma moneda que el catálogo (ARS); si tu cuenta de
+    // Stripe test no la acepta, cambiala a "usd" en el .env.
+    currency: (process.env.STRIPE_CURRENCY || "ars").toLowerCase(),
+  },
+
   // ── Bcrypt ─────────────────────────────────────────────────────────────────
   bcrypt: {
     saltRounds: 10,

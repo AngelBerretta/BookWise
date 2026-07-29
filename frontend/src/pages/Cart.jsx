@@ -7,6 +7,7 @@ import CartEmpty from '../components/cart/CartEmpty';
 import CrossSell from '../components/cart/CrossSell';
 import CartItemSkeleton from '../components/cart/CartItemSkeleton';
 import MobileCheckoutBar from '../components/cart/MobileCheckoutBar';
+import CheckoutStepper from '../components/checkout/CheckoutStepper';
 import Button from '../components/ui/Button';
 import useToast from '../hooks/useToast';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -103,6 +104,8 @@ const Cart = () => {
             </svg>
             Seguir comprando
           </Link>
+
+          <CheckoutStepper currentStep={1} />
 
           {/* Encabezado */}
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">

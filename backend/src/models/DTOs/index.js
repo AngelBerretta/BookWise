@@ -67,4 +67,37 @@ const toPostDTO = (post) => ({
 
 const toWishlistDTO = (products) => (products || []).map(toProductDTO);
 
-export { toUserDTO, toProductDTO, toCartDTO, toPostDTO, toWishlistDTO };
+// ── Order DTO ─────────────────────────────────────────────────────────────────
+
+const toOrderDTO = (order) => ({
+  _id: order._id,
+  orderNumber: order.orderNumber,
+  user: order.user,
+  items: (order.items || []).map((item) => ({
+    product: item.product,
+    title: item.title,
+    price: item.price,
+    quantity: item.quantity,
+    thumbnail: item.thumbnail,
+  })),
+  shippingAddress: order.shippingAddress,
+  subtotal: order.subtotal,
+  shippingCost: order.shippingCost,
+  total: order.total,
+  currency: order.currency,
+  status: order.status,
+  paymentStatus: order.paymentStatus,
+  paidAt: order.paidAt,
+  confirmedVia: order.confirmedVia,
+  createdAt: order.createdAt,
+  updatedAt: order.updatedAt,
+});
+
+export {
+  toUserDTO,
+  toProductDTO,
+  toCartDTO,
+  toPostDTO,
+  toWishlistDTO,
+  toOrderDTO,
+};

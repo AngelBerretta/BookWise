@@ -1,5 +1,5 @@
+import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
-import useToast from '../../hooks/useToast';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**
@@ -12,14 +12,10 @@ import { formatPrice } from '../../utils/formatPrice';
  * }} props
  */
 const CartSummary = ({ products, total, itemCount }) => {
-  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
-    showToast({
-      type: 'info',
-      message: '🚀 El checkout todavía está en desarrollo — por ahora podés seguir agregando libros.',
-      duration: 4000,
-    });
+    navigate('/checkout/shipping');
   };
 
   return (
@@ -88,15 +84,12 @@ const CartSummary = ({ products, total, itemCount }) => {
               style={{ fontSize: '18px' }}
               aria-hidden="true"
             >
-              schedule
+              lock
             </span>
             Finalizar compra
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-              Beta
-            </span>
           </Button>
           <p className="text-xs text-center text-[var(--text)] opacity-60">
-            El pago está en desarrollo — todavía no procesamos compras reales.
+            Pago seguro con Stripe (modo test) — no se realiza ningún cobro real.
           </p>
         </div>
 

@@ -5,7 +5,12 @@ import Footer from './Footer';
 
 // Rutas de "funnel" (conversión) donde el footer compite con el CTA
 // y además la barra fija mobile lo taparía parcialmente al hacer scroll.
-const HIDE_FOOTER_PATHS = ['/cart'];
+const HIDE_FOOTER_PATHS = [
+  '/cart',
+  '/checkout/shipping',
+  '/checkout/payment',
+  '/checkout/confirmation',
+];
 
 /**
  * Layout principal de la aplicación.
