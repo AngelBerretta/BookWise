@@ -16,7 +16,7 @@ const STEPS = [
  *
  * @param {{ currentStep: 1|2|3|4 }} props
  */
-const CheckoutStepper = ({ currentStep }) => {
+const CheckoutStepper = ({ currentStep, completed = false }) => {
   const navigate = useNavigate();
 
   return (
@@ -24,8 +24,8 @@ const CheckoutStepper = ({ currentStep }) => {
       <ol className="flex items-start">
         {STEPS.map((step, idx) => {
           const stepNumber = idx + 1;
-          const isCompleted = stepNumber < currentStep;
-          const isCurrent = stepNumber === currentStep;
+          const isCompleted = stepNumber < currentStep || (stepNumber === currentStep && completed);
+          const isCurrent = stepNumber === currentStep && !completed;
           const isClickable = isCompleted;
           const isLast = idx === STEPS.length - 1;
 

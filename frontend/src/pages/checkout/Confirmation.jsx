@@ -107,7 +107,7 @@ const Confirmation = () => {
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
-      <CheckoutStepper currentStep={4} />
+      <CheckoutStepper currentStep={4} completed={status === 'paid'} />
 
       {status === 'loading' && (
         <div className="flex justify-center py-24">
