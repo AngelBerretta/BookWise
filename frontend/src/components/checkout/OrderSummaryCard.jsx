@@ -16,9 +16,22 @@ import { formatPrice } from '../../utils/formatPrice';
  * }} props
  */
 const OrderSummaryCard = ({ items, subtotal, shippingCost = 0, total, heading = 'Resumen del pedido' }) => {
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Hoy el envío siempre es gratis, así que subtotal === total y esa línea
+  // sería un número duplicado sin aportar nada. La mostramos solo si algún
+  // día difieren (envío pago, descuentos, etc.) — así queda lista para
+  // cuando tenga sentido real, sin tener que tocar este componente de nuevo.
+  const showSubtotalRow = subtotal !== total;
+
   return (
     <Card className="sticky top-24">
-      <h2 className="text-base font-semibold text-[var(--text-h)] mb-4">{heading}</h2>
+      <h2 className="text-base font-semibold text-[var(--text-h)] mb-4">
+        {heading}{' '}
+        <span className="font-normal text-[var(--text-muted)]">
+          ({itemCount} {itemCount === 1 ? 'artículo' : 'artículos'})
+        </span>
+      </h2>
 
       <ul className="flex flex-col gap-3 mb-4 max-h-72 overflow-y-auto pr-1">
         {items.map((item, idx) => (
@@ -40,10 +53,12 @@ const OrderSummaryCard = ({ items, subtotal, shippingCost = 0, total, heading = 
       </ul>
 
       <div className="border-t border-[var(--border-subtle)] pt-3 flex flex-col gap-1.5 text-sm">
-        <div className="flex justify-between text-[var(--text)]">
-          <span>Subtotal</span>
-          <span>{formatPrice(subtotal)}</span>
-        </div>
+        {showSubtotalRow && (
+          <div className="flex justify-between text-[var(--text)]">
+            <span>Subtotal</span>
+            <span>{formatPrice(subtotal)}</span>
+          </div>
+        )}
         <div className="flex justify-between text-[var(--text)]">
           <span>Envío</span>
           <span>{shippingCost > 0 ? formatPrice(shippingCost) : 'Gratis'}</span>
