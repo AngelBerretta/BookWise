@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
   // booleano global, así que un solo click en "+" ponía en loading a
   // TODA la UI del carrito (badge, resumen, otros ítems, etc.), no solo
   // al control que el usuario tocó.
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => isAuthenticated);
   // Ítems con una actualización de cantidad en curso (debounce pendiente
   // o request en vuelo). Se usa solo para feedback visual sutil — NO
   // bloquea los botones +/−, esa es justamente la idea del optimistic UI.
