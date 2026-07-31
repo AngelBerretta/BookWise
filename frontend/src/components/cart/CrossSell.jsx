@@ -25,7 +25,7 @@ const CrossSell = () => {
   const category = getMostFrequentCategory(products);
 
   const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading] = useState(() => Boolean(category));
   const [error, setError]             = useState(false);
 
   useEffect(() => {
