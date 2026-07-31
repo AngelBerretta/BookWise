@@ -92,13 +92,25 @@ api.interceptors.response.use(
       switch (status) {
         case 401: {
           // El backend rechazó el token → limpiar sesión.
-          // Se excluye /auth/login: un 401 ahí es "credenciales incorrectas",
-          // no "sesión expirada" — ese caso ya lo maneja LoginForm con su
-          // propio mensaje, y no debe disparar el evento global.
+          // Se excluye /auth/login del EVENTO (no de la limpieza): un 401
+          // ahí es "credenciales incorrectas", no "sesión expirada" — ese
+          // caso ya lo maneja LoginForm con su propio mensaje. Igual
+          // limpiamos localStorage por si había un token viejo dando vueltas.
           const isLoginAttempt = config?.url?.startsWith('/auth/login');
+
+          // Guarda real contra 401 en cascada: si varias requests en vuelo
+          // fallan casi al mismo tiempo (ej: carrito + wishlist + perfil se
+          // piden juntos al entrar a la app) todas comparten el mismo token
+          // ya vencido, así que TODAS reciben 401. Sin este chequeo, cada
+          // una dispararía su propio evento y el usuario vería un toast de
+          // "sesión expiró" por cada request fallida en vez de uno solo.
+          // Como JS es single-threaded, solo la primera en ejecutarse
+          // encuentra el token todavía presente — las siguientes ya lo
+          // ven removido y no vuelven a disparar el evento.
+          const hadToken = localStorage.getItem('token');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
-          if (!isLoginAttempt) {
+          if (hadToken && !isLoginAttempt) {
             window.dispatchEvent(new CustomEvent('auth:unauthorized'));
           }
           break;
