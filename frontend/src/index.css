@@ -132,6 +132,16 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* `scrollbar-gutter: stable` (agregado antes) solo tiene efecto si el
+     elemento ya tiene un `overflow` explícito (no `visible`) — el <html>
+     por default no lo tiene, así que esa regla sola no alcanzaba. Forzamos
+     `overflow-y: scroll` para que la scrollbar (o su espacio reservado)
+     esté SIEMPRE presente, sin importar si el contenido de la página
+     alcanza a necesitarla o no — así nunca aparece/desaparece y nunca
+     empuja el contenido de ancho. Esto es lo que de verdad evita el salto,
+     con o sin scrollbar-gutter. */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 @layer base {
   body {
