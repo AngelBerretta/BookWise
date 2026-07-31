@@ -417,7 +417,7 @@ const Home = () => {
       <section
         ref={newsletterRef}
         className={`border-t border-[var(--border-subtle)] reveal ${newsletterVisible ? 'is-visible' : ''}`}
-        style={{ background: 'var(--bg-subtle)' }}
+        style={{ background: isAuthenticated ? 'var(--bg-lowest)' : 'var(--bg-subtle)' }}
       >
         <div className="container py-16 sm:py-24">
           <div className="max-w-xl mx-auto flex flex-col items-center text-center gap-6">
