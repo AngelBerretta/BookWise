@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { getMe } from '../services/authService';
 import * as authService from '../services/authService';
+import { resetSessionGuard } from '../services/api';
 import useToast from '../hooks/useToast';
 
 const AuthContext = createContext(null);
@@ -86,6 +87,7 @@ export const AuthProvider = ({ children }) => {
     const { token: newToken, user: newUser } = data;
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(newUser));
+    resetSessionGuard();
     setToken(newToken);
     setUser(newUser);
     setIsAuthenticated(true);

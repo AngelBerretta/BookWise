@@ -25,6 +25,36 @@ const isTokenExpired = (token) => {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Guarda anti-duplicados para el evento auth:unauthorized.           */
+/*  Antes se usaba localStorage.getItem('token') para saber si ya se   */
+/*  había avisado, pero eso genera una carrera: el interceptor de      */
+/*  REQUEST puede borrar el token (por expiración detectada en cliente)*/
+/*  justo antes de que llegue la respuesta 401 del interceptor de      */
+/*  RESPONSE, y este último ya no lo encuentra en localStorage → nunca */
+/*  dispara el evento y React se queda con la sesión "viva" en pantalla*/
+/*  aunque el token ya no exista. Con una bandera en memoria del propio*/
+/*  módulo, cualquiera de los dos interceptors que detecte la sesión   */
+/*  muerta primero dispara el evento una sola vez, sin depender de en  */
+/*  qué orden resuelvan.                                               */
+/* ------------------------------------------------------------------ */
+let sessionKilled = false;
+
+const killSession = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  if (!sessionKilled) {
+    sessionKilled = true;
+    window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+  }
+};
+
+/* Se llama desde login() al obtener un token nuevo, para permitir que  */
+/* futuras sesiones vuelvan a disparar el evento si vencen.             */
+export const resetSessionGuard = () => {
+  sessionKilled = false;
+};
+
+/* ------------------------------------------------------------------ */
 /*  Instancia base                                                     */
 /* ------------------------------------------------------------------ */
 const api = axios.create({
@@ -51,8 +81,9 @@ api.interceptors.request.use(
       if (isTokenExpired(token)) {
         // Token vencido — limpiar sesión y NO mandarlo.
         // Evita 401 en cascada en rutas con auth opcional (ej: /blog).
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // killSession() también avisa a AuthContext (evento auth:unauthorized)
+        // para que la UI (navbar, etc.) deje de mostrar la sesión como activa.
+        killSession();
       } else {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -101,17 +132,16 @@ api.interceptors.response.use(
           // Guarda real contra 401 en cascada: si varias requests en vuelo
           // fallan casi al mismo tiempo (ej: carrito + wishlist + perfil se
           // piden juntos al entrar a la app) todas comparten el mismo token
-          // ya vencido, así que TODAS reciben 401. Sin este chequeo, cada
-          // una dispararía su propio evento y el usuario vería un toast de
-          // "sesión expiró" por cada request fallida en vez de uno solo.
-          // Como JS es single-threaded, solo la primera en ejecutarse
-          // encuentra el token todavía presente — las siguientes ya lo
-          // ven removido y no vuelven a disparar el evento.
-          const hadToken = localStorage.getItem('token');
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          if (hadToken && !isLoginAttempt) {
-            window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+          // ya vencido, así que TODAS reciben 401. killSession() usa una
+          // bandera en memoria (no localStorage) para garantizar que el
+          // evento se dispare una sola vez, sin importar si el request
+          // interceptor ya había matado la sesión antes de que esta
+          // respuesta 401 llegara.
+          if (!isLoginAttempt) {
+            killSession();
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
           }
           break;
         }
