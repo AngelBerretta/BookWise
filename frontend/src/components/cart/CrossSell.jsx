@@ -30,7 +30,7 @@ const CrossSell = () => {
 
   useEffect(() => {
     // Sin categoría dominante no hay nada que pedir — y el guard de
-    // arriba (`if (!category) return null`) ya oculta toda la sección,
+    // abajo (`if (!category) return null`) ya oculta toda la sección,
     // así que no hace falta tocar el estado acá.
     if (!category) return;
 
@@ -66,9 +66,8 @@ const CrossSell = () => {
   }, [category]);
 
   // Nada que mostrar: carrito vacío, error al pedir sugerencias, o sin
-  // sugerencias válidas tras filtrar (todo lo de esa categoría ya está en
-  // el carrito o sin stock). En cualquiera de estos casos preferimos no
-  // mostrar nada antes que una sección vacía o rota.
+  // sugerencias válidas tras filtrar. Sin animación — la sección aparece
+  // o no aparece, tal cual, sin abrir/cerrar nada.
   if (!category) return null;
   if (error) return null;
   if (!loading && suggestions.length === 0) return null;
@@ -77,7 +76,17 @@ const CrossSell = () => {
     PRODUCT_CATEGORIES.find((c) => c.value === category)?.label ?? category;
 
   return (
-    <section aria-label="Sugerencias" className="mt-10">
+    // overflow-anchor: none — la causa real del "acordeón": el navegador
+    // reajusta solo la posición de scroll cuando algo dentro de esta
+    // sección cambia de tamaño aunque sea un poco (CSS Scroll Anchoring,
+    // activado por default), y como el sitio tiene `scroll-behavior:
+    // smooth` en el <html>, ese reajuste se ve como un scroll animado —
+    // no es un cambio de altura del documento (por eso no aparecía en
+    // scrollHeight ni en el layout-shift observer) ni algo que se
+    // resuelva fijando la altura del contenedor. Esto le dice al
+    // navegador que nunca use esta sección como referencia para corregir
+    // el scroll.
+    <section aria-label="Sugerencias" className="mt-10" style={{ overflowAnchor: 'none' }}>
       <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-2">

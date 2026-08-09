@@ -143,7 +143,10 @@ const ProductCard = ({ product }) => {
         {/* ── Info ── */}
         <div className="flex flex-col gap-1 flex-1 min-w-0">
 
-          <div className="flex items-center justify-between gap-2">
+          {/* Altura fija (h-5): así la fila mide lo mismo tenga o no
+              badge de stock bajo — antes esa diferencia era una de las
+              causas del salto de altura al reemplazar el skeleton. */}
+          <div className="flex items-center justify-between gap-2 h-5">
             {category && <Badge category={category} />}
             {lowStock && (
               <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 shrink-0">
@@ -153,19 +156,24 @@ const ProductCard = ({ product }) => {
           </div>
 
           <Link to={`/products/${_id}`}>
+            {/* min-h reserva el alto de 2 líneas siempre (text-xl
+                leading-tight = 20px × 1.25 × 2 = 50px), aunque el
+                título real ocupe una sola línea — evita que cards con
+                títulos cortos midan menos que las de títulos largos. */}
             <h3
-              className="font-headline text-xl leading-tight transition-colors duration-200 line-clamp-2 hover:text-[var(--secondary)]"
+              className="font-headline text-xl leading-tight transition-colors duration-200 line-clamp-2 hover:text-[var(--secondary)] min-h-[3.125rem]"
               style={{ color: 'var(--text-h)', fontFamily: "'Newsreader', Georgia, serif" }}
             >
               {title}
             </h3>
           </Link>
 
-          {author && (
-            <p className="font-body text-sm" style={{ color: 'var(--text)' }}>
-              por {author}
-            </p>
-          )}
+          {/* Se renderiza siempre (antes era condicional a `author`),
+              con altura fija: un producto sin autor ya no achica la
+              card respecto a uno que sí lo tiene. */}
+          <p className="font-body text-sm truncate min-h-[1.25rem]" style={{ color: 'var(--text)' }}>
+            {author ? `por ${author}` : '\u00A0'}
+          </p>
 
           <div className="flex justify-between items-center mt-auto pt-2 gap-2">
             <span className="font-body font-medium" style={{ color: 'var(--text-h)' }}>

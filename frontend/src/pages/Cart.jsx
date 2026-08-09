@@ -42,9 +42,9 @@ const Cart = () => {
   if (loading && !products.length) {
     return (
       <div className="flex flex-col bg-[var(--bg)]">
-         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(7rem_+_env(safe-area-inset-bottom))] lg:pb-10">
+         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(7rem_+_env(safe-area-inset-bottom))] lg:pb-10">
           <h1 className="h1-editorial mb-8">Mi carrito</h1>
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-6">
               {Array.from({ length: 3 }).map((_, i) => <CartItemSkeleton key={i} />)}
             </section>
@@ -92,7 +92,7 @@ const Cart = () => {
       )}
 
       <div className="flex flex-col bg-[var(--bg)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(6rem_+_env(safe-area-inset-bottom))] lg:pb-10">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-[calc(6rem_+_env(safe-area-inset-bottom))] lg:pb-10">
 
           {/* Seguir comprando */}
           <Link
@@ -135,7 +135,7 @@ const Cart = () => {
           </div>
 
           {/* Layout principal */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
 
             {/* Lista de ítems */}
             <section
@@ -143,7 +143,7 @@ const Cart = () => {
               aria-label="Productos en el carrito"
             >
               {/* Cabecera de columnas — solo desktop */}
-              <div className="hidden sm:grid grid-cols-[1fr_auto] gap-4 py-3 border-b border-[var(--border)]">
+              <div className="hidden sm:grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-3 border-b border-[var(--border)]">
                 <span className="text-xs font-medium text-[var(--text)] uppercase tracking-wide">
                   Producto
                 </span>
