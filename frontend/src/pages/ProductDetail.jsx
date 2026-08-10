@@ -131,14 +131,15 @@ const handleToggleWishlist = async () => {
 
   return (
       <div className="antialiased min-h-screen flex flex-col font-body"
-           style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+           style={{ backgroundColor: 'var(--bg)', color: 'var(--text)', zoom: '98%' }}>
+            
 
         {/* ── Main ── */}
-        <main className="flex-grow pt-8 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        <main className="flex-grow pt-6 sm:pt-8 pb-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto w-full">
 
           {/* ── Breadcrumb ── */}
           <div
-            className="flex items-center gap-2 text-xs pb-6 sm:pb-8 mb-6 sm:mb-8"
+            className="flex items-center gap-2 text-xs pb-4 sm:pb-5 mb-4 sm:mb-5"
             style={{
               borderBottom: '1px solid rgba(196,198,205,0.15)',
               color: 'var(--text-muted)',
@@ -169,7 +170,7 @@ const handleToggleWishlist = async () => {
           </div>
 
           {/* ── Product grid ── */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 mb-14 sm:mb-24">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12">
 
             {/* ── Columna imagen ── */}
             <div className="lg:col-span-5 relative">
@@ -408,7 +409,7 @@ const handleToggleWishlist = async () => {
               {/* Descripción */}
               {description && (
                 <div
-                  className="mb-12 leading-relaxed text-base"
+                  className="mb-8 leading-relaxed text-base"
                   style={{ color: 'var(--text)' }}
                 >
                   <p>{description}</p>
@@ -417,7 +418,7 @@ const handleToggleWishlist = async () => {
 
               {/* ── Grid de detalles ── */}
               <div
-                className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-8"
+                className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-6"
                 style={{ borderTop: '1px solid rgba(196,198,205,0.15)' }}
               >
                 {category && (
@@ -441,8 +442,8 @@ const handleToggleWishlist = async () => {
           </section>
 
           {related.length > 0 && (
-            <section className="mt-16 sm:mt-24 pt-8 sm:pt-12" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-              <h2 className="h2-editorial-sm mb-8">También te puede interesar</h2>
+            <section className="mt-8 sm:mt-10 pt-6 sm:pt-8" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <h2 className="h2-editorial-sm mb-6">También te puede interesar</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                 {related.map((p) => <ProductCard key={p._id} product={p} />)}
               </div>
