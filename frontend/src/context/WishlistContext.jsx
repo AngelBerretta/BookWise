@@ -57,7 +57,7 @@ export const WishlistProvider = ({ children }) => {
   // 🆕 Ahora recibe un segundo parámetro opcional: productTitle
   const toggleWishlist = useCallback(async (productId, productTitle = '') => {
     const alreadySaved = wishlist.some((p) => p._id === productId);
-    setLoading(true);
+    // setLoading(true);
     try {
       const data = alreadySaved
         ? await wishlistService.removeFromWishlist(productId)
@@ -68,8 +68,8 @@ export const WishlistProvider = ({ children }) => {
       return { added: !alreadySaved, title: productTitle };
     } catch (error) {
       throw error; // El error lo maneja el componente que llama
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   }, [wishlist]);
 

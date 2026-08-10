@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import useWishlist from '../hooks/useWishlist';
-import ProductGrid from '../components/product/ProductGrid';
+import WishlistList from '../components/wishlist/WishlistList';
 import EmptyState from '../components/ui/EmptyState';
 import { WishlistIcon } from '../components/ui/icons/NavIcons';
 
@@ -52,7 +52,7 @@ const Wishlist = () => {
           </p>
         </div>
 
-        <ProductGrid products={wishlist} loading={loading} />
+        <WishlistList wishlist={wishlist} loading={loading} />
       </div>
     </div>
   );
