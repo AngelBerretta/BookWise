@@ -1,8 +1,8 @@
-<h2 style="margin-bottom:1.5rem">🛒 Carrito <code style="font-size:.8rem;background:***REMOVED***eee;padding:.1rem .4rem;border-radius:4px">{{cartId}}</code></h2>
+<h2 style="margin-bottom:1.5rem">🛒 Carrito <code style="font-size:.8rem;background:#eee;padding:.1rem .4rem;border-radius:4px">{{cartId}}</code></h2>
 
-{{***REMOVED***if products.length}}
-<table style="width:100%;border-collapse:collapse;background:***REMOVED***fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.1)">
-  <thead style="background:***REMOVED***1a1a2e;color:***REMOVED***fff">
+{{#if products.length}}
+<table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.1)">
+  <thead style="background:#1a1a2e;color:#fff">
     <tr>
       <th style="padding:.75rem 1rem;text-align:left">Producto</th>
       <th style="padding:.75rem 1rem;text-align:center">Precio</th>
@@ -12,11 +12,11 @@
     </tr>
   </thead>
   <tbody>
-    {{***REMOVED***each products}}
-    <tr style="border-bottom:1px solid ***REMOVED***eee" data-pid="{{product._id}}">
+    {{#each products}}
+    <tr style="border-bottom:1px solid #eee" data-pid="{{product._id}}">
       <td style="padding:.75rem 1rem">
         <strong>{{product.title}}</strong>
-        <br><span style="font-size:.8rem;color:***REMOVED***888">{{product.category}}</span>
+        <br><span style="font-size:.8rem;color:#888">{{product.category}}</span>
       </td>
       <td style="padding:.75rem 1rem;text-align:center">${{product.price}}</td>
       <td style="padding:.75rem 1rem;text-align:center">{{quantity}}</td>
@@ -28,7 +28,7 @@
     {{/each}}
   </tbody>
   <tfoot>
-    <tr style="background:***REMOVED***f5f5f5;font-weight:700">
+    <tr style="background:#f5f5f5;font-weight:700">
       <td colspan="3" style="padding:.75rem 1rem;text-align:right">Total:</td>
       <td style="padding:.75rem 1rem;text-align:center;font-size:1.1rem">${{total}}</td>
       <td style="padding:.75rem 1rem;text-align:center">
@@ -38,7 +38,7 @@
   </tfoot>
 </table>
 {{else}}
-<div class="card" style="text-align:center;padding:2rem;color:***REMOVED***888">
+<div class="card" style="text-align:center;padding:2rem;color:#888">
   <p style="font-size:1.5rem">🛒</p>
   <p>El carrito está vacío.</p>
   <a href="/products" class="btn btn-primary" style="margin-top:1rem">Ver productos</a>

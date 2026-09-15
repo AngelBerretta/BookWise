@@ -1,4 +1,4 @@
-***REMOVED*** 📚 BookWise
+# 📚 BookWise
 
 A full-stack e-commerce and blog platform for books — built with a Node.js/Express/MongoDB backend and a React/Vite frontend, deployed with a live demo you can log into without signing up.
 
@@ -15,7 +15,7 @@ A full-stack e-commerce and blog platform for books — built with a Node.js/Exp
 
 ---
 
-***REMOVED******REMOVED*** 🚀 Try it live
+## 🚀 Try it live
 
 No signup needed — jump in with a one-click demo account:
 
@@ -24,13 +24,13 @@ No signup needed — jump in with a one-click demo account:
 | Reader | `demo@bookwise.com` | `Demo1234!` |
 | Admin | `admin-demo@bookwise.com` | `Demo1234!` |
 
-Both buttons are on the [login page](https://bookwise-store.vercel.app/login). The admin demo account can create and edit products/posts and try the image upload flow in real time — destructive actions and abusive content are sandboxed (see [Demo Mode Safeguards](***REMOVED***-demo-mode-safeguards) below).
+Both buttons are on the [login page](https://bookwise-store.vercel.app/login). The admin demo account can create and edit products/posts and try the image upload flow in real time — destructive actions and abusive content are sandboxed (see [Demo Mode Safeguards](#-demo-mode-safeguards) below).
 
 > **Note:** the backend runs on Render's free tier, which spins down after inactivity. The first request after a while may take 20–30s to wake up.
 
 ---
 
-***REMOVED******REMOVED*** ✨ Features
+## ✨ Features
 
 **Storefront**
 - Product catalog with category filters, price range, search, sorting and pagination
@@ -52,7 +52,7 @@ Both buttons are on the [login page](https://bookwise-store.vercel.app/login). T
 
 ---
 
-***REMOVED******REMOVED*** 🛠️ Engineering highlights
+## 🛠️ Engineering highlights
 
 A few things worth a closer look if you're reviewing the code:
 
@@ -63,7 +63,7 @@ A few things worth a closer look if you're reviewing the code:
 
 ---
 
-***REMOVED******REMOVED*** 🔒 Demo Mode Safeguards
+## 🔒 Demo Mode Safeguards
 
 Letting anonymous visitors use a real admin account is inherently risky, so the demo admin is wrapped in several independent layers of protection:
 
@@ -80,7 +80,7 @@ None of these are individually bulletproof — combined, they keep a public writ
 
 ---
 
-***REMOVED******REMOVED*** 🧰 Tech Stack
+## 🧰 Tech Stack
 
 | | |
 |---|---|
@@ -90,7 +90,7 @@ None of these are individually bulletproof — combined, they keep a public writ
 
 ---
 
-***REMOVED******REMOVED*** 🏗️ Architecture
+## 🏗️ Architecture
 
 ```
 BookWise/
@@ -118,26 +118,26 @@ BookWise/
 
 ---
 
-***REMOVED******REMOVED*** 💻 Getting Started
+## 💻 Getting Started
 
-***REMOVED******REMOVED******REMOVED*** Prerequisites
+### Prerequisites
 - Node.js ≥ 18
 - A MongoDB instance (local or [Atlas](https://www.mongodb.com/cloud/atlas) free tier)
 - A [Cloudinary](https://cloudinary.com) account (free tier is enough)
 
-***REMOVED******REMOVED******REMOVED*** Setup
+### Setup
 
 ```bash
 git clone https://github.com/AngelBerretta/BookWise.git
 cd BookWise
 
-***REMOVED*** Backend
+# Backend
 cd backend
 npm install
-cp .env.example .env   ***REMOVED*** fill in your values — see table below
+cp .env.example .env   # fill in your values — see table below
 npm run dev
 
-***REMOVED*** Frontend (new terminal)
+# Frontend (new terminal)
 cd frontend
 npm install
 npm run dev
@@ -145,7 +145,7 @@ npm run dev
 
 The app will be available at `http://localhost:5173`, talking to the API at `http://localhost:8080`.
 
-***REMOVED******REMOVED******REMOVED*** Environment Variables — backend (`backend/.env`)
+### Environment Variables — backend (`backend/.env`)
 
 | Variable | Description |
 |---|---|
@@ -158,26 +158,26 @@ The app will be available at `http://localhost:5173`, talking to the API at `htt
 | `CLIENT_URL` | Frontend origin, for CORS |
 | `ENABLE_DEMO_RESEED` | Enables the scheduled demo data reset (production only) |
 
-***REMOVED******REMOVED******REMOVED*** Environment Variables — frontend (`frontend/.env`)
+### Environment Variables — frontend (`frontend/.env`)
 
 | Variable | Description |
 |---|---|
 | `VITE_API_URL` | Backend API base URL, e.g. `http://localhost:8080/api` |
 
-***REMOVED******REMOVED******REMOVED*** Useful scripts (`backend/`)
+### Useful scripts (`backend/`)
 
 ```bash
-npm run dev          ***REMOVED*** start with nodemon (MongoDB mode)
-npm run dev:fs        ***REMOVED*** start with nodemon (flat-file mode)
-npm run seed          ***REMOVED*** seed the product catalog
-npm run seed:blog     ***REMOVED*** seed blog posts
-npm run seed:demo     ***REMOVED*** create/refresh the demo accounts
-npm run seed:all       ***REMOVED*** run all of the above
+npm run dev          # start with nodemon (MongoDB mode)
+npm run dev:fs        # start with nodemon (flat-file mode)
+npm run seed          # seed the product catalog
+npm run seed:blog     # seed blog posts
+npm run seed:demo     # create/refresh the demo accounts
+npm run seed:all       # run all of the above
 ```
 
 ---
 
-***REMOVED******REMOVED*** ☁️ Deployment
+## ☁️ Deployment
 
 - **Backend** → [Render](https://render.com) (persistent Node process — required for Socket.io)
 - **Frontend** → [Vercel](https://vercel.com) (static Vite build with SPA rewrites)
@@ -188,13 +188,13 @@ Both deployments redeploy automatically on push to `main`.
 
 ---
 
-***REMOVED******REMOVED*** 📄 License
+## 📄 License
 
 ISC
 
 ---
 
-***REMOVED******REMOVED*** 👤 Author
+## 👤 Author
 
 **Angel Berretta**
 Full-stack developer · Buenos Aires, Argentina

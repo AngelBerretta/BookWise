@@ -37,7 +37,7 @@ const ProductsMobileFilters = ({
             onClick={() => onClose(false)}
             disabled={loading}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-opacity disabled:opacity-60"
-            style={{ backgroundColor: 'var(--brand)', color: '***REMOVED***fff' }}
+            style={{ backgroundColor: 'var(--brand)', color: '#fff' }}
           >
             {loading ? 'Buscando…' : `Ver ${count} ${count === 1 ? 'resultado' : 'resultados'}`}
           </button>

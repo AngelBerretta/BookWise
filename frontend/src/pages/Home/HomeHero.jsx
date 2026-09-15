@@ -35,7 +35,7 @@ const HomeHero = ({ isAuthenticated }) => (
             </div>
 
             <a
-              href="***REMOVED***novedades"
+              href="#novedades"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-h)] w-fit hover:opacity-60 transition-opacity"
             >
               Ver novedades

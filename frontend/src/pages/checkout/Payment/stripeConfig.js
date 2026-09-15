@@ -20,10 +20,10 @@ export const getStripeAppearance = () => {
     ? {
         theme: 'night',
         variables: {
-          colorPrimary: '***REMOVED***b7c8de',
-          colorBackground: '***REMOVED***161820',
-          colorText: '***REMOVED***f0ede6',
-          colorDanger: '***REMOVED***ffb4ab',
+          colorPrimary: '#b7c8de',
+          colorBackground: '#161820',
+          colorText: '#f0ede6',
+          colorDanger: '#ffb4ab',
           borderRadius: '8px',
           fontFamily: 'Inter, system-ui, sans-serif',
         },
@@ -31,10 +31,10 @@ export const getStripeAppearance = () => {
     : {
         theme: 'stripe',
         variables: {
-          colorPrimary: '***REMOVED***041627',
-          colorBackground: '***REMOVED***fbf9f4',
-          colorText: '***REMOVED***041627',
-          colorDanger: '***REMOVED***ba1a1a',
+          colorPrimary: '#041627',
+          colorBackground: '#fbf9f4',
+          colorText: '#041627',
+          colorDanger: '#ba1a1a',
           borderRadius: '8px',
           fontFamily: 'Inter, system-ui, sans-serif',
         },

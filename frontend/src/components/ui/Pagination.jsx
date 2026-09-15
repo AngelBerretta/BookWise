@@ -58,7 +58,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
             className={btnBase}
             style={
               p === page
-                ? { backgroundColor: 'var(--bw-primary)', color: '***REMOVED***fff' }
+                ? { backgroundColor: 'var(--bw-primary)', color: '#fff' }
                 : { color: 'var(--bw-on-surface-variant)' }
             }
           >

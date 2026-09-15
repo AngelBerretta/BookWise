@@ -55,7 +55,7 @@ const MarkdownEditor = ({
       </div>
 
       <p className="text-xs text-[var(--text)] opacity-60">
-        Admite Markdown: **negrita**, _cursiva_, ***REMOVED******REMOVED*** títulos, listas, &gt; citas y [enlaces](url).
+        Admite Markdown: **negrita**, _cursiva_, ## títulos, listas, &gt; citas y [enlaces](url).
       </p>
 
       {error && (

@@ -6,7 +6,7 @@ const ProductDetailWishlistButton = ({ saved, savingWish, onToggle }) => (
     style={{
       border: saved ? '1px solid var(--accent)' : '1px solid rgba(196,198,205,0.5)',
       backgroundColor: saved ? 'var(--accent)' : 'transparent',
-      color: saved ? '***REMOVED***ffffff' : 'var(--text)',
+      color: saved ? '#ffffff' : 'var(--text)',
     }}
     onMouseEnter={(e) => { if (!saved) e.currentTarget.style.backgroundColor = 'var(--bg-container)'; }}
     onMouseLeave={(e) => { if (!saved) e.currentTarget.style.backgroundColor = 'transparent'; }}

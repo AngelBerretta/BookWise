@@ -1,10 +1,10 @@
-***REMOVED*** 🛒 Backend E-commerce — BookWise API
+# 🛒 Backend E-commerce — BookWise API
 
 API REST para un e-commerce de libros construida con **Node.js + Express**. Soporta dos modos de persistencia intercambiables: **MongoDB** (por defecto) y **File System**.
 
 ---
 
-***REMOVED******REMOVED*** 🚀 Tecnologías
+## 🚀 Tecnologías
 
 | Paquete | Versión | Uso |
 |---|---|---|
@@ -20,46 +20,46 @@ API REST para un e-commerce de libros construida con **Node.js + Express**. Sopo
 
 ---
 
-***REMOVED******REMOVED*** 📁 Estructura del proyecto
+## 📁 Estructura del proyecto
 
 ```
 backend/
-├── config.js                   ***REMOVED*** Configuración global (modo, puerto, MongoDB URI)
-├── .env                        ***REMOVED*** Variables de entorno (no subir a Git)
+├── config.js                   # Configuración global (modo, puerto, MongoDB URI)
+├── .env                        # Variables de entorno (no subir a Git)
 ├── data/
-│   ├── products.json           ***REMOVED*** Datos persistidos en modo FS
+│   ├── products.json           # Datos persistidos en modo FS
 │   └── carts.json
 └── src/
-    ├── app.js                  ***REMOVED*** Entry point (Express + Socket.io + Handlebars)
+    ├── app.js                  # Entry point (Express + Socket.io + Handlebars)
     ├── db/
-    │   └── mongo.js            ***REMOVED*** Conexión a MongoDB
+    │   └── mongo.js            # Conexión a MongoDB
     ├── controllers/
-    │   ├── products.js         ***REMOVED*** Lógica de productos
-    │   └── cart.js             ***REMOVED*** Lógica de carritos
+    │   ├── products.js         # Lógica de productos
+    │   └── cart.js             # Lógica de carritos
     ├── middlewares/
-    │   ├── error.middleware.js ***REMOVED*** Manejo centralizado de errores
-    │   └── validate.middleware.js  ***REMOVED*** Validación con Joi
+    │   ├── error.middleware.js # Manejo centralizado de errores
+    │   └── validate.middleware.js  # Validación con Joi
     ├── models/
     │   ├── DAOs/
-    │   │   ├── BaseDAO.js      ***REMOVED*** Interfaz base
-    │   │   ├── MongoDAO.js     ***REMOVED*** Implementación MongoDB
-    │   │   ├── FileSystemDAO.js ***REMOVED*** Implementación File System
-    │   │   └── index.js        ***REMOVED*** Factory: selecciona DAO según el modo
+    │   │   ├── BaseDAO.js      # Interfaz base
+    │   │   ├── MongoDAO.js     # Implementación MongoDB
+    │   │   ├── FileSystemDAO.js # Implementación File System
+    │   │   └── index.js        # Factory: selecciona DAO según el modo
     │   ├── DTOs/
-    │   │   └── index.js        ***REMOVED*** Transformadores de respuesta
+    │   │   └── index.js        # Transformadores de respuesta
     │   ├── model/
-    │   │   ├── Product.js      ***REMOVED*** Modelo Mongoose de Producto
-    │   │   └── Cart.js         ***REMOVED*** Modelo Mongoose de Carrito
+    │   │   ├── Product.js      # Modelo Mongoose de Producto
+    │   │   └── Cart.js         # Modelo Mongoose de Carrito
     │   └── schemas/
-    │       └── index.js        ***REMOVED*** Esquemas Joi de validación
+    │       └── index.js        # Esquemas Joi de validación
     ├── router/
-    │   ├── index.js            ***REMOVED*** Router principal (/api)
-    │   ├── products.router.js  ***REMOVED*** Rutas de productos
-    │   ├── cart.router.js      ***REMOVED*** Rutas de carritos
-    │   └── views.router.js     ***REMOVED*** Rutas de vistas Handlebars
+    │   ├── index.js            # Router principal (/api)
+    │   ├── products.router.js  # Rutas de productos
+    │   ├── cart.router.js      # Rutas de carritos
+    │   └── views.router.js     # Rutas de vistas Handlebars
     ├── utils/
-    │   ├── ApiError.js         ***REMOVED*** Clase de error personalizada
-    │   └── catchAsync.js       ***REMOVED*** Wrapper para manejo async/await
+    │   ├── ApiError.js         # Clase de error personalizada
+    │   └── catchAsync.js       # Wrapper para manejo async/await
     └── views/
         ├── products.handlebars
         ├── product-detail.handlebars
@@ -71,72 +71,72 @@ backend/
 
 ---
 
-***REMOVED******REMOVED*** ⚙️ Instalación
+## ⚙️ Instalación
 
-***REMOVED******REMOVED******REMOVED*** Requisitos previos
+### Requisitos previos
 
 - Node.js >= 18
 - MongoDB (solo en modo `mongo`)
 
-***REMOVED******REMOVED******REMOVED*** Pasos
+### Pasos
 
 ```bash
-***REMOVED*** 1. Clonar el repositorio
+# 1. Clonar el repositorio
 git clone <url-del-repo>
 cd backend
 
-***REMOVED*** 2. Instalar dependencias
+# 2. Instalar dependencias
 npm install
 
-***REMOVED*** 3. Configurar variables de entorno
+# 3. Configurar variables de entorno
 cp .env.example .env
-***REMOVED*** Editar .env con tus valores
+# Editar .env con tus valores
 ```
 
 ---
 
-***REMOVED******REMOVED*** 🔧 Variables de entorno
+## 🔧 Variables de entorno
 
 Crear un archivo `.env` en la raíz del proyecto basándose en `.env.example`:
 
 ```env
-***REMOVED*** Servidor
+# Servidor
 PORT=8080
-MODE=mongo          ***REMOVED*** "mongo" | "fs"
+MODE=mongo          # "mongo" | "fs"
 
-***REMOVED*** MongoDB
+# MongoDB
 MONGO_URI=mongodb://localhost:27017/ecommerce
 
-***REMOVED*** JWT (para futura autenticación)
+# JWT (para futura autenticación)
 JWT_SECRET=replace_with_a_strong_secret
 JWT_EXPIRES_IN=24h
 
-***REMOVED*** SendGrid (para futuros emails)
+# SendGrid (para futuros emails)
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxx
 SENDGRID_FROM=no-reply@bookwise.com
 
-***REMOVED*** CORS
+# CORS
 CLIENT_URL=http://localhost:5173
 ```
 
 ---
 
-***REMOVED******REMOVED*** ▶️ Scripts disponibles
+## ▶️ Scripts disponibles
 
 ```bash
-***REMOVED*** Producción
+# Producción
 npm start
 
-***REMOVED*** Desarrollo con MongoDB (hot reload)
+# Desarrollo con MongoDB (hot reload)
 npm run dev
 
-***REMOVED*** Desarrollo con File System (hot reload)
+# Desarrollo con File System (hot reload)
 npm run dev:fs
 ```
 
 ---
 
-***REMOVED******REMOVED*** 💾 Modos de persistencia
+## 💾 Modos de persistencia
 
 El proyecto implementa el patrón **DAO (Data Access Object)** con dos implementaciones intercambiables:
 
@@ -149,11 +149,11 @@ El modo también puede setearse con la variable de entorno `MODE=fs`.
 
 ---
 
-***REMOVED******REMOVED*** 📡 API Endpoints
+## 📡 API Endpoints
 
 Base URL: `http://localhost:8080/api`
 
-***REMOVED******REMOVED******REMOVED*** Productos — `/api/products`
+### Productos — `/api/products`
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -163,7 +163,7 @@ Base URL: `http://localhost:8080/api`
 | `PUT` | `/api/products/:pid` | Actualizar producto |
 | `DELETE` | `/api/products/:pid` | Eliminar producto |
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Query params de `GET /api/products`
+#### Query params de `GET /api/products`
 
 | Param | Tipo | Descripción |
 |---|---|---|
@@ -172,11 +172,11 @@ Base URL: `http://localhost:8080/api`
 | `query` | `string` | Filtro por categoría o `status=true`/`status=false` |
 | `sort` | `string` | Ordenar por precio: `asc` o `desc` |
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Categorías válidas
+#### Categorías válidas
 
 `ficcion` · `no-ficcion` · `ciencia-tecnologia` · `desarrollo-personal` · `infantil-juvenil` · `poesia` · `ebooks`
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Body para crear producto (`POST`)
+#### Body para crear producto (`POST`)
 
 ```json
 {
@@ -193,7 +193,7 @@ Base URL: `http://localhost:8080/api`
 
 ---
 
-***REMOVED******REMOVED******REMOVED*** Carritos — `/api/carts`
+### Carritos — `/api/carts`
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -207,7 +207,7 @@ Base URL: `http://localhost:8080/api`
 
 ---
 
-***REMOVED******REMOVED*** 🖥️ Vistas
+## 🖥️ Vistas
 
 El servidor incluye vistas renderizadas con **Handlebars** accesibles desde el navegador:
 
@@ -219,7 +219,7 @@ El servidor incluye vistas renderizadas con **Handlebars** accesibles desde el n
 
 ---
 
-***REMOVED******REMOVED*** 🔌 WebSocket (Socket.io)
+## 🔌 WebSocket (Socket.io)
 
 El servidor emite eventos en tiempo real cuando se modifican productos:
 
@@ -231,7 +231,7 @@ El servidor emite eventos en tiempo real cuando se modifican productos:
 
 ---
 
-***REMOVED******REMOVED*** 🧩 Formato de respuesta
+## 🧩 Formato de respuesta
 
 Las respuestas de la API siguen una estructura consistente:
 
@@ -259,6 +259,6 @@ Los errores devuelven:
 
 ---
 
-***REMOVED******REMOVED*** 📄 Licencia
+## 📄 Licencia
 
 ISC

@@ -8,7 +8,7 @@ export const stripMarkdown = (content = '') => {
     .replace(/`([^`]+)`/g, '$1')               // código inline
     .replace(/!\[.*?\]\(.*?\)/g, ' ')          // imágenes
     .replace(/\[([^\]]+)\]\(.*?\)/g, '$1')     // links → solo el texto
-    .replace(/^***REMOVED***{1,6}\s+/gm, '')               // headers
+    .replace(/^#{1,6}\s+/gm, '')               // headers
     .replace(/^>\s?/gm, '')                    // citas
     .replace(/^[-*+]\s+/gm, '')                // listas
     .replace(/^\d+\.\s+/gm, '')                // listas numeradas

@@ -2,8 +2,8 @@ name: Keep backend awake
 
 on:
   schedule:
-    - cron: '*/10 * * * *'   ***REMOVED*** cada 10 minutos
-  workflow_dispatch:          ***REMOVED*** permite dispararlo manual desde la pestaña Actions
+    - cron: '*/10 * * * *'   # cada 10 minutos
+  workflow_dispatch:          # permite dispararlo manual desde la pestaña Actions
 
 jobs:
   ping:

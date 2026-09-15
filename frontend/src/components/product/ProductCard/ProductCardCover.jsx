@@ -53,7 +53,7 @@ const ProductCardCover = ({
                   transition-all duration-200 disabled:opacity-50"
         style={{
           backgroundColor: saved ? 'var(--accent)' : 'rgba(251,249,244,0.90)',
-          color: saved ? '***REMOVED***ffffff' : 'var(--text)',
+          color: saved ? '#ffffff' : 'var(--text)',
           boxShadow: saved ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
           transform: saved ? 'scale(1.05)' : 'scale(1)',
         }}

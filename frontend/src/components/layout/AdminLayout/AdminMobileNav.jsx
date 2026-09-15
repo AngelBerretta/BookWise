@@ -8,7 +8,7 @@ const AdminMobileNav = ({ open }) => {
   return (
     <nav
       className="md:hidden flex flex-col gap-1 px-3 py-3"
-      style={{ backgroundColor: 'var(--bw-primary, ***REMOVED***041627)' }}
+      style={{ backgroundColor: 'var(--bw-primary, #041627)' }}
       aria-label="Navegación admin mobile"
     >
       {NAV_ITEMS.map((item) => {

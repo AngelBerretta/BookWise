@@ -47,8 +47,8 @@ const sendVerificationEmail = async (to, username, token) => {
             display: inline-block;
             margin: 16px 0;
             padding: 12px 24px;
-            background: ***REMOVED***4f46e5;
-            color: ***REMOVED***fff;
+            background: #4f46e5;
+            color: #fff;
             border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
@@ -56,7 +56,7 @@ const sendVerificationEmail = async (to, username, token) => {
         >
           Verificar cuenta
         </a>
-        <p style="color: ***REMOVED***666; font-size: 0.875rem;">
+        <p style="color: #666; font-size: 0.875rem;">
           Si no creaste esta cuenta podés ignorar este email.
         </p>
       </div>

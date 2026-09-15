@@ -1,17 +1,17 @@
 name: Trigger nightly reseed
 
-***REMOVED*** GitHub Actions no garantiza precisión en los horarios de `schedule`
-***REMOVED*** (puede atrasarse 15-60+ min, sobre todo en horarios de mucha carga global
-***REMOVED*** como la medianoche UTC). Como el reseed ahora es idempotente/selectivo
-***REMOVED*** (no destruye nada del admin real, ver seedProducts.js/seedBlog.js),
-***REMOVED*** programamos 3 intentos espaciados como red de contención: alcanza con que
-***REMOVED*** UNO llegue cerca del horario para que el catálogo/blog quede limpio.
+# GitHub Actions no garantiza precisión en los horarios de `schedule`
+# (puede atrasarse 15-60+ min, sobre todo en horarios de mucha carga global
+# como la medianoche UTC). Como el reseed ahora es idempotente/selectivo
+# (no destruye nada del admin real, ver seedProducts.js/seedBlog.js),
+# programamos 3 intentos espaciados como red de contención: alcanza con que
+# UNO llegue cerca del horario para que el catálogo/blog quede limpio.
 on:
   schedule:
-    - cron: '0 4 * * *'   ***REMOVED*** 04:00 UTC (01:00 Argentina)
-    - cron: '20 4 * * *'  ***REMOVED*** 04:20 UTC
-    - cron: '40 4 * * *'  ***REMOVED*** 04:40 UTC
-  workflow_dispatch:       ***REMOVED*** permite dispararlo manual desde la pestaña Actions
+    - cron: '0 4 * * *'   # 04:00 UTC (01:00 Argentina)
+    - cron: '20 4 * * *'  # 04:20 UTC
+    - cron: '40 4 * * *'  # 04:40 UTC
+  workflow_dispatch:       # permite dispararlo manual desde la pestaña Actions
 
 jobs:
   reseed:

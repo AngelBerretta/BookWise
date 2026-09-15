@@ -6,34 +6,34 @@
 ───────────────────────────────────────────── */
 :root {
   /* Superficie */
-  --bg:              ***REMOVED***fbf9f4;
-  --bg-subtle:       ***REMOVED***f5f3ee;
-  --bg-container:    ***REMOVED***f0eee9;
-  --bg-lowest:       ***REMOVED***ffffff;
+  --bg:              #fbf9f4;
+  --bg-subtle:       #f5f3ee;
+  --bg-container:    #f0eee9;
+  --bg-lowest:       #ffffff;
 
   /* Texto */
-  --text:            ***REMOVED***44474c;
-  --text-h:          ***REMOVED***041627;
-  --text-muted:      ***REMOVED***74777d;
+  --text:            #44474c;
+  --text-h:          #041627;
+  --text-muted:      #74777d;
 
   /* Bordes */
-  --border:          ***REMOVED***c4c6cd;
+  --border:          #c4c6cd;
   --border-subtle:   rgba(196, 198, 205, 0.3);
 
   /* Acento principal — navy */
-  --accent:          ***REMOVED***041627;
-  --accent-hover:    ***REMOVED***1a2b3c;
+  --accent:          #041627;
+  --accent-hover:    #1a2b3c;
   --accent-bg:       rgba(4, 22, 39, 0.06);
   --accent-border:   rgba(4, 22, 39, 0.15);
 
   /* Acento secundario — verde */
-  --secondary:       ***REMOVED***3b6934;
-  --secondary-bg:    ***REMOVED***b9eeab;
-  --secondary-text:  ***REMOVED***3f6d38;
+  --secondary:       #3b6934;
+  --secondary-bg:    #b9eeab;
+  --secondary-text:  #3f6d38;
 
   /* Código / superficies especiales */
-  --code-bg:         ***REMOVED***e4e2dd;
-  --surface-variant: ***REMOVED***e4e2dd;
+  --code-bg:         #e4e2dd;
+  --surface-variant: #e4e2dd;
 
   /* Sombras */
   --shadow:
@@ -63,29 +63,29 @@
 ───────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:              ***REMOVED***0f1117;
-    --bg-subtle:       ***REMOVED***161820;
-    --bg-container:    ***REMOVED***1c1e28;
-    --bg-lowest:       ***REMOVED***090b10;
+    --bg:              #0f1117;
+    --bg-subtle:       #161820;
+    --bg-container:    #1c1e28;
+    --bg-lowest:       #090b10;
 
-    --text:            ***REMOVED***9ca3af;
-    --text-h:          ***REMOVED***f0ede6;
-    --text-muted:      ***REMOVED***6b7280;
+    --text:            #9ca3af;
+    --text-h:          #f0ede6;
+    --text-muted:      #6b7280;
 
-    --border:          ***REMOVED***2e3038;
+    --border:          #2e3038;
     --border-subtle:   rgba(46, 48, 56, 0.6);
 
-    --accent:          ***REMOVED***b7c8de;
-    --accent-hover:    ***REMOVED***d2e4fb;
+    --accent:          #b7c8de;
+    --accent-hover:    #d2e4fb;
     --accent-bg:       rgba(183, 200, 222, 0.08);
     --accent-border:   rgba(183, 200, 222, 0.2);
 
-    --secondary:       ***REMOVED***a1d494;
+    --secondary:       #a1d494;
     --secondary-bg:    rgba(161, 212, 148, 0.15);
-    --secondary-text:  ***REMOVED***a1d494;
+    --secondary-text:  #a1d494;
 
-    --code-bg:         ***REMOVED***1c1e28;
-    --surface-variant: ***REMOVED***1c1e28;
+    --code-bg:         #1c1e28;
+    --surface-variant: #1c1e28;
 
     --shadow:
       rgba(0, 0, 0, 0.3) 0 4px 20px,
@@ -103,22 +103,22 @@
    fondos que deban adaptarse al tema, usar --accent, --bg, etc.
 ───────────────────────────────────────────── */
 :root {
-  --brand:            ***REMOVED***041627;
-  --brand-hover:      ***REMOVED***1a2b3c;
-  --brand-fixed:      ***REMOVED***d2e4fb;
-  --brand-fixed-dim:  ***REMOVED***b7c8de;
-  --brand-tertiary:   ***REMOVED***eebd8e;
+  --brand:            #041627;
+  --brand-hover:      #1a2b3c;
+  --brand-fixed:      #d2e4fb;
+  --brand-fixed-dim:  #b7c8de;
+  --brand-tertiary:   #eebd8e;
 
-  --error:      ***REMOVED***ba1a1a;
-  --error-bg:   ***REMOVED***ffdad6;
-  --error-text: ***REMOVED***93000a;
+  --error:      #ba1a1a;
+  --error-bg:   #ffdad6;
+  --error-text: #93000a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --error:      ***REMOVED***ffb4ab;
+    --error:      #ffb4ab;
     --error-bg:   rgba(255, 180, 171, 0.14);
-    --error-text: ***REMOVED***ffb4ab;
+    --error-text: #ffb4ab;
   }
 }
 
@@ -157,7 +157,7 @@ html {
   }
 }
 
-***REMOVED***root {
+#root {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -317,26 +317,26 @@ img, svg { display: block; }
 :root {
   --bw-primary:                  var(--brand);
   --bw-primary-container:        var(--brand-hover);
-  --bw-on-primary:               ***REMOVED***ffffff;
+  --bw-on-primary:               #ffffff;
   --bw-primary-fixed-dim:        var(--brand-fixed-dim);
   --bw-primary-fixed:            var(--brand-fixed);
 
-  --bw-secondary:                ***REMOVED***3b6934;
+  --bw-secondary:                #3b6934;
   --bw-tertiary-fixed-dim:       var(--brand-tertiary);
 
   /* Fijos — NO alias a --bg-*, para no invertirse en dark mode */
-  --bw-surface-container-lowest: ***REMOVED***ffffff;
-  --bw-surface-container-low:    ***REMOVED***f5f3ee;
-  --bw-surface-container-high:   ***REMOVED***eae8e3;
+  --bw-surface-container-lowest: #ffffff;
+  --bw-surface-container-low:    #f5f3ee;
+  --bw-surface-container-high:   #eae8e3;
 
-  --bw-on-surface:               ***REMOVED***1b1c19;
-  --bw-on-surface-variant:       ***REMOVED***44474c;
-  --bw-outline:                  ***REMOVED***74777d;
-  --bw-outline-variant:          ***REMOVED***c4c6cd;
+  --bw-on-surface:               #1b1c19;
+  --bw-on-surface-variant:       #44474c;
+  --bw-outline:                  #74777d;
+  --bw-outline-variant:          #c4c6cd;
 
-  --bw-error:                    ***REMOVED***ba1a1a;
-  --bw-error-container:          ***REMOVED***ffdad6;
-  --bw-on-error-container:       ***REMOVED***93000a;
+  --bw-error:                    #ba1a1a;
+  --bw-error-container:          #ffdad6;
+  --bw-on-error-container:       #93000a;
 }
 
 /* Layout: la página de login ocupa toda la pantalla sin navbar */
@@ -492,8 +492,8 @@ img, svg { display: block; }
   width:              16px;
   height:             16px;
   border-radius:      50%;
-  background-color:   var(--bw-primary, ***REMOVED***041627);
-  border:             2px solid var(--bw-surface-container-lowest, ***REMOVED***ffffff);
+  background-color:   var(--bw-primary, #041627);
+  border:             2px solid var(--bw-surface-container-lowest, #ffffff);
   box-shadow:         0 1px 4px rgba(4, 22, 39, 0.25);
   cursor:             pointer;
   pointer-events:     all;
@@ -504,8 +504,8 @@ img, svg { display: block; }
   width:            16px;
   height:           16px;
   border-radius:    50%;
-  background-color: var(--bw-primary, ***REMOVED***041627);
-  border:           2px solid var(--bw-surface-container-lowest, ***REMOVED***ffffff);
+  background-color: var(--bw-primary, #041627);
+  border:           2px solid var(--bw-surface-container-lowest, #ffffff);
   box-shadow:       0 1px 4px rgba(4, 22, 39, 0.25);
   cursor:           pointer;
   pointer-events:   all;

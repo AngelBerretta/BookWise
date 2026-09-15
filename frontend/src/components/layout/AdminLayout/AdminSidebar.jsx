@@ -5,7 +5,7 @@ import { NAV_ITEMS, navLinkCls, StoreIcon, LogoutIcon } from './navConfig';
 const AdminSidebar = ({ onLogout }) => (
   <aside
     className="hidden md:flex md:flex-col w-64 shrink-0 sticky top-0 h-screen"
-    style={{ backgroundColor: 'var(--bw-primary, ***REMOVED***041627)' }}
+    style={{ backgroundColor: 'var(--bw-primary, #041627)' }}
   >
     <div className="h-[var(--navbar-h)] flex items-center gap-2 px-6 shrink-0"
          style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>

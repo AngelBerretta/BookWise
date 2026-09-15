@@ -30,7 +30,7 @@ const prefixLine = (textarea, prefix) => {
 const ACTIONS = [
   { icon: Bold,        label: 'Negrita',        apply: (t) => wrapSelection(t, '**', '**', 'texto en negrita') },
   { icon: Italic,       label: 'Cursiva',        apply: (t) => wrapSelection(t, '_', '_', 'texto en cursiva') },
-  { icon: Heading2,     label: 'Título',         apply: (t) => prefixLine(t, '***REMOVED******REMOVED*** ') },
+  { icon: Heading2,     label: 'Título',         apply: (t) => prefixLine(t, '## ') },
   { icon: Quote,        label: 'Cita',           apply: (t) => prefixLine(t, '> ') },
   { icon: List,         label: 'Lista',          apply: (t) => prefixLine(t, '- ') },
   { icon: ListOrdered,  label: 'Lista numerada', apply: (t) => prefixLine(t, '1. ') },

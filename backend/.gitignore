@@ -1,32 +1,32 @@
-***REMOVED*** ── Dependencias ──────────────────────────────────────────────────────────────
+# ── Dependencias ──────────────────────────────────────────────────────────────
 node_modules/
 
-***REMOVED*** ── Variables de entorno ──────────────────────────────────────────────────────
+# ── Variables de entorno ──────────────────────────────────────────────────────
 .env
 .env.local
 .env.*.local
 
-***REMOVED*** ── Logs ──────────────────────────────────────────────────────────────────────
+# ── Logs ──────────────────────────────────────────────────────────────────────
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-***REMOVED*** ── Datos persistidos en modo File System ────────────────────────────────────
-***REMOVED*** Descomenta si no querés versionar los JSON de datos
-***REMOVED*** data/products.json
-***REMOVED*** data/carts.json
+# ── Datos persistidos en modo File System ────────────────────────────────────
+# Descomenta si no querés versionar los JSON de datos
+# data/products.json
+# data/carts.json
 
-***REMOVED*** ── Build / dist ──────────────────────────────────────────────────────────────
+# ── Build / dist ──────────────────────────────────────────────────────────────
 dist/
 build/
 
-***REMOVED*** ── Sistema operativo ─────────────────────────────────────────────────────────
+# ── Sistema operativo ─────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-***REMOVED*** ── Editores ──────────────────────────────────────────────────────────────────
+# ── Editores ──────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.suo
@@ -34,10 +34,10 @@ Thumbs.db
 *.njsproj
 *.sln
 
-***REMOVED*** ── Testing ───────────────────────────────────────────────────────────────────
+# ── Testing ───────────────────────────────────────────────────────────────────
 coverage/
 .nyc_output/
 
-***REMOVED*** ── Misc ──────────────────────────────────────────────────────────────────────
+# ── Misc ──────────────────────────────────────────────────────────────────────
 *.pem
 .cache/

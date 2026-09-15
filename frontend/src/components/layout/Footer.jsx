@@ -22,7 +22,7 @@ const Footer = () => {
 
   return (
     <footer className="mt-auto" role="contentinfo">
-      <div className="py-12 sm:py-16" style={{ background: '***REMOVED***041627', color: '***REMOVED***fbf9f4' }}>
+      <div className="py-12 sm:py-16" style={{ background: '#041627', color: '#fbf9f4' }}>
         <div className="container">
           <div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-10 sm:mb-12 pb-10 sm:pb-12"
@@ -32,7 +32,7 @@ const Footer = () => {
             <div className="sm:col-span-2 md:col-span-1 flex flex-col gap-4">
               <span
                 className="text-xl font-medium tracking-tighter"
-                style={{ fontFamily: 'var(--heading)', color: '***REMOVED***fbf9f4' }}
+                style={{ fontFamily: 'var(--heading)', color: '#fbf9f4' }}
               >
                 BookWise
               </span>

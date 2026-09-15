@@ -27,7 +27,7 @@ if (isStripeConfigured) {
 // ── Monedas de cero decimales ─────────────────────────────────────────────────
 // Stripe espera el monto en la unidad mínima de la moneda (ej: centavos).
 // Estas monedas no tienen subunidad — se mandan "tal cual", sin multiplicar.
-// https://docs.stripe.com/currencies***REMOVED***zero-decimal
+// https://docs.stripe.com/currencies#zero-decimal
 const ZERO_DECIMAL_CURRENCIES = new Set([
   "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
   "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",

@@ -13,18 +13,18 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: ***REMOVED***f5f5f5; color: ***REMOVED***333; }
-    nav  { background: ***REMOVED***1a1a2e; color: ***REMOVED***fff; padding: 1rem 2rem; display: flex; gap: 2rem; align-items: center; }
-    nav a { color: ***REMOVED***e0e0e0; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: ***REMOVED***fff; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #333; }
+    nav  { background: #1a1a2e; color: #fff; padding: 1rem 2rem; display: flex; gap: 2rem; align-items: center; }
+    nav a { color: #e0e0e0; text-decoration: none; font-weight: 500; }
+    nav a:hover { color: #fff; }
     main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-    .card { background: ***REMOVED***fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.1); padding: 1rem; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.1); padding: 1rem; }
     .btn  { display: inline-block; padding: .5rem 1.2rem; border-radius: 6px; cursor: pointer;
             font-size: .9rem; border: none; text-decoration: none; }
-    .btn-primary { background: ***REMOVED***1a1a2e; color: ***REMOVED***fff; }
-    .btn-primary:hover { background: ***REMOVED***16213e; }
-    .btn-danger  { background: ***REMOVED***e74c3c; color: ***REMOVED***fff; }
-    ***REMOVED***toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: ***REMOVED***27ae60; color: ***REMOVED***fff;
+    .btn-primary { background: #1a1a2e; color: #fff; }
+    .btn-primary:hover { background: #16213e; }
+    .btn-danger  { background: #e74c3c; color: #fff; }
+    #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #27ae60; color: #fff;
              padding: .75rem 1.5rem; border-radius: 8px; display: none; z-index: 9999; }
   </style>
 </head>
@@ -41,7 +41,7 @@
   <div id="toast"></div>
 
   <script>
-    function showToast(msg, color = '***REMOVED***27ae60') {
+    function showToast(msg, color = '#27ae60') {
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.style.background = color;
